@@ -1,15 +1,15 @@
 # Play Mine
 
-> High-resolution lossless music player created by Sanchar Koirala, featuring real-time cloud track synchronization, a 32-bit Float Web Audio API mastering DSP engine, and WebGL2 GPU spectrum visualization.
+> Free high-resolution music streaming web application created by Sanchar Koirala, featuring instant browser playback, a 5-band sound equalizer, live audio visualizer, and listener song requests.
 
-## Core Architecture
-- **Dual-Engine Lossless Audio**: Automatically negotiates 32-bit Float Web Audio DSP (5-band Biquad EQ, Mid/Side stereo soundstage widener, and transparent clip limiter) for CORS-enabled streams and direct hardware native DAC playback for external audio hosts.
-- **GPU-Accelerated Visualization**: Offloads real-time spectrum rendering to dedicated graphics hardware via a custom WebGL2 GLSL fragment shader (`Aurora`, `Bars`, and `Wave` modes).
-- **Realtime Cloud Sync**: Synchronizes published tracks instantaneously from Firebase Realtime Database (`play_mine/tracks`).
+## Features
+- **Free Music Streaming**: Instant high-resolution audio playback with shuffle, repeat, and timeline scrubbing.
+- **Custom Sound Equalizer**: 5-band sound shaping (Sub Bass, Bass, Vocals, Clarity, Treble), quick audio presets, stereo surround width control, and volume guard.
+- **Listener Song Requests**: Built-in request form allowing visitors to submit song suggestions with their email address.
 
-## Canonical Entry Points
-- `https://play-mine.pages.dev/`: Public music player, DSP mastering rack, GPU spectrum visualizer, and cloud track vault.
-- `https://play-mine.pages.dev/manifest.json`: Progressive Web App (PWA) manifest.
+## Canonical URLs
+- `https://play-mine.pages.dev/`: Public music player and song request portal.
+- `https://play-mine.pages.dev/manifest.json`: Progressive Web App manifest.
 
 ## Author & Attribution
 - **Creator**: Sanchar Koirala

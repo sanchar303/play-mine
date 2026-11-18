@@ -15,38 +15,38 @@
   <style>
     :root {
       --chassis-bg: #0b0d12;
-      --bevel-top: rgba(255, 255, 255, 0.17);
-      --bevel-left: rgba(255, 255, 255, 0.09);
+      --bevel-top: rgba(255, 255, 255, 0.16);
+      --bevel-left: rgba(255, 255, 255, 0.08);
       --bevel-right: rgba(0, 0, 0, 0.55);
-      --bevel-bottom: rgba(0, 0, 0, 0.78);
-      --gloss-sheen: linear-gradient(145deg, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.015) 42%, rgba(255, 255, 255, 0.035) 100%);
+      --bevel-bottom: rgba(0, 0, 0, 0.8);
+      --gloss-sheen: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.015) 45%, rgba(255, 255, 255, 0.03) 100%);
       --shadow-extrude:
-        14px 14px 30px #030407,
-        -9px -9px 22px rgba(34, 41, 56, 0.28),
-        inset 0 1px 1px rgba(255, 255, 255, 0.16);
+        12px 12px 26px #030407,
+        -8px -8px 20px rgba(34, 41, 56, 0.26),
+        inset 0 1px 1px rgba(255, 255, 255, 0.15);
       --shadow-key:
-        7px 7px 16px #030407,
-        -5px -5px 13px rgba(38, 46, 62, 0.3),
-        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+        6px 6px 14px #030407,
+        -4px -4px 11px rgba(38, 46, 62, 0.28),
+        inset 0 1px 1px rgba(255, 255, 255, 0.19);
       --shadow-key-pressed:
-        inset 5px 5px 12px #020305,
-        inset -3px -3px 8px rgba(42, 50, 68, 0.22);
+        inset 4px 4px 10px #020305,
+        inset -3px -3px 7px rgba(42, 50, 68, 0.22);
       --shadow-well:
-        inset 6px 6px 14px #030407,
-        inset -4px -4px 10px rgba(35, 42, 56, 0.22);
+        inset 5px 5px 12px #030407,
+        inset -3px -3px 9px rgba(35, 42, 56, 0.2);
 
-      --led-ice: #38bdf8;
-      --led-amber: #f59e0b;
-      --led-emerald: #10b981;
-      --led-rose: #f43f5e;
+      --accent-sky: #38bdf8;
+      --accent-amber: #f59e0b;
+      --accent-green: #10b981;
+      --accent-rose: #f43f5e;
       --chrome-bright: #f8fafc;
       --text-main: #eef2f7;
-      --text-dim: #94a0b2;
-      --text-mute: #5d6778;
+      --text-dim: #9aa6b8;
+      --text-mute: #647082;
 
-      --r-chassis: 30px;
-      --r-module: 22px;
-      --r-well: 16px;
+      --r-chassis: 26px;
+      --r-module: 18px;
+      --r-well: 14px;
       --r-pill: 9999px;
       --ease-haptic: cubic-bezier(0.2, 0.9, 0.3, 1);
     }
@@ -64,8 +64,9 @@
       color: var(--text-main);
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       font-variant-numeric: tabular-nums;
-      line-height: 1.5;
+      line-height: 1.45;
       overflow-x: hidden;
+      overscroll-behavior: none;
     }
 
     body::before {
@@ -75,30 +76,20 @@
       z-index: 0;
       pointer-events: none;
       background:
-        radial-gradient(ellipse 75% 55% at 15% 10%, rgba(56, 189, 248, 0.075), transparent 60%),
-        radial-gradient(ellipse 65% 50% at 88% 88%, rgba(245, 158, 11, 0.055), transparent 60%),
+        radial-gradient(ellipse 75% 50% at 15% 5%, rgba(56, 189, 248, 0.07), transparent 60%),
+        radial-gradient(ellipse 65% 45% at 85% 95%, rgba(245, 158, 11, 0.045), transparent 60%),
         linear-gradient(180deg, #0d1017 0%, #090b10 100%);
-    }
-
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      opacity: 0.028;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
     .shell {
       position: relative;
       z-index: 1;
-      max-width: 1360px;
+      max-width: 1320px;
       margin: 0 auto;
-      padding: 22px 24px 42px;
+      padding: 16px 20px 32px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 18px;
       min-height: 100vh;
     }
 
@@ -127,7 +118,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 7px;
       user-select: none;
       cursor: pointer;
       border-radius: var(--r-pill);
@@ -141,8 +132,8 @@
       box-shadow: var(--shadow-key);
       color: var(--text-main);
       font-weight: 600;
-      font-size: 0.84rem;
-      padding: 10px 18px;
+      font-size: 0.82rem;
+      padding: 8px 16px;
       text-decoration: none;
       transition: transform 140ms var(--ease-haptic), box-shadow 140ms var(--ease-haptic), border-color 180ms ease, color 180ms ease;
     }
@@ -161,8 +152,8 @@
     }
 
     .haptic-key:focus-visible {
-      outline: 2px solid var(--led-ice);
-      outline-offset: 3px;
+      outline: 2px solid var(--accent-sky);
+      outline-offset: 2px;
     }
 
     .haptic-key.is-engaged {
@@ -171,7 +162,7 @@
         linear-gradient(145deg, #152333, #0e1520);
       border-top-color: rgba(125, 211, 252, 0.55);
       color: #bae6fd;
-      box-shadow: inset 3px 3px 8px rgba(2, 5, 10, 0.82), 0 0 18px rgba(56, 189, 248, 0.18);
+      box-shadow: inset 3px 3px 8px rgba(2, 5, 10, 0.82);
     }
 
     .haptic-primary {
@@ -183,15 +174,11 @@
       border-bottom: 1.5px solid rgba(2, 32, 54, 0.95);
       color: #031019;
       font-weight: 800;
-      box-shadow:
-        8px 8px 20px #020306,
-        0 0 24px rgba(56, 189, 248, 0.28),
-        inset 0 1px 2px rgba(255, 255, 255, 0.65);
+      box-shadow: 7px 7px 18px #020306, 0 0 20px rgba(56, 189, 248, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.65);
     }
 
     .haptic-primary:hover {
       color: #02080d;
-      box-shadow: 10px 10px 24px #020306, 0 0 30px rgba(56, 189, 248, 0.42);
     }
 
     .haptic-danger {
@@ -202,12 +189,11 @@
     .haptic-danger:hover {
       color: #ffffff;
       border-top-color: rgba(244, 63, 94, 0.7);
-      box-shadow: 7px 7px 16px #030407, 0 0 16px rgba(244, 63, 94, 0.22);
     }
 
     .mini-key {
-      padding: 6px 13px;
-      font-size: 0.75rem;
+      padding: 5px 11px;
+      font-size: 0.74rem;
     }
 
     /* Top Header */
@@ -216,94 +202,85 @@
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 16px;
-      padding: 14px 24px;
+      gap: 12px;
+      padding: 12px 20px;
       border-radius: var(--r-pill);
     }
 
     .brand-cluster {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
 
     .brand-badge {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
       padding: 3px;
       background: linear-gradient(145deg, #1f2636, #0d1017);
       border-top: 1px solid rgba(255, 255, 255, 0.24);
-      box-shadow: 5px 5px 12px #030407, -3px -3px 9px rgba(40, 48, 66, 0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      box-shadow: 4px 4px 10px #030407, -2px -2px 8px rgba(40, 48, 66, 0.25);
       overflow: hidden;
     }
 
     .brand-badge img {
       width: 100%;
       height: 100%;
-      border-radius: 11px;
+      border-radius: 9px;
       object-fit: cover;
     }
 
     .brand-name {
-      font-size: 1.28rem;
+      font-size: 1.18rem;
       font-weight: 800;
-      letter-spacing: -0.025em;
+      letter-spacing: -0.02em;
       color: var(--chrome-bright);
     }
 
     .brand-sub {
-      font-size: 0.72rem;
-      font-weight: 600;
+      font-size: 0.74rem;
       color: var(--text-dim);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
     }
 
     .header-actions {
       display: flex;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
 
-    .led-readout {
+    .status-pill {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 7px 14px;
+      gap: 7px;
+      padding: 6px 13px;
       border-radius: var(--r-pill);
       font-size: 0.75rem;
       font-weight: 600;
       color: var(--text-dim);
     }
 
-    .led-pip {
-      width: 8px;
-      height: 8px;
+    .status-dot {
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      background: var(--led-emerald);
-      box-shadow: 0 0 8px var(--led-emerald);
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
     }
 
     /* Admin Grid */
     .admin-grid {
       display: grid;
-      grid-template-columns: 440px 1fr;
-      gap: 24px;
+      grid-template-columns: 420px 1fr;
+      gap: 18px;
       align-items: start;
     }
 
     .editor-chassis {
-      padding: 26px;
+      padding: 20px 22px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      position: sticky;
-      top: 22px;
+      gap: 13px;
     }
 
     .panel-head {
@@ -314,34 +291,37 @@
     }
 
     .panel-title {
-      font-size: 1.06rem;
+      font-size: 1rem;
       font-weight: 800;
-      letter-spacing: -0.015em;
       color: var(--chrome-bright);
+    }
+
+    .panel-hint {
+      font-size: 0.75rem;
+      color: var(--text-dim);
     }
 
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
     }
 
     .form-row-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 10px;
     }
 
     label {
-      font-size: 0.77rem;
+      font-size: 0.75rem;
       font-weight: 700;
       color: var(--text-dim);
-      letter-spacing: 0.02em;
     }
 
     .neu-input, .neu-select {
       width: 100%;
-      padding: 11px 16px;
+      padding: 10px 15px;
       border-radius: var(--r-pill);
       background: #06080c;
       border-top: 1px solid rgba(0, 0, 0, 0.9);
@@ -351,14 +331,12 @@
       box-shadow: var(--shadow-well);
       color: var(--text-main);
       font-family: inherit;
-      font-size: 0.87rem;
+      font-size: 0.84rem;
       outline: none;
-      transition: border-color 180ms ease, box-shadow 180ms ease;
     }
 
     .neu-input:focus, .neu-select:focus {
       border-bottom-color: rgba(56, 189, 248, 0.55);
-      box-shadow: var(--shadow-well), 0 0 16px rgba(56, 189, 248, 0.14);
     }
 
     .neu-select option {
@@ -366,27 +344,26 @@
       color: #ffffff;
     }
 
-    .quick-tools {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 2px;
-    }
-
     .toggle-well {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 16px;
+      padding: 8px 14px;
       border-radius: var(--r-pill);
     }
 
-    /* Right Catalog */
-    .catalog-chassis {
-      padding: 26px;
+    /* Right Column Stack */
+    .right-stack {
       display: flex;
       flex-direction: column;
       gap: 18px;
+    }
+
+    .catalog-chassis {
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
 
     .catalog-top {
@@ -394,75 +371,74 @@
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .rtdb-bar {
-      display: grid;
-      grid-template-columns: 1fr auto;
       gap: 10px;
-      padding: 12px 14px;
     }
 
     .admin-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
+      max-height: 360px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .admin-list::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .admin-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: var(--r-pill);
     }
 
     .track-plate {
       display: grid;
-      grid-template-columns: 58px 1fr auto;
-      gap: 14px;
+      grid-template-columns: 50px 1fr auto;
+      gap: 12px;
       align-items: center;
-      padding: 13px 16px;
+      padding: 11px 14px;
       border-radius: var(--r-module);
       background:
-        linear-gradient(165deg, rgba(255, 255, 255, 0.065) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(0, 0, 0, 0.18) 100%),
+        linear-gradient(165deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(0, 0, 0, 0.18) 100%),
         linear-gradient(145deg, #171c27, #0f131b);
-      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
       border-left: 1px solid rgba(255, 255, 255, 0.08);
       border-right: 1px solid rgba(0, 0, 0, 0.65);
       border-bottom: 1px solid rgba(0, 0, 0, 0.85);
-      box-shadow: 6px 6px 14px #030407, -4px -4px 10px rgba(36, 44, 60, 0.22);
+      box-shadow: 5px 5px 12px #030407;
     }
 
     .track-plate.is-editing {
       border-top-color: rgba(125, 211, 252, 0.65);
-      box-shadow: inset 3px 3px 9px rgba(2, 5, 10, 0.85), 0 0 20px rgba(56, 189, 248, 0.16);
+      box-shadow: inset 3px 3px 8px rgba(2, 5, 10, 0.82);
     }
 
     .plate-art {
-      width: 58px;
-      height: 58px;
-      border-radius: 14px;
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
       object-fit: cover;
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.14);
     }
 
     .plate-meta {
       min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
     }
 
     .plate-title {
       font-weight: 700;
-      font-size: 0.96rem;
+      font-size: 0.9rem;
       color: var(--chrome-bright);
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .plate-sub {
-      font-size: 0.8rem;
+      font-size: 0.77rem;
       color: var(--text-dim);
     }
 
     .plate-url {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: var(--text-mute);
       white-space: nowrap;
       overflow: hidden;
@@ -473,24 +449,49 @@
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
+    }
+
+    /* User Song Requests Card */
+    .request-plate {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: var(--r-module);
+      background: linear-gradient(145deg, #151a24, #0e1118);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.82);
+    }
+
+    .req-msg {
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--chrome-bright);
+    }
+
+    .req-meta {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 2px;
     }
 
     .toast-pill {
       position: fixed;
-      bottom: 26px;
+      bottom: 22px;
       left: 50%;
       transform: translateX(-50%) translateY(130%);
       z-index: 99;
-      padding: 11px 22px;
+      padding: 10px 20px;
       border-radius: var(--r-pill);
       background: linear-gradient(160deg, #1b2230, #0d1017);
       border-top: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85);
-      font-size: 0.83rem;
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.85);
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--chrome-bright);
-      transition: transform 260ms var(--ease-haptic);
+      transition: transform 240ms var(--ease-haptic);
       pointer-events: none;
     }
 
@@ -500,10 +501,9 @@
 
     .app-footer {
       margin-top: auto;
-      padding-top: 18px;
+      padding-top: 12px;
       text-align: center;
-      font-size: 0.8rem;
-      font-weight: 500;
+      font-size: 0.78rem;
       color: var(--text-mute);
     }
 
@@ -511,14 +511,11 @@
       .admin-grid {
         grid-template-columns: 1fr;
       }
-      .editor-chassis {
-        position: static;
-      }
     }
 
     @media (max-width: 640px) {
       .shell {
-        padding: 14px 14px 32px;
+        padding: 12px 12px 24px;
       }
       .topbar {
         border-radius: var(--r-chassis);
@@ -527,9 +524,6 @@
         grid-template-columns: 1fr;
       }
       .track-plate {
-        grid-template-columns: 1fr;
-      }
-      .rtdb-bar {
         grid-template-columns: 1fr;
       }
     }
@@ -545,14 +539,14 @@
         </div>
         <div>
           <div class="brand-name">Play Mine — Studio Admin</div>
-          <div class="brand-sub">Realtime Cloud Catalog Manager</div>
+          <div class="brand-sub">Manage published music and listener requests</div>
         </div>
       </div>
 
       <div class="header-actions">
-        <div class="led-readout neu-well">
-          <span class="led-pip" id="connLed"></span>
-          <span id="connLabel">Connecting RTDB…</span>
+        <div class="status-pill neu-well">
+          <span class="status-dot" id="connLed"></span>
+          <span id="connLabel">Connected</span>
         </div>
         <a href="https://play-mine.pages.dev" class="haptic-key" target="_blank" rel="noopener">
           Open Play Mine ↗
@@ -560,21 +554,24 @@
       </div>
     </header>
 
-    <!-- Main Admin Grid -->
+    <!-- Main Workspace -->
     <main class="admin-grid">
       <!-- Left: Add / Edit Track Form -->
       <section class="editor-chassis neu-chassis">
         <div class="panel-head">
-          <div class="panel-title" id="editorHeading">Add New Track</div>
+          <div>
+            <div class="panel-title" id="editorHeading">Add New Track</div>
+            <div class="panel-hint">Paste your direct audio link and publish live</div>
+          </div>
           <div class="haptic-key mini-key" id="btnResetForm" role="button" tabindex="0">Clear</div>
         </div>
 
         <input type="hidden" id="editTrackId" value="" />
 
         <div class="form-group">
-          <label for="trackUrl">Direct Audio URL (MP3 / FLAC / WAV / OGG) *</label>
+          <label for="trackUrl">Direct Audio URL (MP3 / FLAC / WAV) *</label>
           <input type="url" id="trackUrl" class="neu-input" placeholder="https://.../audio.mp3" required />
-          <div class="quick-tools">
+          <div style="margin-top:2px;">
             <div class="haptic-key mini-key" id="btnProbeAudio" role="button" tabindex="0">
               Auto-Detect Duration
             </div>
@@ -583,7 +580,7 @@
 
         <div class="form-row-2">
           <div class="form-group">
-            <label for="trackTitle">Track Title *</label>
+            <label for="trackTitle">Song Title *</label>
             <input type="text" id="trackTitle" class="neu-input" placeholder="Track Name" />
           </div>
           <div class="form-group">
@@ -594,24 +591,24 @@
 
         <div class="form-row-2">
           <div class="form-group">
-            <label for="trackAlbum">Album / Release</label>
+            <label for="trackAlbum">Album</label>
             <input type="text" id="trackAlbum" class="neu-input" placeholder="Album Title" />
           </div>
           <div class="form-group">
             <label for="trackGenre">Genre</label>
-            <input type="text" id="trackGenre" class="neu-input" placeholder="Electronic / Ambient" />
+            <input type="text" id="trackGenre" class="neu-input" placeholder="Electronic / Pop" />
           </div>
         </div>
 
         <div class="form-row-2">
           <div class="form-group">
-            <label for="trackQuality">Quality Badge</label>
+            <label for="trackQuality">Quality Label</label>
             <select id="trackQuality" class="neu-select">
               <option value="24-Bit / 96kHz Lossless">24-Bit / 96kHz Lossless</option>
               <option value="FLAC Studio Master">FLAC Studio Master</option>
-              <option value="WAV Uncompressed PCM">WAV Uncompressed PCM</option>
+              <option value="WAV Uncompressed">WAV Uncompressed</option>
               <option value="320kbps High-Bitrate">320kbps High-Bitrate</option>
-              <option value="Hi-Res Cloud Stream">Hi-Res Cloud Stream</option>
+              <option value="High-Res Audio">High-Res Audio</option>
             </select>
           </div>
           <div class="form-group">
@@ -621,36 +618,45 @@
         </div>
 
         <div class="form-group">
-          <label for="trackCover">Cover Artwork URL (Optional)</label>
+          <label for="trackCover">Cover Image URL (Optional)</label>
           <input type="url" id="trackCover" class="neu-input" placeholder="https://.../cover.jpg" />
         </div>
 
         <div class="toggle-well neu-well">
-          <span style="font-size: 0.84rem; font-weight: 600;">★ Pin as Featured Track</span>
+          <span style="font-size: 0.82rem; font-weight: 600;">★ Pin to top as Featured</span>
           <div class="haptic-key mini-key" id="btnToggleFeatured" role="button" tabindex="0">Featured: OFF</div>
         </div>
 
-        <div style="display:flex;gap:10px;margin-top:4px;">
-          <div class="haptic-key haptic-primary" id="btnSaveTrack" role="button" tabindex="0" style="flex: 1;">
-            Publish to Play Mine
-          </div>
+        <div class="haptic-key haptic-primary" id="btnSaveTrack" role="button" tabindex="0" style="width: 100%; margin-top: 2px;">
+          Publish to Play Mine
         </div>
       </section>
 
-      <!-- Right: Published RTDB Catalog -->
-      <section class="catalog-chassis neu-chassis">
-        <div class="catalog-top">
-          <div class="panel-title">Published Tracks (<span id="totalCount">0</span>)</div>
-          <input type="text" id="adminSearch" class="neu-input" placeholder="Filter published tracks…" style="max-width: 260px;" />
+      <!-- Right: Published Tracks + Listener Song Requests -->
+      <section class="right-stack">
+        <!-- Published Tracks -->
+        <div class="catalog-chassis neu-chassis">
+          <div class="catalog-top">
+            <div>
+              <div class="panel-title">Published Tracks (<span id="totalCount">0</span>)</div>
+              <div class="panel-hint">Live songs visible on play-mine.pages.dev</div>
+            </div>
+            <input type="text" id="adminSearch" class="neu-input" placeholder="Filter songs…" style="max-width: 220px;" />
+          </div>
+
+          <div class="admin-list" id="adminList"></div>
         </div>
 
-        <div class="rtdb-bar neu-well">
-          <input type="url" id="rtdbUrlInput" class="neu-input" style="font-size:0.78rem;" aria-label="Firebase RTDB URL" />
-          <div class="haptic-key mini-key" id="btnSaveDbUrl" role="button" tabindex="0">Update RTDB URL</div>
-        </div>
+        <!-- Listener Song Requests Inbox -->
+        <div class="catalog-chassis neu-chassis">
+          <div class="catalog-top">
+            <div>
+              <div class="panel-title">Listener Song Requests (<span id="reqCount">0</span>)</div>
+              <div class="panel-hint">Submissions sent by visitors from the main player</div>
+            </div>
+          </div>
 
-        <div class="admin-list" id="adminList">
-          <!-- Live synced items from RTDB -->
+          <div class="admin-list" id="requestsList" style="max-height: 240px;"></div>
         </div>
       </section>
     </main>
@@ -666,9 +672,8 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
     import { getDatabase, ref, push, set, update, remove, onValue } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
-    const DEFAULT_RTDB_URL = "https://cloud-db-studio-default-rtdb.firebaseio.com";
-    const currentDbUrl = localStorage.getItem("play_mine_rtdb_url") || DEFAULT_RTDB_URL;
-    document.getElementById("rtdbUrlInput").value = currentDbUrl;
+    const DEFAULT_DB_URL = "https://cloud-db-studio-default-rtdb.firebaseio.com";
+    const currentDbUrl = localStorage.getItem("play_mine_rtdb_url") || DEFAULT_DB_URL;
 
     const firebaseConfig = {
       apiKey: "AIzaSyDpCAXfhldRc1nCZDWlWNRbcMFjqAh8uPc",
@@ -680,9 +685,11 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const tracksRef = ref(db, "play_mine/tracks");
+    const requestsRef = ref(db, "play_mine/requests");
 
     const $ = (id) => document.getElementById(id);
     let tracksCache = [];
+    let requestsCache = [];
     let isFeatured = false;
     const previewAudio = new Audio();
     let previewingId = null;
@@ -720,10 +727,10 @@
       let hash = 0;
       for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
       const hue = Math.abs(hash % 360);
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
         <defs><radialGradient id="g" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="hsl(${hue},52%,36%)"/><stop offset="100%" stop-color="#07090d"/></radialGradient></defs>
-        <rect width="200" height="200" fill="url(#g)"/>
-        <circle cx="100" cy="100" r="46" fill="none" stroke="rgba(56,189,248,0.35)" stroke-width="2.5"/>
+        <rect width="160" height="160" fill="url(#g)"/>
+        <circle cx="80" cy="80" r="36" fill="none" stroke="rgba(56,189,248,0.35)" stroke-width="2"/>
       </svg>`;
       return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
     }
@@ -786,7 +793,7 @@
         showToast("Enter an audio URL first.");
         return;
       }
-      showToast("Reading stream metadata…");
+      showToast("Reading audio duration…");
       const probe = new Audio();
       probe.preload = "metadata";
       probe.src = url;
@@ -794,12 +801,12 @@
         const dur = formatDuration(probe.duration);
         if (dur) {
           $("trackDuration").value = dur;
-          showToast(`Verified • Duration: ${dur}`);
+          showToast(`Duration detected: ${dur}`);
         }
         probe.src = "";
       });
       probe.addEventListener("error", () => {
-        showToast("Unable to auto-read duration; enter MM:SS manually.");
+        showToast("Could not auto-read duration; enter MM:SS manually.");
       });
     });
 
@@ -817,7 +824,7 @@
       const artist = $("trackArtist").value.trim();
 
       if (!url || !title || !artist) {
-        showToast("Audio URL, Track Title, and Artist are required.");
+        showToast("Audio URL, Song Title, and Artist are required.");
         return;
       }
 
@@ -827,7 +834,7 @@
         title,
         artist,
         album: $("trackAlbum").value.trim(),
-        genre: $("trackGenre").value.trim() || "Lossless",
+        genre: $("trackGenre").value.trim() || "Music",
         quality: $("trackQuality").value,
         duration: $("trackDuration").value.trim() || "03:30",
         coverUrl: $("trackCover").value.trim(),
@@ -838,28 +845,17 @@
       try {
         if (editId) {
           await update(ref(db, `play_mine/tracks/${editId}`), payload);
-          showToast(`Updated "${title}" live.`);
+          showToast(`Updated "${title}".`);
         } else {
           payload.createdAt = Date.now();
           await set(push(tracksRef), payload);
-          showToast(`Published "${title}" to Play Mine.`);
+          showToast(`Published "${title}" live.`);
         }
         resetForm();
       } catch (err) {
         console.error(err);
-        showToast("RTDB write failed. Verify database permissions.");
+        showToast("Save failed. Check database permissions.");
       }
-    });
-
-    bindHapticKey($("btnSaveDbUrl"), () => {
-      const newUrl = $("rtdbUrlInput").value.trim().replace(/\/$/, "");
-      if (!newUrl.startsWith("https://")) {
-        showToast("Enter a valid https:// Firebase RTDB URL.");
-        return;
-      }
-      localStorage.setItem("play_mine_rtdb_url", newUrl);
-      showToast("RTDB URL updated. Reloading…");
-      setTimeout(() => location.reload(), 650);
     });
 
     function renderAdminList() {
@@ -879,8 +875,8 @@
 
       if (filtered.length === 0) {
         listEl.innerHTML = `
-          <div class="neu-well" style="padding:36px 18px;text-align:center;color:var(--text-dim);font-size:0.88rem;">
-            No tracks in RTDB yet. Add your first song on the left to publish it live to Play Mine.
+          <div class="neu-well" style="padding:28px 16px;text-align:center;color:var(--text-dim);font-size:0.84rem;">
+            No tracks published yet. Add your first song on the left.
           </div>
         `;
         return;
@@ -897,11 +893,8 @@
         plate.innerHTML = `
           <img src="${cover}" alt="" class="plate-art" />
           <div class="plate-meta">
-            <div class="plate-title">
-              <span>${escapeHtml(track.title)}</span>
-              ${track.featured ? '<span style="color:var(--led-amber);font-size:0.78rem;">★ Featured</span>' : ""}
-            </div>
-            <div class="plate-sub">${escapeHtml(track.artist)}${track.album ? " • " + escapeHtml(track.album) : ""} • ${escapeHtml(track.quality || "")} (${escapeHtml(track.duration || "--:--")})</div>
+            <div class="plate-title">${escapeHtml(track.title)}${track.featured ? ' <span style="color:var(--accent-amber);font-size:0.76rem;">★ Featured</span>' : ""}</div>
+            <div class="plate-sub">${escapeHtml(track.artist)}${track.album ? " • " + escapeHtml(track.album) : ""} (${escapeHtml(track.duration || "--:--")})</div>
             <div class="plate-url">${escapeHtml(track.url)}</div>
           </div>
           <div class="plate-actions">
@@ -959,13 +952,53 @@
       });
     }
 
+    function renderRequestsList() {
+      const box = $("requestsList");
+      $("reqCount").textContent = requestsCache.length;
+      box.innerHTML = "";
+
+      if (requestsCache.length === 0) {
+        box.innerHTML = `
+          <div class="neu-well" style="padding:24px 16px;text-align:center;color:var(--text-dim);font-size:0.84rem;">
+            No song requests from listeners yet.
+          </div>
+        `;
+        return;
+      }
+
+      requestsCache.forEach((req) => {
+        const card = document.createElement("div");
+        card.className = "request-plate";
+        const when = req.createdAt ? new Date(req.createdAt).toLocaleString() : "";
+
+        card.innerHTML = `
+          <div>
+            <div class="req-msg">${escapeHtml(req.message || "")}</div>
+            <div class="req-meta">From: ${escapeHtml(req.email || "")}${when ? " • " + escapeHtml(when) : ""}</div>
+          </div>
+          <div class="haptic-key mini-key haptic-danger" data-del="1" role="button" tabindex="0">Remove</div>
+        `;
+
+        bindHapticKey(card.querySelector('[data-del="1"]'), async () => {
+          try {
+            await remove(ref(db, `play_mine/requests/${req.id}`));
+            showToast("Request removed.");
+          } catch (_) {
+            showToast("Could not remove request.");
+          }
+        });
+
+        box.appendChild(card);
+      });
+    }
+
     $("adminSearch").addEventListener("input", renderAdminList);
 
     onValue(
       tracksRef,
       (snapshot) => {
-        $("connLed").style.background = "var(--led-emerald)";
-        $("connLabel").textContent = "RTDB Live Sync";
+        $("connLed").style.background = "var(--accent-green)";
+        $("connLabel").textContent = "Connected";
         const val = snapshot.val();
         if (val && typeof val === "object") {
           tracksCache = Object.entries(val)
@@ -976,12 +1009,23 @@
         }
         renderAdminList();
       },
-      (err) => {
-        console.error(err);
-        $("connLed").style.background = "var(--led-rose)";
-        $("connLabel").textContent = "RTDB Error";
+      () => {
+        $("connLed").style.background = "var(--accent-rose)";
+        $("connLabel").textContent = "Offline";
       }
     );
+
+    onValue(requestsRef, (snapshot) => {
+      const val = snapshot.val();
+      if (val && typeof val === "object") {
+        requestsCache = Object.entries(val)
+          .map(([id, item]) => ({ id, ...item }))
+          .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      } else {
+        requestsCache = [];
+      }
+      renderRequestsList();
+    });
   </script>
 </body>
 </html>

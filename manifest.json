@@ -1,7 +1,7 @@
 {
   "name": "Play Mine",
   "short_name": "Play Mine",
-  "description": "High-resolution lossless music player with 32-bit Float Web Audio DSP and WebGL2 GPU spectrum visualization.",
+  "description": "Free high-resolution music streaming with custom sound equalizer and live audio visuals.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
