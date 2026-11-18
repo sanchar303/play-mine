@@ -1,0 +1,17 @@
+# Play Mine
+
+> High-resolution lossless music streaming web application created by Sanchar Koirala, featuring real-time cloud track synchronization, a 32-bit Float Web Audio API mastering DSP engine, and hardware-accelerated WebGL2 GPU spectrum visualization.
+
+## Core Capabilities
+- **Lossless & High-Resolution Audio Pipeline**: Uses `AudioContext` configured with `latencyHint: "playback"` to negotiate native OS DAC sample rates (48 kHz / 96 kHz) and internal 32-bit floating-point precision.
+- **Dual Signal Modes**: Supports both **Bit-Perfect Direct Pass-Through** and **Studio Mastering DSP** (5-band Biquad EQ, Mid/Side stereo soundstage widener, and transparent lookahead-style clip limiter).
+- **GPU-Accelerated Visualization**: Offloads real-time 4096-point FFT frequency rendering to dedicated graphics hardware via a custom WebGL2 GLSL fragment shader (`Aurora`, `64-Band Bars`, and `Phase Oscilloscope` modes).
+- **Realtime Cloud Sync**: Powered by Firebase Realtime Database (`play_mine/tracks`) for instant zero-refresh catalog updates.
+
+## Application Entry Points
+- `/index.html`: Public audiophile music player, DSP mastering rack, GPU spectrum visualizer, and searchable cloud library.
+- `/manifest.json`: Progressive Web App (PWA) manifest for standalone installation.
+
+## Author & Attribution
+- **Creator**: Sanchar Koirala
+- **Copyright**: © 2026 Sanchar Koirala | All rights reserved

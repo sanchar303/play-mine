@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /llms.txt
+Allow: /manifest.json
+Disallow: /admin.html
+
+Sitemap: https://play-mine.pages.dev/sitemap.xml
