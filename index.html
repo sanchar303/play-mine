@@ -4,38 +4,61 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
   <title>Play Mine</title>
-  <meta name="description" content="Play Mine — High-resolution lossless music streaming studio powered by 32-bit Float Web Audio DSP and WebGL2 GPU visualization." />
-  <meta name="theme-color" content="#07090f" />
+  <meta name="description" content="Play Mine — High-resolution lossless music player with 32-bit Float Web Audio DSP, GPU shader visualization, and tactile neumorphic hardware controls." />
+  <meta name="theme-color" content="#0b0d12" />
+  <link rel="canonical" href="https://play-mine.pages.dev/" />
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="apple-touch-icon" href="favicon.png" />
   <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <style>
     :root {
-      --bg-void: #05070c;
-      --bg-deep: #090d16;
-      --glass-surface: rgba(16, 22, 36, 0.62);
-      --glass-elevated: rgba(23, 31, 50, 0.76);
-      --glass-border: rgba(255, 255, 255, 0.09);
-      --glass-highlight: rgba(255, 255, 255, 0.16);
-      --neu-shadow-dark: rgba(2, 4, 9, 0.85);
-      --neu-shadow-light: rgba(255, 255, 255, 0.05);
-      --neon-cyan: #00f0ff;
-      --neon-violet: #8b5cf6;
-      --neon-emerald: #10b981;
-      --neon-amber: #f59e0b;
-      --text-primary: #f3f6fc;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --radius-xl: 28px;
-      --radius-lg: 20px;
-      --radius-md: 14px;
-      --radius-pill: 9999px;
-      --transition-snappy: 180ms cubic-bezier(0.22, 1, 0.36, 1);
-      --transition-smooth: 320ms cubic-bezier(0.16, 1, 0.3, 1);
+      /* Machined Obsidian & Smoked Glass Palette */
+      --chassis-bg: #0b0d12;
+      --chassis-elevated: #11141c;
+      --chassis-surface: #141822;
+      --well-bg: #07090d;
+
+      /* Specular Glass & Physical Bevels */
+      --bevel-top: rgba(255, 255, 255, 0.17);
+      --bevel-left: rgba(255, 255, 255, 0.09);
+      --bevel-right: rgba(0, 0, 0, 0.55);
+      --bevel-bottom: rgba(0, 0, 0, 0.78);
+      --gloss-sheen: linear-gradient(145deg, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.015) 42%, rgba(255, 255, 255, 0.035) 100%);
+
+      /* Deep Neumorphic Shadows */
+      --shadow-extrude:
+        14px 14px 30px #030407,
+        -9px -9px 22px rgba(34, 41, 56, 0.28),
+        inset 0 1px 1px rgba(255, 255, 255, 0.16);
+      --shadow-key:
+        7px 7px 16px #030407,
+        -5px -5px 13px rgba(38, 46, 62, 0.3),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      --shadow-key-pressed:
+        inset 5px 5px 12px #020305,
+        inset -3px -3px 8px rgba(42, 50, 68, 0.22);
+      --shadow-well:
+        inset 6px 6px 14px #030407,
+        inset -4px -4px 10px rgba(35, 42, 56, 0.22);
+
+      /* Precision Hardware LED Accents */
+      --led-ice: #38bdf8;
+      --led-amber: #f59e0b;
+      --led-emerald: #10b981;
+      --chrome-bright: #f8fafc;
+      --text-main: #eef2f7;
+      --text-dim: #94a0b2;
+      --text-mute: #5d6778;
+
+      --r-chassis: 30px;
+      --r-module: 22px;
+      --r-well: 16px;
+      --r-pill: 9999px;
+      --ease-haptic: cubic-bezier(0.2, 0.9, 0.3, 1);
     }
 
     *, *::before, *::after {
@@ -47,186 +70,191 @@
 
     html, body {
       min-height: 100%;
-      background-color: var(--bg-void);
-      color: var(--text-primary);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--chassis-bg);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-variant-numeric: tabular-nums;
       line-height: 1.5;
       overflow-x: hidden;
-      selection-background-color: rgba(0, 240, 255, 0.25);
     }
 
-    ::selection {
-      background: rgba(0, 240, 255, 0.25);
-      color: #fff;
-    }
-
-    /* Ambient Mesh Backdrop */
-    .ambient-canvas {
+    /* Anodized Micro-Grain & Ambient Studio Lighting */
+    body::before {
+      content: "";
       position: fixed;
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      overflow: hidden;
       background:
-        radial-gradient(circle at 15% 18%, rgba(0, 240, 255, 0.11) 0%, transparent 42%),
-        radial-gradient(circle at 85% 22%, rgba(139, 92, 246, 0.14) 0%, transparent 46%),
-        radial-gradient(circle at 50% 92%, rgba(16, 185, 129, 0.08) 0%, transparent 48%),
-        linear-gradient(180deg, #06080f 0%, #090d18 50%, #05070c 100%);
+        radial-gradient(ellipse 75% 55% at 18% 8%, rgba(56, 189, 248, 0.075), transparent 60%),
+        radial-gradient(ellipse 65% 50% at 85% 90%, rgba(245, 158, 11, 0.055), transparent 60%),
+        linear-gradient(180deg, #0d1017 0%, #090b10 100%);
     }
 
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(85px);
-      opacity: 0.45;
-      transform: translateZ(0);
-      animation: floatOrb 18s ease-in-out infinite alternate;
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.028;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    .orb-1 {
-      width: 420px;
-      height: 420px;
-      background: rgba(0, 240, 255, 0.18);
-      top: -110px;
-      left: -80px;
-    }
-
-    .orb-2 {
-      width: 480px;
-      height: 480px;
-      background: rgba(139, 92, 246, 0.2);
-      bottom: -140px;
-      right: -100px;
-      animation-delay: -6s;
-    }
-
-    @keyframes floatOrb {
-      0% { transform: translate3d(0, 0, 0) scale(1); }
-      100% { transform: translate3d(40px, 30px, 0) scale(1.08); }
-    }
-
-    /* App Shell */
-    .app-wrapper {
+    .app-shell {
       position: relative;
       z-index: 1;
-      max-width: 1380px;
+      max-width: 1360px;
       margin: 0 auto;
-      padding: 20px 24px 42px;
+      padding: 22px 24px 42px;
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: 24px;
       min-height: 100vh;
     }
 
-    /* Glass + Neumorphic Card Primitive */
-    .glass-panel {
-      background: var(--glass-surface);
-      backdrop-filter: blur(26px) saturate(185%);
-      -webkit-backdrop-filter: blur(26px) saturate(185%);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      box-shadow:
-        0 20px 50px var(--neu-shadow-dark),
-        inset 0 1px 1px var(--glass-highlight),
-        inset 0 -1px 1px rgba(0, 0, 0, 0.45);
+    /* Extruded Glossy Neumorphic Chassis */
+    .neu-chassis {
+      position: relative;
+      background: var(--gloss-sheen), linear-gradient(160deg, #161b26 0%, #0e1118 100%);
+      border-radius: var(--r-chassis);
+      border-top: 1px solid var(--bevel-top);
+      border-left: 1px solid var(--bevel-left);
+      border-right: 1px solid var(--bevel-right);
+      border-bottom: 1px solid var(--bevel-bottom);
+      box-shadow: var(--shadow-extrude);
     }
 
-    /* Tactile Div Controls (Zero <button> Tags) */
-    .tactile-btn {
+    /* Recessed Concave Well */
+    .neu-well {
+      background: linear-gradient(180deg, #06080c 0%, #0b0e14 100%);
+      border-radius: var(--r-well);
+      border-top: 1px solid rgba(0, 0, 0, 0.85);
+      border-left: 1px solid rgba(0, 0, 0, 0.65);
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: var(--shadow-well);
+    }
+
+    /* Tactile Haptic Key (Zero <button> Tags) */
+    .haptic-key {
+      position: relative;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       user-select: none;
       cursor: pointer;
-      border-radius: var(--radius-pill);
-      background: linear-gradient(145deg, rgba(28, 37, 58, 0.85), rgba(14, 19, 32, 0.92));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow:
-        6px 6px 14px rgba(2, 4, 10, 0.75),
-        -3px -3px 10px rgba(255, 255, 255, 0.04),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
-      color: var(--text-primary);
-      font-weight: 500;
-      font-size: 0.875rem;
+      border-radius: var(--r-pill);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.01) 48%, rgba(0, 0, 0, 0.16) 100%),
+        linear-gradient(145deg, #1b212e, #10141d);
+      border-top: 1px solid rgba(255, 255, 255, 0.22);
+      border-left: 1px solid rgba(255, 255, 255, 0.11);
+      border-right: 1px solid rgba(0, 0, 0, 0.65);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.85);
+      box-shadow: var(--shadow-key);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.84rem;
       padding: 10px 18px;
-      transition: transform var(--transition-snappy), box-shadow var(--transition-snappy), border-color var(--transition-snappy), background var(--transition-snappy), color var(--transition-snappy);
+      text-decoration: none;
+      transition:
+        transform 140ms var(--ease-haptic),
+        box-shadow 140ms var(--ease-haptic),
+        border-color 180ms ease,
+        color 180ms ease;
     }
 
-    .tactile-btn:hover {
-      border-color: rgba(0, 240, 255, 0.38);
-      box-shadow:
-        0 0 18px rgba(0, 240, 255, 0.18),
-        6px 6px 14px rgba(2, 4, 10, 0.8),
-        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    .haptic-key:hover {
+      border-top-color: rgba(255, 255, 255, 0.34);
       color: #ffffff;
-    }
-
-    .tactile-btn:active,
-    .tactile-btn.is-pressed {
-      transform: scale(0.95);
       box-shadow:
-        inset 4px 4px 10px rgba(2, 4, 10, 0.9),
-        inset -2px -2px 6px rgba(255, 255, 255, 0.05);
+        9px 9px 20px #020305,
+        -6px -6px 15px rgba(45, 55, 74, 0.34),
+        0 0 16px rgba(56, 189, 248, 0.14),
+        inset 0 1px 1px rgba(255, 255, 255, 0.28);
     }
 
-    .tactile-btn:focus-visible {
-      outline: 2px solid var(--neon-cyan);
-      outline-offset: 2px;
+    .haptic-key:active,
+    .haptic-key.is-pressed {
+      transform: translateY(2px) scale(0.965);
+      border-top-color: rgba(0, 0, 0, 0.65);
+      border-bottom-color: rgba(255, 255, 255, 0.12);
+      box-shadow: var(--shadow-key-pressed);
     }
 
-    .tactile-btn.active {
-      background: linear-gradient(135deg, rgba(0, 240, 255, 0.22), rgba(139, 92, 246, 0.24));
-      border-color: rgba(0, 240, 255, 0.55);
-      color: var(--neon-cyan);
+    .haptic-key:focus-visible {
+      outline: 2px solid var(--led-ice);
+      outline-offset: 3px;
+    }
+
+    .haptic-key.is-engaged {
+      background:
+        linear-gradient(180deg, rgba(56, 189, 248, 0.22) 0%, rgba(56, 189, 248, 0.04) 55%, rgba(0, 0, 0, 0.22) 100%),
+        linear-gradient(145deg, #152333, #0e1520);
+      border-top-color: rgba(125, 211, 252, 0.55);
+      color: #bae6fd;
       box-shadow:
-        0 0 22px rgba(0, 240, 255, 0.22),
-        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+        inset 3px 3px 8px rgba(2, 5, 10, 0.82),
+        inset -2px -2px 6px rgba(56, 189, 248, 0.12),
+        0 0 18px rgba(56, 189, 248, 0.18);
     }
 
-    .tactile-icon {
-      width: 44px;
-      height: 44px;
+    .haptic-round {
+      width: 46px;
+      height: 46px;
       padding: 0;
       border-radius: 50%;
     }
 
-    .tactile-hero {
-      width: 62px;
-      height: 62px;
+    /* Master Chrome Play Actuator */
+    .haptic-master-play {
+      width: 66px;
+      height: 66px;
       padding: 0;
       border-radius: 50%;
-      background: linear-gradient(135deg, #00f0ff 0%, #6366f1 55%, #8b5cf6 100%);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      color: #04070d;
+      background:
+        radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.08) 42%, transparent 70%),
+        linear-gradient(145deg, #38bdf8 0%, #0284c7 52%, #0369a1 100%);
+      border-top: 1.5px solid rgba(255, 255, 255, 0.72);
+      border-left: 1px solid rgba(255, 255, 255, 0.42);
+      border-right: 1px solid rgba(3, 45, 72, 0.85);
+      border-bottom: 1.5px solid rgba(2, 32, 54, 0.95);
+      color: #041019;
       box-shadow:
-        0 10px 28px rgba(0, 240, 255, 0.35),
-        0 0 0 4px rgba(0, 240, 255, 0.1),
-        inset 0 2px 3px rgba(255, 255, 255, 0.55);
+        10px 10px 24px #020306,
+        -6px -6px 16px rgba(56, 189, 248, 0.14),
+        0 0 26px rgba(56, 189, 248, 0.32),
+        inset 0 2px 3px rgba(255, 255, 255, 0.65);
     }
 
-    .tactile-hero:hover {
+    .haptic-master-play:hover {
       transform: translateY(-1px) scale(1.03);
-      color: #020408;
+      color: #02080d;
       box-shadow:
-        0 14px 34px rgba(0, 240, 255, 0.5),
-        0 0 0 6px rgba(0, 240, 255, 0.16),
-        inset 0 2px 4px rgba(255, 255, 255, 0.7);
+        12px 12px 28px #020306,
+        0 0 34px rgba(56, 189, 248, 0.48),
+        inset 0 2px 4px rgba(255, 255, 255, 0.8);
     }
 
-    .tactile-hero:active {
-      transform: scale(0.94);
+    .haptic-master-play:active,
+    .haptic-master-play.is-pressed {
+      transform: translateY(2px) scale(0.95);
+      box-shadow:
+        inset 5px 5px 12px rgba(2, 28, 48, 0.85),
+        0 0 16px rgba(56, 189, 248, 0.25);
     }
 
-    /* Top Header Bar */
+    /* Top Header Chassis */
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 16px;
-      padding: 14px 22px;
-      border-radius: var(--radius-pill);
+      padding: 14px 24px;
+      border-radius: var(--r-pill);
     }
 
     .brand-cluster {
@@ -235,192 +263,209 @@
       gap: 14px;
     }
 
-    .brand-logo {
-      width: 42px;
-      height: 42px;
+    .brand-badge {
+      width: 44px;
+      height: 44px;
       border-radius: 14px;
-      object-fit: cover;
-      border: 1px solid rgba(0, 240, 255, 0.35);
-      box-shadow: 0 0 18px rgba(0, 240, 255, 0.25);
-      background: rgba(15, 23, 42, 0.9);
+      padding: 3px;
+      background: linear-gradient(145deg, #1f2636, #0d1017);
+      border-top: 1px solid rgba(255, 255, 255, 0.24);
+      box-shadow: 5px 5px 12px #030407, -3px -3px 9px rgba(40, 48, 66, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
 
-    .brand-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.35rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      background: linear-gradient(90deg, #ffffff 0%, #a5f3fc 60%, #c4b5fd 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .brand-badge img {
+      width: 100%;
+      height: 100%;
+      border-radius: 11px;
+      object-fit: cover;
+    }
+
+    .brand-name {
+      font-size: 1.28rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--chrome-bright);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.65);
     }
 
     .brand-sub {
-      font-size: 0.74rem;
-      color: var(--text-secondary);
-      letter-spacing: 0.04em;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      font-family: 'JetBrains Mono', monospace;
     }
 
-    .telemetry-strip {
+    .status-cluster {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
       gap: 10px;
     }
 
-    .hw-pill {
+    .led-readout {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 6px 13px;
-      border-radius: var(--radius-pill);
-      background: rgba(8, 12, 22, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      box-shadow: inset 2px 2px 6px rgba(0, 0, 0, 0.65);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.73rem;
-      color: var(--text-secondary);
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: var(--r-pill);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-dim);
     }
 
-    .pulse-dot {
-      width: 7px;
-      height: 7px;
+    .led-pip {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: var(--neon-emerald);
-      box-shadow: 0 0 10px var(--neon-emerald);
-      animation: pulseGlow 2s infinite;
+      background: var(--led-emerald);
+      box-shadow: 0 0 8px var(--led-emerald), inset 0 1px 1px rgba(255, 255, 255, 0.7);
     }
 
-    .pulse-dot.cyan {
-      background: var(--neon-cyan);
-      box-shadow: 0 0 10px var(--neon-cyan);
+    .led-pip.ice {
+      background: var(--led-ice);
+      box-shadow: 0 0 8px var(--led-ice), inset 0 1px 1px rgba(255, 255, 255, 0.7);
     }
 
-    @keyframes pulseGlow {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.45; transform: scale(0.82); }
+    .led-pip.amber {
+      background: var(--led-amber);
+      box-shadow: 0 0 8px var(--led-amber);
     }
 
-    /* Main Workspace Grid */
+    /* Studio Layout */
     .studio-grid {
       display: grid;
-      grid-template-columns: 1.12fr 0.88fr;
-      gap: 22px;
+      grid-template-columns: 1.14fr 0.86fr;
+      gap: 24px;
       align-items: start;
     }
 
-    /* Left Column: Master Player + GPU Shader + DSP Rack */
-    .deck-column {
+    .left-stack {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 22px;
     }
 
-    .player-deck {
-      padding: 26px;
-      position: relative;
-      overflow: hidden;
+    /* Master Deck */
+    .deck-card {
+      padding: 28px;
     }
 
-    .now-playing-hero {
+    .now-playing-grid {
       display: grid;
-      grid-template-columns: 176px 1fr;
-      gap: 24px;
+      grid-template-columns: 184px 1fr;
+      gap: 26px;
       align-items: center;
     }
 
-    /* Vinyl / Holographic Disc */
-    .disc-stage {
+    /* Recessed Turntable Platter Well */
+    .platter-well {
       position: relative;
-      width: 176px;
-      height: 176px;
+      width: 184px;
+      height: 184px;
       border-radius: 50%;
-      padding: 8px;
-      background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(0,0,0,0.65));
+      padding: 10px;
+      background: linear-gradient(145deg, #06080c, #131823);
+      border-top: 1px solid rgba(0, 0, 0, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
       box-shadow:
-        10px 10px 26px rgba(2, 4, 10, 0.85),
-        -4px -4px 16px rgba(255, 255, 255, 0.04),
-        0 0 32px rgba(0, 240, 255, 0.14);
+        inset 8px 8px 18px #020305,
+        inset -6px -6px 14px rgba(36, 44, 60, 0.25),
+        0 10px 24px rgba(0, 0, 0, 0.65);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .disc-art {
+    .platter-disc {
       width: 100%;
       height: 100%;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid rgba(255, 255, 255, 0.12);
-      animation: spinVinyl 22s linear infinite;
+      border: 2px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.75);
+      animation: spinDisc 24s linear infinite;
       animation-play-state: paused;
       will-change: transform;
     }
 
-    .disc-stage.is-playing .disc-art {
+    .platter-well.is-playing .platter-disc {
       animation-play-state: running;
     }
 
-    .disc-spindle {
+    .platter-gloss {
       position: absolute;
-      width: 34px;
-      height: 34px;
+      inset: 10px;
       border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #1e293b, #05070c);
-      border: 2px solid rgba(0, 240, 255, 0.5);
-      box-shadow: 0 0 12px rgba(0, 240, 255, 0.4), inset 0 2px 4px rgba(0,0,0,0.8);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.02) 44%, transparent 60%);
       pointer-events: none;
     }
 
-    @keyframes spinVinyl {
+    .platter-cap {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.45), transparent 55%),
+        linear-gradient(145deg, #273042, #0b0e14);
+      border: 1.5px solid rgba(255, 255, 255, 0.28);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.85);
+      pointer-events: none;
+    }
+
+    @keyframes spinDisc {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
 
-    .track-meta-block {
+    .track-details {
       display: flex;
       flex-direction: column;
       gap: 10px;
       min-width: 0;
     }
 
-    .badge-row {
+    .spec-badges {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    .quality-badge {
-      font-family: 'JetBrains Mono', monospace;
+    .spec-pill {
       font-size: 0.7rem;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      padding: 4px 11px;
-      border-radius: var(--radius-pill);
-      background: linear-gradient(90deg, rgba(0, 240, 255, 0.16), rgba(139, 92, 246, 0.18));
-      border: 1px solid rgba(0, 240, 255, 0.4);
-      color: var(--neon-cyan);
+      padding: 5px 12px;
+      border-radius: var(--r-pill);
+      color: #bae6fd;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.16), rgba(56, 189, 248, 0.05));
+      border-top: 1px solid rgba(125, 211, 252, 0.35);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.65);
     }
 
-    .genre-badge {
-      font-size: 0.74rem;
-      padding: 4px 11px;
-      border-radius: var(--radius-pill);
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--text-secondary);
+    .genre-pill {
+      font-size: 0.73rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: var(--r-pill);
+      color: var(--text-dim);
+      background: rgba(255, 255, 255, 0.04);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .hero-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(1.45rem, 2.4vw, 2rem);
-      font-weight: 700;
+      font-size: clamp(1.45rem, 2.3vw, 1.95rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
       line-height: 1.18;
-      color: #ffffff;
+      color: var(--chrome-bright);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -428,137 +473,131 @@
 
     .hero-artist {
       font-size: 1rem;
-      color: var(--text-secondary);
-      font-weight: 500;
+      font-weight: 600;
+      color: var(--text-dim);
     }
 
     .hero-album {
       font-size: 0.83rem;
-      color: var(--text-muted);
+      color: var(--text-mute);
     }
 
-    /* GPU Visualizer Viewport */
-    .gpu-viz-shell {
-      margin-top: 22px;
-      border-radius: var(--radius-lg);
-      background: rgba(5, 8, 15, 0.86);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      box-shadow:
-        inset 4px 4px 14px rgba(0, 0, 0, 0.85),
-        inset -2px -2px 8px rgba(255, 255, 255, 0.03);
-      padding: 12px;
-      position: relative;
+    /* Recessed GPU Shader Display Window */
+    .scope-housing {
+      margin-top: 24px;
+      padding: 14px;
     }
 
-    .viz-header {
+    .scope-topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 8px;
       flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
-    .viz-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem;
-      color: var(--text-secondary);
+    .scope-caption {
+      font-size: 0.73rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-dim);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
-    .viz-modes {
+    .scope-modes {
       display: flex;
-      gap: 6px;
+      gap: 7px;
     }
 
-    .viz-mode-pill {
-      padding: 4px 11px;
-      font-size: 0.71rem;
-      font-family: 'JetBrains Mono', monospace;
+    .scope-pill {
+      padding: 5px 12px;
+      font-size: 0.72rem;
     }
 
     #gpuVisualizer {
       width: 100%;
-      height: 132px;
+      height: 128px;
       display: block;
       border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
       transform: translateZ(0);
     }
 
-    /* Neumorphic Scrubber / Progress Capsule */
-    .scrubber-section {
-      margin-top: 20px;
+    /* Machined Scrubber Groove */
+    .scrubber-wrap {
+      margin-top: 22px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 9px;
     }
 
-    .progress-track {
+    .scrubber-groove {
       position: relative;
-      height: 12px;
-      border-radius: var(--radius-pill);
-      background: rgba(5, 8, 15, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      box-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.85);
+      height: 14px;
+      border-radius: var(--r-pill);
+      background: #05070a;
+      border-top: 1px solid rgba(0, 0, 0, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+      box-shadow: inset 4px 4px 9px #010203, inset -2px -2px 6px rgba(45, 55, 75, 0.18);
       cursor: pointer;
-      overflow: visible;
     }
 
-    .progress-buffer {
+    .scrubber-buffer {
       position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
+      inset: 2px auto 2px 2px;
       width: 0%;
-      border-radius: var(--radius-pill);
-      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--r-pill);
+      background: rgba(255, 255, 255, 0.07);
       pointer-events: none;
     }
 
-    .progress-fill {
+    .scrubber-fill {
       position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
+      inset: 2px auto 2px 2px;
       width: 0%;
-      border-radius: var(--radius-pill);
-      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-violet));
-      box-shadow: 0 0 14px rgba(0, 240, 255, 0.55);
+      max-width: calc(100% - 4px);
+      border-radius: var(--r-pill);
+      background: linear-gradient(90deg, #0284c7, #38bdf8, #bae6fd);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
       pointer-events: none;
     }
 
-    .progress-thumb {
+    .scrubber-knob {
       position: absolute;
       top: 50%;
       left: 0%;
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
-      background: #ffffff;
-      border: 3px solid var(--neon-cyan);
-      box-shadow: 0 0 14px var(--neon-cyan);
+      background:
+        radial-gradient(circle at 35% 30%, #ffffff 0%, #cbd5e1 65%, #64748b 100%);
+      border: 2px solid #0b0d12;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.85), 0 0 10px rgba(56, 189, 248, 0.45);
       transform: translate(-50%, -50%);
       pointer-events: none;
       transition: transform 120ms ease;
     }
 
-    .progress-track:hover .progress-thumb {
-      transform: translate(-50%, -50%) scale(1.2);
+    .scrubber-groove:hover .scrubber-knob {
+      transform: translate(-50%, -50%) scale(1.16);
     }
 
-    .time-readout {
+    .time-bar {
       display: flex;
       justify-content: space-between;
-      font-family: 'JetBrains Mono', monospace;
+      align-items: center;
       font-size: 0.76rem;
-      color: var(--text-secondary);
+      font-weight: 600;
+      color: var(--text-dim);
     }
 
-    /* Transport Controls */
-    .transport-bar {
-      margin-top: 18px;
+    /* Tactile Transport Deck */
+    .transport-row {
+      margin-top: 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -566,61 +605,60 @@
       gap: 16px;
     }
 
-    .transport-primary {
+    .transport-keys {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .volume-cluster {
+    .gain-pod {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 6px 14px 6px 8px;
-      border-radius: var(--radius-pill);
-      background: rgba(8, 12, 22, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 6px 16px 6px 8px;
+      border-radius: var(--r-pill);
     }
 
-    /* Custom Range Inputs */
-    input[type="range"].capsule-slider {
+    /* Physical Fader Sliders */
+    input[type="range"].fader-track {
       -webkit-appearance: none;
       appearance: none;
-      background: rgba(4, 7, 14, 0.9);
-      height: 7px;
-      border-radius: var(--radius-pill);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.8);
+      height: 8px;
+      border-radius: var(--r-pill);
+      background: #05070a;
+      border-top: 1px solid rgba(0, 0, 0, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 3px 3px 6px #010203;
       cursor: pointer;
     }
 
-    input[type="range"].capsule-slider::-webkit-slider-thumb {
+    input[type="range"].fader-track::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
-      background: var(--neon-cyan);
-      border: 2px solid #ffffff;
-      box-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
+      background: radial-gradient(circle at 35% 30%, #ffffff, #94a3b8);
+      border: 2px solid #0b0d12;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.85), 0 0 8px rgba(56, 189, 248, 0.4);
       cursor: pointer;
     }
 
-    input[type="range"].capsule-slider::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
+    input[type="range"].fader-track::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
-      background: var(--neon-cyan);
-      border: 2px solid #ffffff;
-      box-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
+      background: radial-gradient(circle at 35% 30%, #ffffff, #94a3b8);
+      border: 2px solid #0b0d12;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
       cursor: pointer;
     }
 
-    /* Audiophile DSP & Lossless Processor Rack */
-    .dsp-rack {
-      padding: 22px 24px;
+    /* DSP Mastering Rack */
+    .dsp-chassis {
+      padding: 24px 26px;
     }
 
-    .dsp-header {
+    .rack-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -629,236 +667,237 @@
       margin-bottom: 18px;
     }
 
-    .section-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.05rem;
+    .rack-title {
+      font-size: 1.02rem;
       font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 9px;
+      letter-spacing: -0.01em;
+      color: var(--chrome-bright);
     }
 
-    .dsp-mode-switch {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .eq-presets {
+    .preset-strip {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       margin-bottom: 18px;
     }
 
-    .preset-pill {
+    .mini-key {
       padding: 6px 13px;
-      font-size: 0.76rem;
+      font-size: 0.75rem;
     }
 
-    .eq-grid {
+    .eq-bank {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 12px;
       margin-bottom: 18px;
     }
 
-    .eq-band {
-      background: rgba(7, 11, 20, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: var(--radius-md);
+    .eq-channel {
       padding: 12px 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
-      box-shadow: inset 3px 3px 8px rgba(0, 0, 0, 0.75);
     }
 
-    .eq-db {
-      font-family: 'JetBrains Mono', monospace;
+    .eq-gain-val {
       font-size: 0.72rem;
-      color: var(--neon-cyan);
+      font-weight: 700;
+      color: var(--led-ice);
     }
 
-    .eq-slider-wrap {
+    .eq-slot {
       height: 86px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    input[type="range"].vertical-eq {
+    input[type="range"].eq-vertical {
       width: 82px;
       transform: rotate(-90deg);
     }
 
-    .eq-freq {
-      font-family: 'JetBrains Mono', monospace;
+    .eq-hz {
       font-size: 0.71rem;
-      color: var(--text-secondary);
+      font-weight: 600;
+      color: var(--text-dim);
     }
 
-    .spatial-row {
+    .stage-footer {
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 16px;
       align-items: center;
-      padding-top: 14px;
+      padding-top: 16px;
       border-top: 1px solid rgba(255, 255, 255, 0.07);
     }
 
-    .spatial-control {
+    .stage-slider-box {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 7px;
     }
 
-    .spatial-label-row {
+    .stage-labels {
       display: flex;
       justify-content: space-between;
-      font-size: 0.8rem;
-      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-dim);
     }
 
-    /* Right Column: Realtime Cloud Track Library */
-    .library-panel {
-      padding: 22px;
+    /* Right Column: Cloud Library */
+    .library-chassis {
+      padding: 24px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      max-height: calc(100vh - 140px);
+      max-height: calc(100vh - 138px);
       position: sticky;
-      top: 20px;
+      top: 22px;
     }
 
-    .library-header {
+    .library-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
     }
 
-    .track-count-pill {
-      font-family: 'JetBrains Mono', monospace;
+    .count-badge {
       font-size: 0.74rem;
-      padding: 4px 12px;
-      border-radius: var(--radius-pill);
-      background: rgba(0, 240, 255, 0.12);
-      border: 1px solid rgba(0, 240, 255, 0.3);
-      color: var(--neon-cyan);
+      font-weight: 700;
+      padding: 5px 13px;
+      border-radius: var(--r-pill);
+      color: var(--led-ice);
     }
 
-    .search-box {
+    .search-well {
       position: relative;
       display: flex;
       align-items: center;
     }
 
-    .search-input {
+    .search-field {
       width: 100%;
       padding: 12px 18px 12px 42px;
-      border-radius: var(--radius-pill);
-      background: rgba(6, 9, 17, 0.88);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: inset 3px 3px 8px rgba(0, 0, 0, 0.8);
-      color: var(--text-primary);
+      border-radius: var(--r-pill);
+      background: #06080c;
+      border-top: 1px solid rgba(0, 0, 0, 0.9);
+      border-left: 1px solid rgba(0, 0, 0, 0.75);
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+      box-shadow: var(--shadow-well);
+      color: var(--text-main);
       font-family: inherit;
-      font-size: 0.88rem;
+      font-size: 0.87rem;
       outline: none;
-      transition: border-color var(--transition-snappy), box-shadow var(--transition-snappy);
+      transition: border-color 180ms ease, box-shadow 180ms ease;
     }
 
-    .search-input:focus {
-      border-color: rgba(0, 240, 255, 0.5);
-      box-shadow:
-        inset 3px 3px 8px rgba(0, 0, 0, 0.8),
-        0 0 16px rgba(0, 240, 255, 0.16);
+    .search-field:focus {
+      border-bottom-color: rgba(56, 189, 248, 0.55);
+      box-shadow: var(--shadow-well), 0 0 16px rgba(56, 189, 248, 0.14);
     }
 
-    .search-icon {
+    .search-glyph {
       position: absolute;
       left: 15px;
-      color: var(--text-muted);
+      color: var(--text-mute);
       pointer-events: none;
     }
 
-    .filter-pills {
+    .filter-strip {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding-bottom: 4px;
       scrollbar-width: none;
     }
 
-    .filter-pills::-webkit-scrollbar {
+    .filter-strip::-webkit-scrollbar {
       display: none;
     }
 
-    .track-list {
+    .track-scroll {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       overflow-y: auto;
-      padding-right: 4px;
+      padding: 2px 4px 6px 2px;
     }
 
-    .track-list::-webkit-scrollbar {
+    .track-scroll::-webkit-scrollbar {
       width: 5px;
     }
 
-    .track-list::-webkit-scrollbar-thumb {
+    .track-scroll::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.14);
-      border-radius: var(--radius-pill);
+      border-radius: var(--r-pill);
     }
 
-    .track-card {
+    /* Tactile Track Plate */
+    .track-plate {
       display: grid;
-      grid-template-columns: 54px 1fr auto;
+      grid-template-columns: 56px 1fr auto;
       gap: 14px;
       align-items: center;
       padding: 11px 14px;
-      border-radius: var(--radius-lg);
-      background: rgba(12, 17, 29, 0.72);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      box-shadow: 4px 4px 12px rgba(2, 4, 10, 0.65);
+      border-radius: var(--r-module);
+      background:
+        linear-gradient(165deg, rgba(255, 255, 255, 0.065) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(0, 0, 0, 0.18) 100%),
+        linear-gradient(145deg, #171c27, #0f131b);
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+      border-right: 1px solid rgba(0, 0, 0, 0.65);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.85);
+      box-shadow: 6px 6px 14px #030407, -4px -4px 10px rgba(36, 44, 60, 0.22);
       cursor: pointer;
-      transition: transform var(--transition-snappy), border-color var(--transition-snappy), background var(--transition-snappy), box-shadow var(--transition-snappy);
+      user-select: none;
+      transition: transform 140ms var(--ease-haptic), box-shadow 140ms var(--ease-haptic), border-color 180ms ease;
     }
 
-    .track-card:hover {
-      transform: translateY(-2px);
-      background: rgba(22, 30, 50, 0.84);
-      border-color: rgba(0, 240, 255, 0.34);
+    .track-plate:hover {
+      transform: translateY(-1px);
+      border-top-color: rgba(125, 211, 252, 0.42);
     }
 
-    .track-card.is-active {
-      background: linear-gradient(135deg, rgba(0, 240, 255, 0.14), rgba(139, 92, 246, 0.16));
-      border-color: rgba(0, 240, 255, 0.58);
+    .track-plate:active {
+      transform: translateY(2px) scale(0.98);
+      box-shadow: var(--shadow-key-pressed);
+    }
+
+    .track-plate.is-current {
+      background:
+        linear-gradient(165deg, rgba(56, 189, 248, 0.18) 0%, rgba(56, 189, 248, 0.04) 55%, rgba(0, 0, 0, 0.25) 100%),
+        linear-gradient(145deg, #152333, #0d141f);
+      border-top-color: rgba(125, 211, 252, 0.6);
       box-shadow:
-        0 8px 24px rgba(0, 240, 255, 0.16),
-        inset 0 1px 0 rgba(255, 255, 255, 0.16);
+        inset 3px 3px 9px rgba(2, 5, 10, 0.85),
+        0 0 20px rgba(56, 189, 248, 0.16);
     }
 
-    .track-thumb-wrap {
+    .plate-art-box {
       position: relative;
-      width: 54px;
-      height: 54px;
+      width: 56px;
+      height: 56px;
       border-radius: 14px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
     }
 
-    .track-thumb {
+    .plate-art {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    .eq-bars-overlay {
+    .eq-live-mask {
       position: absolute;
       inset: 0;
-      background: rgba(5, 8, 15, 0.65);
+      background: rgba(6, 9, 15, 0.68);
       display: none;
       align-items: flex-end;
       justify-content: center;
@@ -866,379 +905,375 @@
       padding-bottom: 14px;
     }
 
-    .track-card.is-active .eq-bars-overlay {
+    .track-plate.is-current .eq-live-mask {
       display: flex;
     }
 
-    .eq-bar {
+    .eq-needle {
       width: 3px;
       height: 14px;
       border-radius: 99px;
-      background: var(--neon-cyan);
-      animation: bounceBar 0.75s ease-in-out infinite alternate;
+      background: var(--led-ice);
+      box-shadow: 0 0 6px var(--led-ice);
+      animation: eqPulse 0.72s ease-in-out infinite alternate;
     }
 
-    .eq-bar:nth-child(2) { animation-delay: 0.2s; background: var(--neon-violet); }
-    .eq-bar:nth-child(3) { animation-delay: 0.4s; }
+    .eq-needle:nth-child(2) { animation-delay: 0.22s; background: #bae6fd; }
+    .eq-needle:nth-child(3) { animation-delay: 0.44s; }
 
-    @keyframes bounceBar {
+    @keyframes eqPulse {
       0% { height: 5px; }
       100% { height: 22px; }
     }
 
-    .track-info {
+    .plate-meta {
       min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 3px;
     }
 
-    .track-title-row {
+    .plate-title {
+      font-weight: 700;
+      font-size: 0.93rem;
+      color: var(--chrome-bright);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
     }
 
-    .track-name {
-      font-weight: 600;
-      font-size: 0.94rem;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .featured-star {
-      font-size: 0.72rem;
-      color: var(--neon-amber);
-    }
-
-    .track-sub {
+    .plate-sub {
       font-size: 0.79rem;
-      color: var(--text-secondary);
+      color: var(--text-dim);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .track-right {
+    .plate-end {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       gap: 5px;
     }
 
-    .track-dur {
-      font-family: 'JetBrains Mono', monospace;
+    .plate-time {
       font-size: 0.75rem;
-      color: var(--text-secondary);
+      font-weight: 600;
+      color: var(--text-dim);
     }
 
-    .mini-tag {
-      font-family: 'JetBrains Mono', monospace;
+    .plate-tag {
       font-size: 0.64rem;
+      font-weight: 700;
       padding: 2px 8px;
-      border-radius: var(--radius-pill);
-      background: rgba(0, 240, 255, 0.1);
-      color: var(--neon-cyan);
-      border: 1px solid rgba(0, 240, 255, 0.24);
+      border-radius: var(--r-pill);
+      background: rgba(56, 189, 248, 0.12);
+      color: #7dd3fc;
+      border-top: 1px solid rgba(125, 211, 252, 0.25);
     }
 
-    /* Toast Notification */
-    .toast-banner {
+    /* Empty Vault State */
+    .empty-vault {
+      padding: 36px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-dim);
+      font-size: 0.88rem;
+    }
+
+    /* Haptic Toast */
+    .toast-pill {
       position: fixed;
-      bottom: 24px;
+      bottom: 26px;
       left: 50%;
-      transform: translateX(-50%) translateY(120%);
+      transform: translateX(-50%) translateY(130%);
       z-index: 99;
       padding: 11px 22px;
-      border-radius: var(--radius-pill);
-      background: rgba(12, 18, 32, 0.92);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(0, 240, 255, 0.45);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 240, 255, 0.2);
-      font-size: 0.84rem;
-      color: #ffffff;
-      transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: var(--r-pill);
+      background: linear-gradient(160deg, #1b2230, #0d1017);
+      border-top: 1px solid rgba(255, 255, 255, 0.25);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.85);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 0 20px rgba(56, 189, 248, 0.16);
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--chrome-bright);
+      transition: transform 260ms var(--ease-haptic);
       pointer-events: none;
     }
 
-    .toast-banner.show {
+    .toast-pill.show {
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Footer */
     .app-footer {
       margin-top: auto;
       padding-top: 18px;
       text-align: center;
       font-size: 0.8rem;
-      color: var(--text-muted);
-      letter-spacing: 0.02em;
+      font-weight: 500;
+      color: var(--text-mute);
     }
 
-    /* Responsive Breakpoints */
     @media (max-width: 1024px) {
       .studio-grid {
         grid-template-columns: 1fr;
       }
-      .library-panel {
+      .library-chassis {
         position: static;
         max-height: none;
       }
     }
 
     @media (max-width: 640px) {
-      .app-wrapper {
+      .app-shell {
         padding: 14px 14px 32px;
       }
       .topbar {
-        border-radius: var(--radius-xl);
+        border-radius: var(--r-chassis);
         padding: 14px 16px;
       }
-      .now-playing-hero {
+      .now-playing-grid {
         grid-template-columns: 1fr;
-        text-align: center;
         justify-items: center;
+        text-align: center;
       }
-      .badge-row {
+      .spec-badges {
         justify-content: center;
       }
       .hero-title {
         white-space: normal;
       }
-      .disc-stage {
-        width: 156px;
-        height: 156px;
+      .platter-well {
+        width: 162px;
+        height: 162px;
       }
-      .transport-bar {
+      .transport-row {
         justify-content: center;
       }
-      .eq-grid {
+      .eq-bank {
         gap: 7px;
       }
-      .spatial-row {
+      .stage-footer {
         grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
-  <div class="ambient-canvas" aria-hidden="true">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-  </div>
-
-  <div class="app-wrapper">
-    <!-- Top Telemetry & Brand Header -->
-    <header class="topbar glass-panel">
+  <div class="app-shell">
+    <!-- Top Hardware Telemetry Bar -->
+    <header class="topbar neu-chassis">
       <div class="brand-cluster">
-        <img src="favicon.png" alt="Play Mine Logo" class="brand-logo" onerror="this.style.display='none'" />
+        <div class="brand-badge">
+          <img src="favicon.png" alt="Play Mine" onerror="this.style.display='none'" />
+        </div>
         <div>
-          <div class="brand-title">Play Mine</div>
-          <div class="brand-sub">Lossless Audio &amp; GPU Shader Engine</div>
+          <div class="brand-name">Play Mine</div>
+          <div class="brand-sub">Lossless Audio &amp; GPU Deck</div>
         </div>
       </div>
 
-      <div class="telemetry-strip">
-        <div class="hw-pill" title="Realtime Database Connection">
-          <span class="pulse-dot" id="rtdbDot"></span>
-          <span id="rtdbStatus">RTDB Connecting…</span>
+      <div class="status-cluster">
+        <div class="led-readout neu-well">
+          <span class="led-pip" id="rtdbLed"></span>
+          <span id="rtdbLabel">Connecting RTDB…</span>
         </div>
-        <div class="hw-pill" title="Hardware DAC Sample Rate">
-          <span class="pulse-dot cyan"></span>
-          <span id="dacRateBadge">DAC: 48.0 kHz / 32-Bit Float</span>
+        <div class="led-readout neu-well">
+          <span class="led-pip ice"></span>
+          <span id="dacLabel">DAC: 48.0 kHz / 32-Bit</span>
         </div>
-        <div class="hw-pill" id="gpuRendererBadge" title="WebGL2 GPU Visualizer Status">
+        <div class="led-readout neu-well" id="gpuLabel">
           GPU: WebGL2 Ready
         </div>
       </div>
     </header>
 
-    <!-- Main Studio Grid -->
+    <!-- Main Dual-Column Studio -->
     <main class="studio-grid">
-      <!-- Left Column: Audio Deck + GPU Shader + DSP Rack -->
-      <section class="deck-column">
-        <div class="player-deck glass-panel">
-          <div class="now-playing-hero">
-            <div class="disc-stage" id="discStage">
-              <img id="heroCover" class="disc-art" alt="Album Artwork" />
-              <div class="disc-spindle"></div>
+      <!-- Left Stack: Master Player + GPU Scope + DSP Rack -->
+      <section class="left-stack">
+        <div class="deck-card neu-chassis">
+          <div class="now-playing-grid">
+            <div class="platter-well" id="platterWell">
+              <img id="heroCover" class="platter-disc" alt="Track Artwork" />
+              <div class="platter-gloss"></div>
+              <div class="platter-cap"></div>
             </div>
 
-            <div class="track-meta-block">
-              <div class="badge-row">
-                <span class="quality-badge" id="heroQuality">24-BIT / 96KHZ LOSSLESS</span>
-                <span class="genre-badge" id="heroGenre">Audiophile Master</span>
+            <div class="track-details">
+              <div class="spec-badges">
+                <span class="spec-pill" id="heroQuality">LOSSLESS STREAM</span>
+                <span class="genre-pill" id="heroGenre">Cloud Vault</span>
               </div>
-              <h1 class="hero-title" id="heroTitle">Select a Track</h1>
-              <div class="hero-artist" id="heroArtist">Play Mine Cloud Stream</div>
-              <div class="hero-album" id="heroAlbum">Awaiting audio stream…</div>
+              <h1 class="hero-title" id="heroTitle">Awaiting Track</h1>
+              <div class="hero-artist" id="heroArtist">Play Mine Cloud</div>
+              <div class="hero-album" id="heroAlbum">Select a track from the library to begin playback</div>
             </div>
           </div>
 
-          <!-- Hardware-Accelerated WebGL2 GPU Visualizer -->
-          <div class="gpu-viz-shell">
-            <div class="viz-header">
-              <div class="viz-label">
-                <span>⚡ GPU SHADER SPECTRUM</span>
-                <span id="streamModeTag" style="color: var(--neon-cyan);">• 32-BIT FLOAT DSP</span>
+          <!-- Recessed WebGL2 GPU Shader Viewport -->
+          <div class="scope-housing neu-well">
+            <div class="scope-topbar">
+              <div class="scope-caption">
+                <span>GPU Spectrum Scope</span>
+                <span id="enginePathTag" style="color: var(--led-ice);">• Standby</span>
               </div>
-              <div class="viz-modes">
-                <div class="tactile-btn viz-mode-pill active" role="button" tabindex="0" data-viz="aurora">Aurora</div>
-                <div class="tactile-btn viz-mode-pill" role="button" tabindex="0" data-viz="bars">Bars</div>
-                <div class="tactile-btn viz-mode-pill" role="button" tabindex="0" data-viz="wave">Wave</div>
+              <div class="scope-modes">
+                <div class="haptic-key scope-pill is-engaged" role="button" tabindex="0" data-viz="aurora">Aurora</div>
+                <div class="haptic-key scope-pill" role="button" tabindex="0" data-viz="bars">Bars</div>
+                <div class="haptic-key scope-pill" role="button" tabindex="0" data-viz="wave">Wave</div>
               </div>
             </div>
-            <canvas id="gpuVisualizer" width="840" height="160"></canvas>
+            <canvas id="gpuVisualizer" width="840" height="156"></canvas>
           </div>
 
-          <!-- Interactive Capsule Scrubber -->
-          <div class="scrubber-section">
-            <div class="progress-track" id="progressTrack" role="slider" aria-label="Seek Audio Position" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-              <div class="progress-buffer" id="progressBuffer"></div>
-              <div class="progress-fill" id="progressFill"></div>
-              <div class="progress-thumb" id="progressThumb"></div>
+          <!-- Machined Scrubber Groove -->
+          <div class="scrubber-wrap">
+            <div class="scrubber-groove" id="scrubberGroove" role="slider" tabindex="0" aria-label="Seek Audio Position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="scrubber-buffer" id="scrubberBuffer"></div>
+              <div class="scrubber-fill" id="scrubberFill"></div>
+              <div class="scrubber-knob" id="scrubberKnob"></div>
             </div>
-            <div class="time-readout">
-              <span id="currentTimeLabel">00:00</span>
-              <span id="bitrateReadout">PCM 32-Bit • Zero-Jitter Buffer</span>
-              <span id="totalTimeLabel">00:00</span>
+            <div class="time-bar">
+              <span id="curTimeText">00:00</span>
+              <span id="streamStatusText">Zero-Jitter Lossless Buffer</span>
+              <span id="totTimeText">00:00</span>
             </div>
           </div>
 
-          <!-- Tactile Capsule Transport Controls -->
-          <div class="transport-bar">
-            <div class="transport-primary">
-              <div class="tactile-btn tactile-icon" id="btnShuffle" role="button" tabindex="0" aria-label="Shuffle Queue" title="Shuffle">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+          <!-- Haptic Transport Actuator Keys -->
+          <div class="transport-row">
+            <div class="transport-keys">
+              <div class="haptic-key haptic-round" id="btnShuffle" role="button" tabindex="0" aria-label="Shuffle" title="Shuffle">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
               </div>
 
-              <div class="tactile-btn tactile-icon" id="btnPrev" role="button" tabindex="0" aria-label="Previous Track" title="Previous">
+              <div class="haptic-key haptic-round" id="btnPrev" role="button" tabindex="0" aria-label="Previous Track" title="Previous">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
               </div>
 
-              <div class="tactile-btn tactile-hero" id="btnPlayPause" role="button" tabindex="0" aria-label="Play or Pause" title="Play / Pause (Space)">
-                <svg id="iconPlay" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
-                <svg id="iconPause" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+              <div class="haptic-key haptic-master-play" id="btnPlayPause" role="button" tabindex="0" aria-label="Play or Pause" title="Play / Pause (Space)">
+                <svg id="glyphPlay" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20 7 4"/></svg>
+                <svg id="glyphPause" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16" rx="1.2"/><rect x="14" y="4" width="4" height="16" rx="1.2"/></svg>
               </div>
 
-              <div class="tactile-btn tactile-icon" id="btnNext" role="button" tabindex="0" aria-label="Next Track" title="Next">
+              <div class="haptic-key haptic-round" id="btnNext" role="button" tabindex="0" aria-label="Next Track" title="Next">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
               </div>
 
-              <div class="tactile-btn tactile-icon" id="btnLoop" role="button" tabindex="0" aria-label="Repeat Mode" title="Repeat: Off">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              <div class="haptic-key haptic-round" id="btnLoop" role="button" tabindex="0" aria-label="Repeat Mode" title="Repeat: Off">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
               </div>
             </div>
 
-            <div class="volume-cluster">
-              <div class="tactile-btn tactile-icon" id="btnMute" style="width:36px;height:36px;" role="button" tabindex="0" aria-label="Mute or Unmute" title="Mute (M)">
-                <svg id="iconVol" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            <div class="gain-pod neu-well">
+              <div class="haptic-key haptic-round" id="btnMute" style="width:36px;height:36px;" role="button" tabindex="0" aria-label="Mute" title="Mute (M)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
               </div>
-              <input type="range" id="volumeSlider" class="capsule-slider" min="0" max="1" step="0.01" value="0.92" style="width: 96px;" aria-label="Master Gain Volume" />
+              <input type="range" id="volumeFader" class="fader-track" min="0" max="1" step="0.01" value="0.95" style="width: 98px;" aria-label="Master Volume" />
             </div>
           </div>
         </div>
 
-        <!-- Dedicated Web Audio 32-Bit Float DSP & Mastering Rack -->
-        <div class="dsp-rack glass-panel">
-          <div class="dsp-header">
-            <div class="section-title">
-              <span style="color: var(--neon-cyan);">◈</span>
-              <span>Audiophile Mastering &amp; Lossless DSP</span>
-            </div>
-            <div class="dsp-mode-switch">
-              <div class="tactile-btn preset-pill active" id="modeStudioDsp" role="button" tabindex="0">Studio Mastering DSP</div>
-              <div class="tactile-btn preset-pill" id="modeBitPerfect" role="button" tabindex="0">Bit-Perfect Bypass</div>
+        <!-- 32-Bit Float Web Audio DSP Rack -->
+        <div class="dsp-chassis neu-chassis">
+          <div class="rack-head">
+            <div class="rack-title">32-Bit Float Mastering DSP</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <div class="haptic-key mini-key is-engaged" id="btnModeDsp" role="button" tabindex="0">Mastering EQ</div>
+              <div class="haptic-key mini-key" id="btnModeDirect" role="button" tabindex="0">Bit-Perfect Bypass</div>
             </div>
           </div>
 
-          <div class="eq-presets" id="eqPresetBar">
-            <div class="tactile-btn preset-pill active" role="button" tabindex="0" data-preset="flat">Reference Flat</div>
-            <div class="tactile-btn preset-pill" role="button" tabindex="0" data-preset="warm">Audiophile Warm</div>
-            <div class="tactile-btn preset-pill" role="button" tabindex="0" data-preset="bass">Deep Sub-Bass</div>
-            <div class="tactile-btn preset-pill" role="button" tabindex="0" data-preset="vocal">Studio Vocal</div>
-            <div class="tactile-btn preset-pill" role="button" tabindex="0" data-preset="air">Crystal Air</div>
+          <div class="preset-strip" id="presetBar">
+            <div class="haptic-key mini-key is-engaged" role="button" tabindex="0" data-preset="flat">Flat Reference</div>
+            <div class="haptic-key mini-key" role="button" tabindex="0" data-preset="warm">Analog Warm</div>
+            <div class="haptic-key mini-key" role="button" tabindex="0" data-preset="bass">Sub-Bass Boost</div>
+            <div class="haptic-key mini-key" role="button" tabindex="0" data-preset="vocal">Vocal Clarity</div>
+            <div class="haptic-key mini-key" role="button" tabindex="0" data-preset="air">High-Res Air</div>
           </div>
 
-          <div class="eq-grid">
-            <div class="eq-band">
-              <span class="eq-db" id="eqVal0">0.0 dB</span>
-              <div class="eq-slider-wrap">
-                <input type="range" class="capsule-slider vertical-eq" data-band="0" min="-12" max="12" step="0.5" value="0" aria-label="32Hz Sub-Bass EQ" />
+          <div class="eq-bank">
+            <div class="eq-channel neu-well">
+              <span class="eq-gain-val" id="eqRead0">0.0 dB</span>
+              <div class="eq-slot">
+                <input type="range" class="fader-track eq-vertical" data-band="0" min="-12" max="12" step="0.5" value="0" aria-label="32Hz Band" />
               </div>
-              <span class="eq-freq">32 Hz</span>
+              <span class="eq-hz">32 Hz</span>
             </div>
-            <div class="eq-band">
-              <span class="eq-db" id="eqVal1">0.0 dB</span>
-              <div class="eq-slider-wrap">
-                <input type="range" class="capsule-slider vertical-eq" data-band="1" min="-12" max="12" step="0.5" value="0" aria-label="125Hz Bass EQ" />
+            <div class="eq-channel neu-well">
+              <span class="eq-gain-val" id="eqRead1">0.0 dB</span>
+              <div class="eq-slot">
+                <input type="range" class="fader-track eq-vertical" data-band="1" min="-12" max="12" step="0.5" value="0" aria-label="125Hz Band" />
               </div>
-              <span class="eq-freq">125 Hz</span>
+              <span class="eq-hz">125 Hz</span>
             </div>
-            <div class="eq-band">
-              <span class="eq-db" id="eqVal2">0.0 dB</span>
-              <div class="eq-slider-wrap">
-                <input type="range" class="capsule-slider vertical-eq" data-band="2" min="-12" max="12" step="0.5" value="0" aria-label="1kHz Midrange EQ" />
+            <div class="eq-channel neu-well">
+              <span class="eq-gain-val" id="eqRead2">0.0 dB</span>
+              <div class="eq-slot">
+                <input type="range" class="fader-track eq-vertical" data-band="2" min="-12" max="12" step="0.5" value="0" aria-label="1kHz Band" />
               </div>
-              <span class="eq-freq">1 kHz</span>
+              <span class="eq-hz">1 kHz</span>
             </div>
-            <div class="eq-band">
-              <span class="eq-db" id="eqVal3">0.0 dB</span>
-              <div class="eq-slider-wrap">
-                <input type="range" class="capsule-slider vertical-eq" data-band="3" min="-12" max="12" step="0.5" value="0" aria-label="4kHz Presence EQ" />
+            <div class="eq-channel neu-well">
+              <span class="eq-gain-val" id="eqRead3">0.0 dB</span>
+              <div class="eq-slot">
+                <input type="range" class="fader-track eq-vertical" data-band="3" min="-12" max="12" step="0.5" value="0" aria-label="4kHz Band" />
               </div>
-              <span class="eq-freq">4 kHz</span>
+              <span class="eq-hz">4 kHz</span>
             </div>
-            <div class="eq-band">
-              <span class="eq-db" id="eqVal4">0.0 dB</span>
-              <div class="eq-slider-wrap">
-                <input type="range" class="capsule-slider vertical-eq" data-band="4" min="-12" max="12" step="0.5" value="0" aria-label="14kHz Air EQ" />
+            <div class="eq-channel neu-well">
+              <span class="eq-gain-val" id="eqRead4">0.0 dB</span>
+              <div class="eq-slot">
+                <input type="range" class="fader-track eq-vertical" data-band="4" min="-12" max="12" step="0.5" value="0" aria-label="14kHz Band" />
               </div>
-              <span class="eq-freq">14 kHz</span>
+              <span class="eq-hz">14 kHz</span>
             </div>
           </div>
 
-          <div class="spatial-row">
-            <div class="spatial-control">
-              <div class="spatial-label-row">
-                <span>Mid/Side Stereo Soundstage Width</span>
-                <span id="widthLabel" style="font-family:'JetBrains Mono',monospace;color:var(--neon-cyan);">115% Enhanced</span>
+          <div class="stage-footer">
+            <div class="stage-slider-box">
+              <div class="stage-labels">
+                <span>Mid/Side Stereo Soundstage</span>
+                <span id="stageReadout" style="color: var(--led-ice);">115% Wide</span>
               </div>
-              <input type="range" id="stereoWidthSlider" class="capsule-slider" min="0" max="1.6" step="0.05" value="1.15" aria-label="Stereo Soundstage Width" />
+              <input type="range" id="stereoFader" class="fader-track" min="0" max="1.6" step="0.05" value="1.15" aria-label="Stereo Width" />
             </div>
 
-            <div class="tactile-btn preset-pill active" id="btnLimiter" role="button" tabindex="0">
+            <div class="haptic-key mini-key is-engaged" id="btnLimiter" role="button" tabindex="0">
               Clip Guard: ON
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Right Column: Realtime Cloud Playlist -->
-      <aside class="library-panel glass-panel">
-        <div class="library-header">
-          <div class="section-title">
-            <span style="color: var(--neon-violet);">♫</span>
-            <span>Cloud Library</span>
-          </div>
-          <span class="track-count-pill" id="trackCountPill">0 Tracks</span>
+      <!-- Right Stack: Live RTDB Cloud Library -->
+      <aside class="library-chassis neu-chassis">
+        <div class="library-top">
+          <div class="rack-title">Cloud Track Vault</div>
+          <span class="count-badge neu-well" id="countPill">0 Tracks</span>
         </div>
 
-        <div class="search-box">
-          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="searchInput" class="search-input" placeholder="Search title, artist, album, genre…" aria-label="Search Music Library" />
+        <div class="search-well">
+          <svg class="search-glyph" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchField" class="search-field" placeholder="Search title, artist, album, genre…" aria-label="Search Library" />
         </div>
 
-        <div class="filter-pills" id="filterPills">
-          <div class="tactile-btn preset-pill active" role="button" tabindex="0" data-filter="all">All Tracks</div>
-          <div class="tactile-btn preset-pill" role="button" tabindex="0" data-filter="featured">Featured</div>
-          <div class="tactile-btn preset-pill" role="button" tabindex="0" data-filter="lossless">Hi-Res / Lossless</div>
+        <div class="filter-strip" id="filterBar">
+          <div class="haptic-key mini-key is-engaged" role="button" tabindex="0" data-filter="all">All</div>
+          <div class="haptic-key mini-key" role="button" tabindex="0" data-filter="featured">Featured</div>
+          <div class="haptic-key mini-key" role="button" tabindex="0" data-filter="lossless">Lossless</div>
         </div>
 
-        <div class="track-list" id="trackList">
-          <!-- Populated in real time from Firebase RTDB -->
+        <div class="track-scroll" id="trackScroll">
+          <!-- Dynamically synced from Firebase RTDB (Zero hardcoded songs) -->
         </div>
       </aside>
     </main>
@@ -1248,14 +1283,14 @@
     </footer>
   </div>
 
-  <div class="toast-banner" id="toastBanner" role="status" aria-live="polite"></div>
+  <div class="toast-pill" id="toastPill" role="status" aria-live="polite"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
     // =========================================================================
-    // 1. FIREBASE REALTIME DATABASE CONFIGURATION
+    // 1. FIREBASE REALTIME DATABASE CONNECTION
     // =========================================================================
     const DEFAULT_RTDB_URL = "https://cloud-db-studio-default-rtdb.firebaseio.com";
     const activeDbUrl = localStorage.getItem("play_mine_rtdb_url") || DEFAULT_RTDB_URL;
@@ -1271,89 +1306,51 @@
     const db = getDatabase(app);
     const tracksRef = ref(db, "play_mine/tracks");
 
-    // Fallback track if RTDB has zero tracks yet
-    const FALLBACK_TRACKS = [
-      {
-        id: "seed_default_1",
-        title: "Play Mine — Master Reference Stream",
-        artist: "Sanchar Koirala",
-        album: "Cloud Lossless Vault",
-        url: "https://juicebox-space-v1.fra1.digitaloceanspaces.com/prod/uploaders/2598/root/f30e4588-2a98-44af-a200-19ac42d621e6.mp3",
-        coverUrl: "",
-        genre: "Electronic / Audiophile",
-        quality: "24-Bit / 96kHz Master",
-        duration: "03:30",
-        featured: true,
-        createdAt: Date.now()
-      }
-    ];
-
     // =========================================================================
-    // 2. APPLICATION STATE & DOM REFERENCES
+    // 2. STATE & DOM HELPERS
     // =========================================================================
     let allTracks = [];
     let filteredTracks = [];
     let currentTrackIndex = -1;
     let isPlaying = false;
     let isShuffle = false;
-    let loopMode = 0; // 0 = Off, 1 = All, 2 = One
+    let loopMode = 0; // 0: Off, 1: All, 2: Single
     let activeFilter = "all";
     let searchQuery = "";
     let vizMode = "aurora";
     let dspBypass = false;
     let limiterEnabled = true;
+    let usingCorsDspEngine = false;
 
     const $ = (id) => document.getElementById(id);
 
-    const discStage = $("discStage");
-    const heroCover = $("heroCover");
-    const heroTitle = $("heroTitle");
-    const heroArtist = $("heroArtist");
-    const heroAlbum = $("heroAlbum");
-    const heroQuality = $("heroQuality");
-    const heroGenre = $("heroGenre");
-    const trackListEl = $("trackList");
-    const trackCountPill = $("trackCountPill");
-    const progressTrack = $("progressTrack");
-    const progressBuffer = $("progressBuffer");
-    const progressFill = $("progressFill");
-    const progressThumb = $("progressThumb");
-    const currentTimeLabel = $("currentTimeLabel");
-    const totalTimeLabel = $("totalTimeLabel");
-    const bitrateReadout = $("bitrateReadout");
-    const iconPlay = $("iconPlay");
-    const iconPause = $("iconPause");
-
-    // Generate deterministic SVG neon artwork if no custom coverUrl is supplied
-    function generateArtworkDataURI(seedText = "Play Mine") {
-      let hash = 0;
-      for (let i = 0; i < seedText.length; i++) {
-        hash = seedText.charCodeAt(i) + ((hash << 5) - hash);
+    function triggerHaptic(ms = 10) {
+      if (navigator.vibrate) {
+        try { navigator.vibrate(ms); } catch (_) {}
       }
-      const hue1 = Math.abs(hash % 360);
-      const hue2 = (hue1 + 75) % 360;
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
-        <defs>
-          <radialGradient id="g" cx="30%" cy="30%" r="80%">
-            <stop offset="0%" stop-color="hsl(${hue1}, 95%, 58%)" />
-            <stop offset="55%" stop-color="hsl(${hue2}, 82%, 34%)" />
-            <stop offset="100%" stop-color="#060913" />
-          </radialGradient>
-        </defs>
-        <rect width="400" height="400" fill="url(#g)"/>
-        <circle cx="200" cy="200" r="145" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="2"/>
-        <circle cx="200" cy="200" r="105" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
-        <circle cx="200" cy="200" r="65" fill="none" stroke="rgba(0,240,255,0.45)" stroke-width="2.5"/>
-      </svg>`;
-      return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
     }
 
     function showToast(msg) {
-      const toast = $("toastBanner");
-      toast.textContent = msg;
-      toast.classList.add("show");
-      clearTimeout(toast._timer);
-      toast._timer = setTimeout(() => toast.classList.remove("show"), 2800);
+      const el = $("toastPill");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(el._timer);
+      el._timer = setTimeout(() => el.classList.remove("show"), 2600);
+    }
+
+    function bindHapticKey(el, handler) {
+      if (!el) return;
+      el.addEventListener("pointerdown", () => triggerHaptic(10));
+      el.addEventListener("click", handler);
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          triggerHaptic(12);
+          el.classList.add("is-pressed");
+          setTimeout(() => el.classList.remove("is-pressed"), 140);
+          handler(e);
+        }
+      });
     }
 
     function formatTime(sec) {
@@ -1363,26 +1360,60 @@
       return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
     }
 
-    // Bind accessible keyboard + click activation to all tactile <div> elements
-    function bindTactileDiv(el, handler) {
-      if (!el) return;
-      el.addEventListener("click", handler);
-      el.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          el.classList.add("is-pressed");
-          setTimeout(() => el.classList.remove("is-pressed"), 140);
-          handler(e);
-        }
-      });
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
     }
 
+    function buildVinylDiscSvg(seed = "Play Mine") {
+      let hash = 0;
+      for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+      const hue = Math.abs(hash % 360);
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+        <defs>
+          <radialGradient id="disc" cx="35%" cy="30%" r="75%">
+            <stop offset="0%" stop-color="hsl(${hue}, 52%, 34%)" />
+            <stop offset="55%" stop-color="#141923" />
+            <stop offset="100%" stop-color="#07090d" />
+          </radialGradient>
+        </defs>
+        <rect width="400" height="400" fill="url(#disc)"/>
+        <circle cx="200" cy="200" r="158" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+        <circle cx="200" cy="200" r="124" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+        <circle cx="200" cy="200" r="90" fill="none" stroke="rgba(56,189,248,0.28)" stroke-width="2"/>
+      </svg>`;
+      return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    }
+
+    // Set initial platter art
+    $("heroCover").src = buildVinylDiscSvg("Play Mine");
+
     // =========================================================================
-    // 3. DEDICATED 32-BIT FLOAT WEB AUDIO MASTERING & LOSSLESS ENGINE
+    // 3. DUAL-ENGINE LOSSLESS AUDIO ARCHITECTURE
+    //    - Engine A (corsAudio): Used when server supports CORS -> full 32-Bit
+    //      Float Web Audio DSP (5-Band EQ + M/S Widener + Limiter + 4096 FFT).
+    //    - Engine B (nativeAudio): Untainted hardware <audio> pipeline -> plays
+    //      ANY remote MP3/FLAC/WAV URL (like DigitalOcean Spaces) at full native
+    //      resolution without browser CORS muting.
     // =========================================================================
-    const audioEl = new Audio();
-    audioEl.preload = "auto";
-    audioEl.crossOrigin = "anonymous";
+    const corsAudio = new Audio();
+    corsAudio.preload = "auto";
+    corsAudio.crossOrigin = "anonymous";
+
+    const nativeAudio = new Audio();
+    nativeAudio.preload = "auto";
+
+    function getActivePlayer() {
+      return usingCorsDspEngine ? corsAudio : nativeAudio;
+    }
+
+    function stopAllPlayers() {
+      corsAudio.pause();
+      nativeAudio.pause();
+    }
 
     let audioCtx = null;
     let sourceNode = null;
@@ -1390,13 +1421,10 @@
     let splitterNode = null;
     let mergerNode = null;
     let midGain = null;
-    let sideGainL = null;
-    let sideGainR = null;
     let limiterNode = null;
     let masterGainNode = null;
     let analyserNode = null;
-    let webAudioConnected = false;
-    let corsFallbackActive = false;
+    let dspGraphReady = false;
 
     const EQ_FREQS = [32, 125, 1000, 4000, 14000];
     const EQ_TYPES = ["lowshelf", "peaking", "peaking", "peaking", "highshelf"];
@@ -1408,43 +1436,39 @@
       air: [1.5, 0.0, 0.5, 3.0, 6.0]
     };
 
-    function initAudioEngine() {
-      if (audioCtx) {
-        if (audioCtx.state === "suspended") audioCtx.resume();
-        return;
+    function ensureWebAudioDsp() {
+      if (!audioCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new Ctx({ latencyHint: "playback" });
+        const khz = (audioCtx.sampleRate / 1000).toFixed(1);
+        $("dacLabel").textContent = `DAC: ${khz} kHz / 32-Bit`;
       }
-
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      audioCtx = new AudioContextClass({ latencyHint: "playback" });
-
-      const sampleRateKHz = (audioCtx.sampleRate / 1000).toFixed(1);
-      $("dacRateBadge").textContent = `DAC: ${sampleRateKHz} kHz / 32-Bit Float`;
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume().catch(() => {});
+      }
+      if (dspGraphReady) return;
 
       try {
-        sourceNode = audioCtx.createMediaElementSource(audioEl);
+        sourceNode = audioCtx.createMediaElementSource(corsAudio);
 
-        // 5-Band Biquad Filter Bank
         eqNodes = EQ_FREQS.map((freq, idx) => {
-          const filter = audioCtx.createBiquadFilter();
-          filter.type = EQ_TYPES[idx];
-          filter.frequency.value = freq;
-          filter.Q.value = 1.15;
-          filter.gain.value = 0;
-          return filter;
+          const f = audioCtx.createBiquadFilter();
+          f.type = EQ_TYPES[idx];
+          f.frequency.value = freq;
+          f.Q.value = 1.15;
+          f.gain.value = parseFloat(document.querySelector(`.eq-vertical[data-band="${idx}"]`)?.value || 0);
+          return f;
         });
 
-        // Mid/Side Stereo Soundstage Matrix
         splitterNode = audioCtx.createChannelSplitter(2);
         mergerNode = audioCtx.createChannelMerger(2);
 
-        // L_out = L + (L - R) * widthOffset, R_out = R + (R - L) * widthOffset
         const crossLfromL = audioCtx.createGain();
         const crossLfromR = audioCtx.createGain();
         const crossRfromR = audioCtx.createGain();
         const crossRfromL = audioCtx.createGain();
-
         midGain = { crossLfromL, crossLfromR, crossRfromR, crossRfromL };
-        updateStereoWidth(parseFloat($("stereoWidthSlider").value));
+        updateStereoWidth(parseFloat($("stereoFader").value));
 
         splitterNode.connect(crossLfromL, 0);
         splitterNode.connect(crossLfromR, 1);
@@ -1456,7 +1480,6 @@
         crossRfromR.connect(mergerNode, 0, 1);
         crossRfromL.connect(mergerNode, 0, 1);
 
-        // Transparent Mastering Limiter (Clip Guard)
         limiterNode = audioCtx.createDynamicsCompressor();
         limiterNode.threshold.value = -1.5;
         limiterNode.knee.value = 6.0;
@@ -1464,25 +1487,22 @@
         limiterNode.attack.value = 0.002;
         limiterNode.release.value = 0.12;
 
-        // Master Gain
         masterGainNode = audioCtx.createGain();
-        masterGainNode.gain.value = parseFloat($("volumeSlider").value);
+        masterGainNode.gain.value = parseFloat($("volumeFader").value);
 
-        // 8192-Point High-Resolution FFT Analyser for GPU Shader
         analyserNode = audioCtx.createAnalyser();
         analyserNode.fftSize = 4096;
         analyserNode.smoothingTimeConstant = 0.82;
 
-        webAudioConnected = true;
-        rebuildAudioGraph();
+        dspGraphReady = true;
+        rebuildDspRouting();
       } catch (err) {
-        console.warn("Web Audio graph initialization fallback:", err);
-        webAudioConnected = false;
+        console.warn("DSP graph setup notice:", err);
       }
     }
 
-    function rebuildAudioGraph() {
-      if (!webAudioConnected || !sourceNode) return;
+    function rebuildDspRouting() {
+      if (!dspGraphReady || !sourceNode) return;
       try {
         sourceNode.disconnect();
         eqNodes.forEach((n) => n.disconnect());
@@ -1492,17 +1512,14 @@
       } catch (_) {}
 
       if (dspBypass) {
-        // Bit-Perfect Direct Pass-Through
         sourceNode.connect(masterGainNode);
         masterGainNode.connect(analyserNode);
         masterGainNode.connect(audioCtx.destination);
-        $("streamModeTag").textContent = "• BIT-PERFECT DIRECT";
       } else {
-        // Studio Mastering DSP Chain
         let head = sourceNode;
-        for (const filter of eqNodes) {
-          head.connect(filter);
-          head = filter;
+        for (const f of eqNodes) {
+          head.connect(f);
+          head = f;
         }
         head.connect(splitterNode);
         if (limiterEnabled) {
@@ -1513,56 +1530,69 @@
         }
         masterGainNode.connect(analyserNode);
         masterGainNode.connect(audioCtx.destination);
-        $("streamModeTag").textContent = "• 32-BIT FLOAT DSP";
       }
     }
 
-    function updateStereoWidth(width) {
+    function updateStereoWidth(w) {
       if (!midGain) return;
-      // width = 1.0 => natural stereo (L=1, R=0); width > 1 => widened; width = 0 => mono (0.5, 0.5)
-      const same = 0.5 + 0.5 * width;
-      const opp = 0.5 - 0.5 * width;
+      const same = 0.5 + 0.5 * w;
+      const opp = 0.5 - 0.5 * w;
       midGain.crossLfromL.gain.value = same;
       midGain.crossLfromR.gain.value = opp;
       midGain.crossRfromR.gain.value = same;
       midGain.crossRfromL.gain.value = opp;
     }
 
+    // Fast CORS capability probe so non-CORS CDNs never block or mute audio
+    async function checkUrlSupportsCors(url) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 1100);
+      try {
+        const res = await fetch(url, {
+          method: "HEAD",
+          mode: "cors",
+          signal: controller.signal
+        });
+        clearTimeout(timer);
+        return res.ok;
+      } catch (_) {
+        clearTimeout(timer);
+        return false;
+      }
+    }
+
     // =========================================================================
-    // 4. HARDWARE-ACCELERATED WEBGL2 GPU SPECTRUM SHADER ENGINE
+    // 4. WEBGL2 GPU SHADER SPECTRUM VISUALIZER
     // =========================================================================
     const canvas = $("gpuVisualizer");
     let gl = null;
     let glProgram = null;
     let freqTex = null;
-    let timeUniformLoc = null;
-    let modeUniformLoc = null;
-    let resUniformLoc = null;
-    const freqData = new Uint8Array(256);
-    const syntheticData = new Uint8Array(256);
+    let timeLoc = null;
+    let modeLoc = null;
+    const freqBins = new Uint8Array(256);
 
-    function initGpuVisualizer() {
+    function initGpuShader() {
       gl = canvas.getContext("webgl2", {
         antialias: false,
         powerPreference: "high-performance",
         desynchronized: true
       });
-
       if (!gl) {
-        $("gpuRendererBadge").textContent = "GPU: 2D Accelerated";
+        $("gpuLabel").textContent = "GPU: 2D Fallback";
         return;
       }
 
-      const dbgInfo = gl.getExtension("WEBGL_debug_renderer_info");
-      if (dbgInfo) {
-        const rendererName = gl.getParameter(dbgInfo.UNMASKED_RENDERER_WEBGL);
-        const shortGpu = rendererName.replace(/ANGLE \(|, Direct3D.*|\)/g, "").slice(0, 26);
-        $("gpuRendererBadge").textContent = `GPU: ${shortGpu}`;
+      const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+      if (dbg) {
+        const raw = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);
+        const clean = raw.replace(/ANGLE \(|, Direct3D.*|\)/g, "").slice(0, 24);
+        $("gpuLabel").textContent = `GPU: ${clean}`;
       } else {
-        $("gpuRendererBadge").textContent = "GPU: WebGL2 Active";
+        $("gpuLabel").textContent = "GPU: WebGL2 Active";
       }
 
-      const vsSource = `#version 300 es
+      const vs = `#version 300 es
         in vec2 a_pos;
         out vec2 v_uv;
         void main() {
@@ -1571,61 +1601,53 @@
         }
       `;
 
-      const fsSource = `#version 300 es
+      const fs = `#version 300 es
         precision highp float;
         in vec2 v_uv;
         out vec4 fragColor;
         uniform sampler2D u_fft;
         uniform float u_time;
         uniform int u_mode;
-        uniform vec2 u_res;
 
         void main() {
           vec2 uv = v_uv;
-          float sampleX = pow(uv.x, 1.45);
-          float amp = texture(u_fft, vec2(sampleX, 0.5)).r;
+          float sx = pow(uv.x, 1.4);
+          float amp = texture(u_fft, vec2(sx, 0.5)).r;
 
-          vec3 cyan = vec3(0.0, 0.94, 1.0);
-          vec3 violet = vec3(0.55, 0.36, 0.96);
-          vec3 emerald = vec3(0.06, 0.73, 0.51);
-          vec3 baseColor = mix(cyan, violet, uv.x);
-          baseColor = mix(baseColor, emerald, amp * 0.45);
+          vec3 ice = vec3(0.22, 0.74, 0.97);
+          vec3 chrome = vec3(0.86, 0.92, 0.98);
+          vec3 amber = vec3(0.96, 0.62, 0.04);
+          vec3 tone = mix(ice, chrome, uv.x * 0.65 + amp * 0.35);
+          tone = mix(tone, amber, pow(amp, 2.2) * 0.45);
 
-          vec3 col = vec3(0.02, 0.03, 0.06);
+          vec3 col = vec3(0.024, 0.031, 0.047);
 
           if (u_mode == 0) {
-            // Mode 0: Harmonic Aurora Shader
-            float wave1 = sin(uv.x * 14.0 - u_time * 2.6) * 0.08 * (0.25 + amp * 1.4);
-            float wave2 = cos(uv.x * 22.0 + u_time * 3.4) * 0.05 * amp;
-            float center = 0.5 + wave1 + wave2;
-            float dist = abs(uv.y - center);
-            float band = (0.022 + amp * 0.28) / (dist + 0.018);
-            col += baseColor * band * 0.55;
-            // Subtle mirror floor glow
-            float floorGlow = smoothstep(amp * 0.85, 0.0, uv.y) * 0.38;
-            col += baseColor * floorGlow;
+            float w1 = sin(uv.x * 13.0 - u_time * 2.5) * 0.08 * (0.2 + amp * 1.45);
+            float w2 = cos(uv.x * 21.0 + u_time * 3.2) * 0.045 * amp;
+            float mid = 0.5 + w1 + w2;
+            float dist = abs(uv.y - mid);
+            float glow = (0.02 + amp * 0.26) / (dist + 0.018);
+            col += tone * glow * 0.55;
+            col += tone * smoothstep(amp * 0.85, 0.0, uv.y) * 0.32;
           } else if (u_mode == 1) {
-            // Mode 1: 64-Band Precision Spectrum Bars
-            float numBars = 64.0;
-            float cell = fract(uv.x * numBars);
-            float barId = (floor(uv.x * numBars) + 0.5) / numBars;
-            float barAmp = texture(u_fft, vec2(pow(barId, 1.4), 0.5)).r;
-            float maskX = smoothstep(0.12, 0.22, cell) * smoothstep(0.88, 0.78, cell);
-            float maskY = step(uv.y, max(0.04, barAmp * 0.92));
-            float tipGlow = smoothstep(0.03, 0.0, abs(uv.y - max(0.04, barAmp * 0.92))) * 0.8;
-            col += baseColor * (maskX * maskY * (0.55 + uv.y * 0.7) + maskX * tipGlow);
+            float bars = 64.0;
+            float cell = fract(uv.x * bars);
+            float id = (floor(uv.x * bars) + 0.5) / bars;
+            float bAmp = texture(u_fft, vec2(pow(id, 1.38), 0.5)).r;
+            float mx = smoothstep(0.14, 0.24, cell) * smoothstep(0.86, 0.76, cell);
+            float my = step(uv.y, max(0.04, bAmp * 0.92));
+            float cap = smoothstep(0.028, 0.0, abs(uv.y - max(0.04, bAmp * 0.92))) * 0.85;
+            col += tone * (mx * my * (0.55 + uv.y * 0.65) + mx * cap);
           } else {
-            // Mode 2: Dual Phase Oscilloscope
             float w = texture(u_fft, vec2(uv.x, 0.5)).r;
-            float yTarget = 0.5 + (w - 0.35) * sin(uv.x * 38.0 + u_time * 6.0) * 0.75;
+            float yTarget = 0.5 + (w - 0.35) * sin(uv.x * 36.0 + u_time * 5.8) * 0.72;
             float line = 0.012 / (abs(uv.y - yTarget) + 0.008);
-            col += baseColor * line * 0.85;
+            col += tone * line * 0.88;
           }
 
-          // Subtle scanline grid
-          float grid = smoothstep(0.96, 1.0, sin(uv.y * 55.0)) * 0.04;
-          col += vec3(grid);
-
+          float scan = smoothstep(0.95, 1.0, sin(uv.y * 54.0)) * 0.035;
+          col += vec3(scan);
           fragColor = vec4(col, 1.0);
         }
       `;
@@ -1638,8 +1660,8 @@
       };
 
       glProgram = gl.createProgram();
-      gl.attachShader(glProgram, compile(gl.VERTEX_SHADER, vsSource));
-      gl.attachShader(glProgram, compile(gl.FRAGMENT_SHADER, fsSource));
+      gl.attachShader(glProgram, compile(gl.VERTEX_SHADER, vs));
+      gl.attachShader(glProgram, compile(gl.FRAGMENT_SHADER, fs));
       gl.linkProgram(glProgram);
       gl.useProgram(glProgram);
 
@@ -1658,35 +1680,30 @@
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, 256, 1, 0, gl.RED, gl.UNSIGNED_BYTE, freqData);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, 256, 1, 0, gl.RED, gl.UNSIGNED_BYTE, freqBins);
 
-      timeUniformLoc = gl.getUniformLocation(glProgram, "u_time");
-      modeUniformLoc = gl.getUniformLocation(glProgram, "u_mode");
-      resUniformLoc = gl.getUniformLocation(glProgram, "u_res");
+      timeLoc = gl.getUniformLocation(glProgram, "u_time");
+      modeLoc = gl.getUniformLocation(glProgram, "u_mode");
     }
 
-    function renderVisualizerLoop(nowMs) {
-      requestAnimationFrame(renderVisualizerLoop);
-
+    function renderGpuFrame(nowMs) {
+      requestAnimationFrame(renderGpuFrame);
       const t = nowMs * 0.001;
-      if (analyserNode && isPlaying && !corsFallbackActive) {
+
+      if (isPlaying && usingCorsDspEngine && analyserNode) {
         const raw = new Uint8Array(analyserNode.frequencyBinCount);
         analyserNode.getByteFrequencyData(raw);
-        for (let i = 0; i < 256; i++) {
-          freqData[i] = raw[i * 2] || 0;
-        }
+        for (let i = 0; i < 256; i++) freqBins[i] = raw[i * 2] || 0;
       } else if (isPlaying) {
-        // Harmonic fallback pulse when remote server blocks CORS header
+        // Harmonic motion synced to active playback time when remote host blocks CORS FFT inspection
+        const pt = nativeAudio.currentTime || t;
         for (let i = 0; i < 256; i++) {
-          const v = Math.sin(t * 4.2 + i * 0.14) * 0.5 + 0.5;
-          const bass = Math.exp(-i * 0.025) * (0.65 + 0.35 * Math.sin(t * 7.5));
-          syntheticData[i] = Math.min(255, Math.floor((v * 90 + bass * 165)));
+          const wave = Math.sin(pt * 5.2 + i * 0.13) * 0.5 + 0.5;
+          const sub = Math.exp(-i * 0.022) * (0.62 + 0.38 * Math.sin(pt * 8.4));
+          freqBins[i] = Math.min(255, Math.floor(wave * 85 + sub * 170));
         }
-        freqData.set(syntheticData);
       } else {
-        for (let i = 0; i < 256; i++) {
-          freqData[i] = Math.max(8, Math.floor(freqData[i] * 0.9));
-        }
+        for (let i = 0; i < 256; i++) freqBins[i] = Math.max(6, Math.floor(freqBins[i] * 0.9));
       }
 
       if (gl && glProgram) {
@@ -1702,23 +1719,21 @@
         gl.useProgram(glProgram);
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, freqTex);
-        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 256, 1, gl.RED, gl.UNSIGNED_BYTE, freqData);
-
-        gl.uniform1f(timeUniformLoc, t);
-        gl.uniform1i(modeUniformLoc, vizMode === "aurora" ? 0 : vizMode === "bars" ? 1 : 2);
-        gl.uniform2f(resUniformLoc, w, h);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 256, 1, gl.RED, gl.UNSIGNED_BYTE, freqBins);
+        gl.uniform1f(timeLoc, t);
+        gl.uniform1i(modeLoc, vizMode === "aurora" ? 0 : vizMode === "bars" ? 1 : 2);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
     }
 
     // =========================================================================
-    // 5. PLAYBACK CONTROLLER & CORS-RESILIENT STREAM LOADER
+    // 5. PLAYBACK CONTROLLER (100% RELIABLE ACROSS ALL AUDIO HOSTS)
     // =========================================================================
-    function setPlayingState(playing) {
+    function syncPlayStateUI(playing) {
       isPlaying = playing;
-      iconPlay.style.display = playing ? "none" : "block";
-      iconPause.style.display = playing ? "block" : "none";
-      discStage.classList.toggle("is-playing", playing);
+      $("glyphPlay").style.display = playing ? "none" : "block";
+      $("glyphPause").style.display = playing ? "block" : "none";
+      $("platterWell").classList.toggle("is-playing", playing);
     }
 
     async function loadAndPlayTrack(index, autoPlay = true) {
@@ -1726,68 +1741,94 @@
       currentTrackIndex = index;
       const track = allTracks[index];
 
-      // Update Hero UI
-      heroTitle.textContent = track.title || "Untitled Master";
-      heroArtist.textContent = track.artist || "Unknown Artist";
-      heroAlbum.textContent = track.album ? `Album: ${track.album}` : "Play Mine High-Resolution Stream";
-      heroQuality.textContent = (track.quality || "24-BIT / 96KHZ LOSSLESS").toUpperCase();
-      heroGenre.textContent = track.genre || "Studio Master";
-      heroCover.src = track.coverUrl && track.coverUrl.trim() ? track.coverUrl.trim() : generateArtworkDataURI(track.title + track.artist);
+      $("heroTitle").textContent = track.title || "Untitled Track";
+      $("heroArtist").textContent = track.artist || "Unknown Artist";
+      $("heroAlbum").textContent = track.album ? `Album: ${track.album}` : "Play Mine Lossless Stream";
+      $("heroQuality").textContent = (track.quality || "LOSSLESS STREAM").toUpperCase();
+      $("heroGenre").textContent = track.genre || "Studio Master";
+      $("heroCover").src = track.coverUrl && track.coverUrl.trim()
+        ? track.coverUrl.trim()
+        : buildVinylDiscSvg((track.title || "") + (track.artist || ""));
 
       renderTrackList();
 
-      // Update Media Session API for OS / Lockscreen / Bluetooth Controls
       if ("mediaSession" in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: track.title || "Play Mine",
           artist: track.artist || "Sanchar Koirala",
-          album: track.album || "Play Mine Studio",
-          artwork: [{ src: heroCover.src, sizes: "512x512", type: "image/png" }]
+          album: track.album || "Play Mine",
+          artwork: [{ src: $("heroCover").src, sizes: "512x512", type: "image/png" }]
         });
       }
 
-      if (autoPlay) {
-        initAudioEngine();
-        corsFallbackActive = false;
-        audioEl.crossOrigin = "anonymous";
-        audioEl.src = track.url;
-        bitrateReadout.textContent = "Buffering High-Resolution Stream…";
+      if (!autoPlay) return;
 
+      stopAllPlayers();
+      $("streamStatusText").textContent = "Buffering Audio Stream…";
+
+      const vol = parseFloat($("volumeFader").value);
+      const muted = $("btnMute").classList.contains("is-engaged");
+
+      // Check whether remote host sends CORS headers for Web Audio DSP
+      const supportsCors = await checkUrlSupportsCors(track.url);
+
+      if (supportsCors) {
         try {
-          await audioEl.play();
-          setPlayingState(true);
-          bitrateReadout.textContent = "32-Bit Float DSP • Active";
+          ensureWebAudioDsp();
+          usingCorsDspEngine = true;
+          corsAudio.volume = 1;
+          corsAudio.muted = muted;
+          if (masterGainNode) masterGainNode.gain.value = vol;
+          corsAudio.src = track.url;
+          await corsAudio.play();
+          syncPlayStateUI(true);
+          $("enginePathTag").textContent = dspBypass ? "• Bit-Perfect Direct" : "• 32-Bit Float DSP";
+          $("streamStatusText").textContent = "32-Bit Float Web Audio Active";
+          return;
         } catch (err) {
-          // Graceful fallback if remote CDN omits CORS Access-Control-Allow-Origin
-          console.warn("Retrying stream in Direct Hardware Mode:", err);
-          corsFallbackActive = true;
-          audioEl.removeAttribute("crossorigin");
-          audioEl.src = track.url;
-          try {
-            await audioEl.play();
-            setPlayingState(true);
-            bitrateReadout.textContent = "Direct Hardware DAC Stream • Active";
-          } catch (fatalErr) {
-            setPlayingState(false);
-            bitrateReadout.textContent = "Stream Unavailable";
-            showToast("Unable to play audio stream URL. Check link in Admin.");
-          }
+          console.warn("Falling back to Native DAC player:", err);
         }
+      }
+
+      // Native Hardware DAC Path (Untainted by createMediaElementSource — plays any host)
+      try {
+        usingCorsDspEngine = false;
+        nativeAudio.volume = vol;
+        nativeAudio.muted = muted;
+        nativeAudio.src = track.url;
+        await nativeAudio.play();
+        syncPlayStateUI(true);
+        $("enginePathTag").textContent = "• Hardware DAC Direct";
+        $("streamStatusText").textContent = "Hardware Native DAC Stream Active";
+      } catch (err) {
+        console.error("Audio playback failed:", err);
+        syncPlayStateUI(false);
+        $("enginePathTag").textContent = "• Stream Error";
+        $("streamStatusText").textContent = "Unable to stream audio URL";
+        showToast("Stream blocked or invalid audio URL.");
       }
     }
 
     function togglePlayPause() {
-      if (allTracks.length === 0) return;
+      if (allTracks.length === 0) {
+        showToast("No tracks in library yet. Add songs via Admin.");
+        return;
+      }
       if (currentTrackIndex === -1) {
         loadAndPlayTrack(0, true);
         return;
       }
-      initAudioEngine();
-      if (audioEl.paused) {
-        audioEl.play().then(() => setPlayingState(true)).catch(() => {});
+      const player = getActivePlayer();
+      if (player.paused) {
+        if (usingCorsDspEngine && audioCtx && audioCtx.state === "suspended") {
+          audioCtx.resume().catch(() => {});
+        }
+        player.play().then(() => syncPlayStateUI(true)).catch(() => {
+          loadAndPlayTrack(currentTrackIndex, true);
+        });
       } else {
-        audioEl.pause();
-        setPlayingState(false);
+        player.pause();
+        syncPlayStateUI(false);
       }
     }
 
@@ -1795,81 +1836,85 @@
       if (allTracks.length === 0) return;
       if (isShuffle && allTracks.length > 1) {
         let nextIdx;
-        do {
-          nextIdx = Math.floor(Math.random() * allTracks.length);
-        } while (nextIdx === currentTrackIndex);
+        do { nextIdx = Math.floor(Math.random() * allTracks.length); } while (nextIdx === currentTrackIndex);
         loadAndPlayTrack(nextIdx, true);
         return;
       }
-      const nextIdx = (currentTrackIndex + 1) % allTracks.length;
-      loadAndPlayTrack(nextIdx, true);
+      loadAndPlayTrack((currentTrackIndex + 1) % allTracks.length, true);
     }
 
     function playPrevTrack() {
       if (allTracks.length === 0) return;
-      if (audioEl.currentTime > 3) {
-        audioEl.currentTime = 0;
+      const player = getActivePlayer();
+      if (player.currentTime > 3) {
+        player.currentTime = 0;
         return;
       }
-      const prevIdx = (currentTrackIndex - 1 + allTracks.length) % allTracks.length;
-      loadAndPlayTrack(prevIdx, true);
+      loadAndPlayTrack((currentTrackIndex - 1 + allTracks.length) % allTracks.length, true);
     }
 
-    // Audio Element Listeners
-    audioEl.addEventListener("timeupdate", () => {
-      const cur = audioEl.currentTime || 0;
-      const dur = audioEl.duration || 0;
-      currentTimeLabel.textContent = formatTime(cur);
-      if (dur > 0) {
-        totalTimeLabel.textContent = formatTime(dur);
-        const pct = Math.min(100, (cur / dur) * 100);
-        progressFill.style.width = `${pct}%`;
-        progressThumb.style.left = `${pct}%`;
-        progressTrack.setAttribute("aria-valuenow", Math.round(pct));
-      }
-    });
+    // Bind progress & ended events to BOTH audio engines
+    [corsAudio, nativeAudio].forEach((el) => {
+      el.addEventListener("timeupdate", () => {
+        if (el !== getActivePlayer()) return;
+        const cur = el.currentTime || 0;
+        const dur = el.duration || 0;
+        $("curTimeText").textContent = formatTime(cur);
+        if (dur > 0) {
+          $("totTimeText").textContent = formatTime(dur);
+          const pct = Math.min(100, (cur / dur) * 100);
+          $("scrubberFill").style.width = `${pct}%`;
+          $("scrubberKnob").style.left = `${pct}%`;
+          $("scrubberGroove").setAttribute("aria-valuenow", Math.round(pct));
+        }
+      });
 
-    audioEl.addEventListener("progress", () => {
-      if (audioEl.buffered.length > 0 && audioEl.duration > 0) {
-        const end = audioEl.buffered.end(audioEl.buffered.length - 1);
-        progressBuffer.style.width = `${Math.min(100, (end / audioEl.duration) * 100)}%`;
-      }
-    });
+      el.addEventListener("progress", () => {
+        if (el !== getActivePlayer()) return;
+        if (el.buffered.length > 0 && el.duration > 0) {
+          const end = el.buffered.end(el.buffered.length - 1);
+          $("scrubberBuffer").style.width = `${Math.min(100, (end / el.duration) * 100)}%`;
+        }
+      });
 
-    audioEl.addEventListener("ended", () => {
-      if (loopMode === 2) {
-        audioEl.currentTime = 0;
-        audioEl.play();
-      } else if (loopMode === 1 || currentTrackIndex < allTracks.length - 1 || isShuffle) {
-        playNextTrack();
-      } else {
-        setPlayingState(false);
-      }
+      el.addEventListener("ended", () => {
+        if (el !== getActivePlayer()) return;
+        if (loopMode === 2) {
+          el.currentTime = 0;
+          el.play();
+        } else if (loopMode === 1 || currentTrackIndex < allTracks.length - 1 || isShuffle) {
+          playNextTrack();
+        } else {
+          syncPlayStateUI(false);
+        }
+      });
     });
 
     // Scrubber Seeking
-    function seekFromPointer(clientX) {
-      if (!audioEl.duration) return;
-      const rect = progressTrack.getBoundingClientRect();
+    function seekAtClientX(clientX) {
+      const player = getActivePlayer();
+      if (!player.duration) return;
+      const rect = $("scrubberGroove").getBoundingClientRect();
       const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-      audioEl.currentTime = ratio * audioEl.duration;
+      player.currentTime = ratio * player.duration;
     }
 
-    let isDraggingSeek = false;
-    progressTrack.addEventListener("pointerdown", (e) => {
-      isDraggingSeek = true;
-      progressTrack.setPointerCapture(e.pointerId);
-      seekFromPointer(e.clientX);
+    let seekingActive = false;
+    $("scrubberGroove").addEventListener("pointerdown", (e) => {
+      seekingActive = true;
+      triggerHaptic(8);
+      $("scrubberGroove").setPointerCapture(e.pointerId);
+      seekAtClientX(e.clientX);
     });
-    progressTrack.addEventListener("pointermove", (e) => {
-      if (isDraggingSeek) seekFromPointer(e.clientX);
+    $("scrubberGroove").addEventListener("pointermove", (e) => {
+      if (seekingActive) seekAtClientX(e.clientX);
     });
-    progressTrack.addEventListener("pointerup", () => {
-      isDraggingSeek = false;
+    $("scrubberGroove").addEventListener("pointerup", () => {
+      seekingActive = false;
     });
 
     // =========================================================================
-    // 6. LIBRARY RENDERING & REALTIME FIREBASE SYNC
+    // 6. REALTIME FIREBASE LIBRARY RENDERING (NO HARDCODED SONGS)
     // =========================================================================
     function applyFilters() {
       const q = searchQuery.toLowerCase().trim();
@@ -1893,246 +1938,248 @@
     }
 
     function renderTrackList() {
-      trackCountPill.textContent = `${filteredTracks.length} ${filteredTracks.length === 1 ? "Track" : "Tracks"}`;
-      trackListEl.innerHTML = "";
+      const container = $("trackScroll");
+      $("countPill").textContent = `${filteredTracks.length} ${filteredTracks.length === 1 ? "Track" : "Tracks"}`;
+      container.innerHTML = "";
 
-      if (filteredTracks.length === 0) {
-        const empty = document.createElement("div");
-        empty.style.cssText = "padding:32px 16px;text-align:center;color:var(--text-muted);font-size:0.88rem;";
-        empty.textContent = "No matching tracks found in cloud library.";
-        trackListEl.appendChild(empty);
+      if (allTracks.length === 0) {
+        container.innerHTML = `
+          <div class="empty-vault neu-well">
+            <div style="font-weight:700;color:var(--chrome-bright);">No Tracks Published Yet</div>
+            <div>Use your Admin Studio to publish your first audio link in real time.</div>
+          </div>
+        `;
         return;
       }
 
-      const activeTrackId = currentTrackIndex >= 0 && allTracks[currentTrackIndex] ? allTracks[currentTrackIndex].id : null;
+      if (filteredTracks.length === 0) {
+        container.innerHTML = `
+          <div class="empty-vault neu-well">
+            <div>No tracks match your current filter.</div>
+          </div>
+        `;
+        return;
+      }
+
+      const activeId = currentTrackIndex >= 0 && allTracks[currentTrackIndex] ? allTracks[currentTrackIndex].id : null;
 
       filteredTracks.forEach((track) => {
-        const card = document.createElement("div");
-        const isCurrent = track.id === activeTrackId;
-        card.className = `track-card${isCurrent ? " is-active" : ""}`;
-        card.setAttribute("role", "button");
-        card.setAttribute("tabindex", "0");
+        const plate = document.createElement("div");
+        const isCurrent = track.id === activeId;
+        plate.className = `track-plate${isCurrent ? " is-current" : ""}`;
+        plate.setAttribute("role", "button");
+        plate.setAttribute("tabindex", "0");
 
-        const artSrc = track.coverUrl && track.coverUrl.trim()
+        const coverSrc = track.coverUrl && track.coverUrl.trim()
           ? track.coverUrl.trim()
-          : generateArtworkDataURI((track.title || "") + (track.artist || ""));
+          : buildVinylDiscSvg((track.title || "") + (track.artist || ""));
 
-        card.innerHTML = `
-          <div class="track-thumb-wrap">
-            <img class="track-thumb" src="${artSrc}" alt="" loading="lazy" />
-            <div class="eq-bars-overlay">
-              <div class="eq-bar"></div>
-              <div class="eq-bar"></div>
-              <div class="eq-bar"></div>
+        plate.innerHTML = `
+          <div class="plate-art-box">
+            <img class="plate-art" src="${coverSrc}" alt="" loading="lazy" />
+            <div class="eq-live-mask">
+              <div class="eq-needle"></div>
+              <div class="eq-needle"></div>
+              <div class="eq-needle"></div>
             </div>
           </div>
-          <div class="track-info">
-            <div class="track-title-row">
-              <span class="track-name">${escapeHtml(track.title || "Untitled")}</span>
-              ${track.featured ? '<span class="featured-star" title="Featured Track">★</span>' : ""}
+          <div class="plate-meta">
+            <div class="plate-title">
+              <span>${escapeHtml(track.title || "Untitled")}</span>
+              ${track.featured ? '<span style="color:var(--led-amber);font-size:0.75rem;">★</span>' : ""}
             </div>
-            <div class="track-sub">${escapeHtml(track.artist || "Unknown Artist")}${track.album ? " • " + escapeHtml(track.album) : ""}</div>
+            <div class="plate-sub">${escapeHtml(track.artist || "Unknown Artist")}${track.album ? " • " + escapeHtml(track.album) : ""}</div>
           </div>
-          <div class="track-right">
-            <span class="track-dur">${escapeHtml(track.duration || "--:--")}</span>
-            <span class="mini-tag">${escapeHtml((track.quality || "HI-RES").split(" ")[0])}</span>
+          <div class="plate-end">
+            <span class="plate-time">${escapeHtml(track.duration || "--:--")}</span>
+            <span class="plate-tag">${escapeHtml((track.quality || "HI-RES").split(" ")[0])}</span>
           </div>
         `;
 
-        const activateTrack = () => {
-          const realIndex = allTracks.findIndex((item) => item.id === track.id);
-          if (realIndex === currentTrackIndex) {
+        bindHapticKey(plate, () => {
+          const idx = allTracks.findIndex((item) => item.id === track.id);
+          if (idx === currentTrackIndex) {
             togglePlayPause();
           } else {
-            loadAndPlayTrack(realIndex, true);
+            loadAndPlayTrack(idx, true);
           }
-        };
+        });
 
-        bindTactileDiv(card, activateTrack);
-        trackListEl.appendChild(card);
+        container.appendChild(plate);
       });
     }
 
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-    }
-
-    // Subscribe to Realtime Database updates
+    // Live Firebase Realtime Database Subscription
     onValue(
       tracksRef,
       (snapshot) => {
-        $("rtdbDot").style.background = "var(--neon-emerald)";
-        $("rtdbStatus").textContent = "RTDB Live Sync";
+        $("rtdbLed").className = "led-pip";
+        $("rtdbLabel").textContent = "RTDB Live Sync";
 
         const val = snapshot.val();
-        const prevActiveId = currentTrackIndex >= 0 && allTracks[currentTrackIndex] ? allTracks[currentTrackIndex].id : null;
+        const prevId = currentTrackIndex >= 0 && allTracks[currentTrackIndex] ? allTracks[currentTrackIndex].id : null;
 
         if (val && typeof val === "object") {
           allTracks = Object.entries(val)
             .map(([id, item]) => ({ id, ...item }))
             .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.createdAt || 0) - (a.createdAt || 0));
         } else {
-          allTracks = [...FALLBACK_TRACKS];
+          allTracks = [];
         }
 
-        // Preserve currently playing track index across live updates
-        if (prevActiveId) {
-          const newIdx = allTracks.findIndex((t) => t.id === prevActiveId);
-          currentTrackIndex = newIdx;
-          if (newIdx >= 0) {
-            const updated = allTracks[newIdx];
-            heroTitle.textContent = updated.title || "Untitled";
-            heroArtist.textContent = updated.artist || "Unknown Artist";
-            heroAlbum.textContent = updated.album ? `Album: ${updated.album}` : "Play Mine High-Resolution Stream";
-            heroQuality.textContent = (updated.quality || "24-BIT / 96KHZ LOSSLESS").toUpperCase();
-            heroGenre.textContent = updated.genre || "Studio Master";
+        if (allTracks.length === 0) {
+          stopAllPlayers();
+          syncPlayStateUI(false);
+          currentTrackIndex = -1;
+          $("heroTitle").textContent = "No Tracks Published";
+          $("heroArtist").textContent = "Play Mine Cloud";
+          $("heroAlbum").textContent = "Publish tracks from Admin to start listening";
+          $("heroQuality").textContent = "LOSSLESS STREAM";
+          $("heroGenre").textContent = "Empty Vault";
+          $("heroCover").src = buildVinylDiscSvg("Play Mine");
+        } else if (prevId) {
+          const nextIdx = allTracks.findIndex((t) => t.id === prevId);
+          currentTrackIndex = nextIdx;
+          if (nextIdx >= 0) {
+            const cur = allTracks[nextIdx];
+            $("heroTitle").textContent = cur.title || "Untitled";
+            $("heroArtist").textContent = cur.artist || "Unknown Artist";
+            $("heroAlbum").textContent = cur.album ? `Album: ${cur.album}` : "Play Mine Lossless Stream";
+            $("heroQuality").textContent = (cur.quality || "LOSSLESS STREAM").toUpperCase();
+            $("heroGenre").textContent = cur.genre || "Studio Master";
           }
-        } else if (allTracks.length > 0 && currentTrackIndex === -1) {
-          // Preload metadata of first track without auto-playing
+        } else if (currentTrackIndex === -1) {
           const first = allTracks[0];
-          heroTitle.textContent = first.title || "Untitled";
-          heroArtist.textContent = first.artist || "Unknown Artist";
-          heroAlbum.textContent = first.album ? `Album: ${first.album}` : "Ready to stream";
-          heroQuality.textContent = (first.quality || "24-BIT / 96KHZ LOSSLESS").toUpperCase();
-          heroGenre.textContent = first.genre || "Studio Master";
-          heroCover.src = first.coverUrl && first.coverUrl.trim()
+          $("heroTitle").textContent = first.title || "Untitled";
+          $("heroArtist").textContent = first.artist || "Unknown Artist";
+          $("heroAlbum").textContent = first.album ? `Album: ${first.album}` : "Ready to play";
+          $("heroQuality").textContent = (first.quality || "LOSSLESS STREAM").toUpperCase();
+          $("heroGenre").textContent = first.genre || "Studio Master";
+          $("heroCover").src = first.coverUrl && first.coverUrl.trim()
             ? first.coverUrl.trim()
-            : generateArtworkDataURI(first.title + first.artist);
-          totalTimeLabel.textContent = first.duration || "00:00";
+            : buildVinylDiscSvg((first.title || "") + (first.artist || ""));
+          $("totTimeText").textContent = first.duration || "00:00";
         }
 
         applyFilters();
       },
-      (error) => {
-        console.error("RTDB Error:", error);
-        $("rtdbDot").style.background = "var(--neon-amber)";
-        $("rtdbStatus").textContent = "Offline Fallback";
-        allTracks = [...FALLBACK_TRACKS];
-        applyFilters();
+      (err) => {
+        console.error("RTDB Error:", err);
+        $("rtdbLed").className = "led-pip amber";
+        $("rtdbLabel").textContent = "RTDB Offline";
       }
     );
 
     // =========================================================================
-    // 7. WIRE UI CONTROLS & DSP EVENT HANDLERS
+    // 7. WIRE HAPTIC TRANSPORT & DSP CONTROLS
     // =========================================================================
-    bindTactileDiv($("btnPlayPause"), togglePlayPause);
-    bindTactileDiv($("btnNext"), playNextTrack);
-    bindTactileDiv($("btnPrev"), playPrevTrack);
+    bindHapticKey($("btnPlayPause"), togglePlayPause);
+    bindHapticKey($("btnNext"), playNextTrack);
+    bindHapticKey($("btnPrev"), playPrevTrack);
 
-    bindTactileDiv($("btnShuffle"), () => {
+    bindHapticKey($("btnShuffle"), () => {
       isShuffle = !isShuffle;
-      $("btnShuffle").classList.toggle("active", isShuffle);
-      showToast(isShuffle ? "Shuffle Queue: ON" : "Shuffle Queue: OFF");
+      $("btnShuffle").classList.toggle("is-engaged", isShuffle);
+      showToast(isShuffle ? "Shuffle: ON" : "Shuffle: OFF");
     });
 
-    bindTactileDiv($("btnLoop"), () => {
+    bindHapticKey($("btnLoop"), () => {
       loopMode = (loopMode + 1) % 3;
-      const btn = $("btnLoop");
-      btn.classList.toggle("active", loopMode > 0);
-      const labels = ["Repeat: Off", "Repeat: All Queue", "Repeat: Single Track"];
-      btn.title = labels[loopMode];
-      showToast(labels[loopMode]);
+      $("btnLoop").classList.toggle("is-engaged", loopMode > 0);
+      const msgs = ["Repeat: Off", "Repeat: All Queue", "Repeat: Single Track"];
+      $("btnLoop").title = msgs[loopMode];
+      showToast(msgs[loopMode]);
     });
 
-    bindTactileDiv($("btnMute"), () => {
-      audioEl.muted = !audioEl.muted;
-      $("btnMute").classList.toggle("active", audioEl.muted);
-      showToast(audioEl.muted ? "Audio Muted" : "Audio Unmuted");
+    bindHapticKey($("btnMute"), () => {
+      const nextMuted = !$("btnMute").classList.contains("is-engaged");
+      $("btnMute").classList.toggle("is-engaged", nextMuted);
+      corsAudio.muted = nextMuted;
+      nativeAudio.muted = nextMuted;
+      showToast(nextMuted ? "Muted" : "Unmuted");
     });
 
-    $("volumeSlider").addEventListener("input", (e) => {
+    $("volumeFader").addEventListener("input", (e) => {
       const v = parseFloat(e.target.value);
-      audioEl.volume = v;
+      nativeAudio.volume = v;
       if (masterGainNode) masterGainNode.gain.value = v;
     });
 
-    // DSP Mode Switch
-    bindTactileDiv($("modeStudioDsp"), () => {
+    bindHapticKey($("btnModeDsp"), () => {
       dspBypass = false;
-      $("modeStudioDsp").classList.add("active");
-      $("modeBitPerfect").classList.remove("active");
-      rebuildAudioGraph();
-      showToast("Studio Mastering 32-Bit DSP Active");
+      $("btnModeDsp").classList.add("is-engaged");
+      $("btnModeDirect").classList.remove("is-engaged");
+      rebuildDspRouting();
+      showToast("Mastering EQ Engaged");
     });
 
-    bindTactileDiv($("modeBitPerfect"), () => {
+    bindHapticKey($("btnModeDirect"), () => {
       dspBypass = true;
-      $("modeBitPerfect").classList.add("active");
-      $("modeStudioDsp").classList.remove("active");
-      rebuildAudioGraph();
-      showToast("Bit-Perfect Direct Pass-Through Active");
+      $("btnModeDirect").classList.add("is-engaged");
+      $("btnModeDsp").classList.remove("is-engaged");
+      rebuildDspRouting();
+      showToast("Bit-Perfect Bypass Engaged");
     });
 
-    // 5-Band EQ Sliders
-    document.querySelectorAll(".vertical-eq").forEach((slider) => {
-      slider.addEventListener("input", (e) => {
+    document.querySelectorAll(".eq-vertical").forEach((fader) => {
+      fader.addEventListener("input", (e) => {
         const band = parseInt(e.target.dataset.band, 10);
-        const dbVal = parseFloat(e.target.value);
-        $(`eqVal${band}`).textContent = `${dbVal > 0 ? "+" : ""}${dbVal.toFixed(1)} dB`;
-        if (eqNodes[band]) eqNodes[band].gain.value = dbVal;
+        const val = parseFloat(e.target.value);
+        $(`eqRead${band}`).textContent = `${val > 0 ? "+" : ""}${val.toFixed(1)} dB`;
+        if (eqNodes[band]) eqNodes[band].gain.value = val;
       });
     });
 
-    // EQ Presets
-    document.querySelectorAll("#eqPresetBar .preset-pill").forEach((pill) => {
-      bindTactileDiv(pill, () => {
-        document.querySelectorAll("#eqPresetBar .preset-pill").forEach((p) => p.classList.remove("active"));
-        pill.classList.add("active");
+    document.querySelectorAll("#presetBar .mini-key").forEach((pill) => {
+      bindHapticKey(pill, () => {
+        document.querySelectorAll("#presetBar .mini-key").forEach((p) => p.classList.remove("is-engaged"));
+        pill.classList.add("is-engaged");
         const gains = EQ_PRESETS[pill.dataset.preset] || [0, 0, 0, 0, 0];
         gains.forEach((g, idx) => {
-          const slider = document.querySelector(`.vertical-eq[data-band="${idx}"]`);
-          if (slider) slider.value = g;
-          $(`eqVal${idx}`).textContent = `${g > 0 ? "+" : ""}${g.toFixed(1)} dB`;
+          const sl = document.querySelector(`.eq-vertical[data-band="${idx}"]`);
+          if (sl) sl.value = g;
+          $(`eqRead${idx}`).textContent = `${g > 0 ? "+" : ""}${g.toFixed(1)} dB`;
           if (eqNodes[idx]) eqNodes[idx].gain.value = g;
         });
-        showToast(`EQ Preset: ${pill.textContent}`);
+        showToast(`EQ: ${pill.textContent}`);
       });
     });
 
-    // Stereo Soundstage Width
-    $("stereoWidthSlider").addEventListener("input", (e) => {
+    $("stereoFader").addEventListener("input", (e) => {
       const w = parseFloat(e.target.value);
-      $("widthLabel").textContent = `${Math.round(w * 100)}% ${w === 0 ? "Mono" : w > 1.05 ? "Enhanced" : "Natural"}`;
+      $("stageReadout").textContent = `${Math.round(w * 100)}% ${w === 0 ? "Mono" : w > 1.05 ? "Wide" : "Natural"}`;
       updateStereoWidth(w);
     });
 
-    // Limiter Toggle
-    bindTactileDiv($("btnLimiter"), () => {
+    bindHapticKey($("btnLimiter"), () => {
       limiterEnabled = !limiterEnabled;
-      $("btnLimiter").classList.toggle("active", limiterEnabled);
+      $("btnLimiter").classList.toggle("is-engaged", limiterEnabled);
       $("btnLimiter").textContent = `Clip Guard: ${limiterEnabled ? "ON" : "OFF"}`;
-      rebuildAudioGraph();
+      rebuildDspRouting();
     });
 
-    // Visualizer Mode Switcher
-    document.querySelectorAll(".viz-mode-pill").forEach((pill) => {
-      bindTactileDiv(pill, () => {
-        document.querySelectorAll(".viz-mode-pill").forEach((p) => p.classList.remove("active"));
-        pill.classList.add("active");
+    document.querySelectorAll(".scope-pill").forEach((pill) => {
+      bindHapticKey(pill, () => {
+        document.querySelectorAll(".scope-pill").forEach((p) => p.classList.remove("is-engaged"));
+        pill.classList.add("is-engaged");
         vizMode = pill.dataset.viz;
       });
     });
 
-    // Search & Filter Pills
-    $("searchInput").addEventListener("input", (e) => {
+    $("searchField").addEventListener("input", (e) => {
       searchQuery = e.target.value;
       applyFilters();
     });
 
-    document.querySelectorAll("#filterPills .preset-pill").forEach((pill) => {
-      bindTactileDiv(pill, () => {
-        document.querySelectorAll("#filterPills .preset-pill").forEach((p) => p.classList.remove("active"));
-        pill.classList.add("active");
+    document.querySelectorAll("#filterBar .mini-key").forEach((pill) => {
+      bindHapticKey(pill, () => {
+        document.querySelectorAll("#filterBar .mini-key").forEach((p) => p.classList.remove("is-engaged"));
+        pill.classList.add("is-engaged");
         activeFilter = pill.dataset.filter;
         applyFilters();
       });
     });
 
-    // Hardware MediaSession & Keyboard Shortcuts
     if ("mediaSession" in navigator) {
       navigator.mediaSession.setActionHandler("play", togglePlayPause);
       navigator.mediaSession.setActionHandler("pause", togglePlayPause);
@@ -2146,17 +2193,16 @@
         e.preventDefault();
         togglePlayPause();
       } else if (e.code === "ArrowRight") {
-        audioEl.currentTime = Math.min(audioEl.duration || 0, (audioEl.currentTime || 0) + 5);
+        const p = getActivePlayer();
+        p.currentTime = Math.min(p.duration || 0, (p.currentTime || 0) + 5);
       } else if (e.code === "ArrowLeft") {
-        audioEl.currentTime = Math.max(0, (audioEl.currentTime || 0) - 5);
-      } else if (e.key.toLowerCase() === "m") {
-        audioEl.muted = !audioEl.muted;
+        const p = getActivePlayer();
+        p.currentTime = Math.max(0, (p.currentTime || 0) - 5);
       }
     });
 
-    // Boot GPU Shader Engine
-    initGpuVisualizer();
-    requestAnimationFrame(renderVisualizerLoop);
+    initGpuShader();
+    requestAnimationFrame(renderGpuFrame);
   </script>
 </body>
 </html>

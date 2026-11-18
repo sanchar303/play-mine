@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
-Allow: /index.html
 Allow: /llms.txt
 Allow: /manifest.json
 Disallow: /admin.html

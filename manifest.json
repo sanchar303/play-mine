@@ -1,13 +1,13 @@
 {
   "name": "Play Mine",
   "short_name": "Play Mine",
-  "description": "High-resolution lossless music streaming application powered by 32-bit Float Web Audio DSP and WebGL2 GPU visualization.",
-  "start_url": "/index.html",
+  "description": "High-resolution lossless music player with 32-bit Float Web Audio DSP and WebGL2 GPU spectrum visualization.",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#05070c",
-  "theme_color": "#07090f",
+  "background_color": "#0b0d12",
+  "theme_color": "#0b0d12",
   "categories": ["music", "audio", "entertainment"],
   "icons": [
     {
