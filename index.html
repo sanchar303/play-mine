@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
   <title>Play Mine</title>
   <meta name="description" content="Play Mine — Free high-resolution music streaming with custom sound tuning, live audio visualizer, and instant song requests." />
   <meta name="theme-color" content="#0b0d12" />
@@ -17,30 +17,26 @@
   <style>
     :root {
       --chassis-bg: #0b0d12;
-      --well-bg: #06080c;
-
-      /* Specular Bevels & Gloss */
       --bevel-top: rgba(255, 255, 255, 0.16);
       --bevel-left: rgba(255, 255, 255, 0.08);
       --bevel-right: rgba(0, 0, 0, 0.55);
       --bevel-bottom: rgba(0, 0, 0, 0.8);
-      --gloss-sheen: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.015) 45%, rgba(255, 255, 255, 0.03) 100%);
+      --gloss-sheen: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 45%, rgba(255, 255, 255, 0.025) 100%);
 
-      /* Deep Neumorphic Elevation */
       --shadow-extrude:
-        12px 12px 26px #030407,
-        -8px -8px 20px rgba(34, 41, 56, 0.26),
-        inset 0 1px 1px rgba(255, 255, 255, 0.15);
+        10px 10px 22px #030407,
+        -6px -6px 16px rgba(34, 41, 56, 0.24),
+        inset 0 1px 1px rgba(255, 255, 255, 0.14);
       --shadow-key:
-        6px 6px 14px #030407,
-        -4px -4px 11px rgba(38, 46, 62, 0.28),
-        inset 0 1px 1px rgba(255, 255, 255, 0.19);
+        5px 5px 12px #030407,
+        -3px -3px 9px rgba(38, 46, 62, 0.25),
+        inset 0 1px 1px rgba(255, 255, 255, 0.18);
       --shadow-key-pressed:
-        inset 4px 4px 10px #020305,
-        inset -3px -3px 7px rgba(42, 50, 68, 0.22);
+        inset 4px 4px 9px #020305,
+        inset -2px -2px 6px rgba(42, 50, 68, 0.22);
       --shadow-well:
-        inset 5px 5px 12px #030407,
-        inset -3px -3px 9px rgba(35, 42, 56, 0.2);
+        inset 4px 4px 10px #030407,
+        inset -2px -2px 7px rgba(35, 42, 56, 0.18);
 
       --accent-sky: #38bdf8;
       --accent-amber: #f59e0b;
@@ -50,8 +46,8 @@
       --text-dim: #9aa6b8;
       --text-mute: #647082;
 
-      --r-chassis: 26px;
-      --r-module: 18px;
+      --r-chassis: 24px;
+      --r-module: 16px;
       --r-well: 14px;
       --r-pill: 9999px;
       --ease-haptic: cubic-bezier(0.2, 0.9, 0.3, 1);
@@ -64,43 +60,44 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html, body {
+    html {
       min-height: 100%;
+      overflow-x: clip;
       background-color: var(--chassis-bg);
+    }
+
+    body {
+      min-height: 100dvh;
+      overflow-x: clip;
+      overflow-y: auto;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      background-color: var(--chassis-bg);
+      background-image:
+        radial-gradient(ellipse 80% 45% at 15% 0%, rgba(56, 189, 248, 0.07), transparent 60%),
+        radial-gradient(ellipse 70% 40% at 85% 100%, rgba(245, 158, 11, 0.045), transparent 60%),
+        linear-gradient(180deg, #0d1017 0%, #090b10 100%);
       color: var(--text-main);
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       font-variant-numeric: tabular-nums;
       line-height: 1.45;
-      overflow-x: hidden;
-      overscroll-behavior: none;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background:
-        radial-gradient(ellipse 75% 50% at 15% 5%, rgba(56, 189, 248, 0.07), transparent 60%),
-        radial-gradient(ellipse 65% 45% at 85% 95%, rgba(245, 158, 11, 0.045), transparent 60%),
-        linear-gradient(180deg, #0d1017 0%, #090b10 100%);
     }
 
     .app-shell {
-      position: relative;
-      z-index: 1;
+      width: 100%;
       max-width: 1320px;
       margin: 0 auto;
-      padding: 16px 20px 28px;
+      padding: 14px 16px calc(28px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      min-height: 100vh;
+      gap: 14px;
     }
 
     /* Extruded Glossy Chassis */
     .neu-chassis {
+      width: 100%;
+      min-width: 0;
       background: var(--gloss-sheen), linear-gradient(160deg, #161b26 0%, #0e1118 100%);
       border-radius: var(--r-chassis);
       border-top: 1px solid var(--bevel-top);
@@ -112,6 +109,7 @@
 
     /* Concave Recessed Well */
     .neu-well {
+      min-width: 0;
       background: linear-gradient(180deg, #06080c 0%, #0b0e14 100%);
       border-radius: var(--r-well);
       border-top: 1px solid rgba(0, 0, 0, 0.85);
@@ -126,8 +124,9 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
+      gap: 6px;
       user-select: none;
+      touch-action: manipulation;
       cursor: pointer;
       border-radius: var(--r-pill);
       background:
@@ -141,9 +140,9 @@
       color: var(--text-main);
       font-weight: 600;
       font-size: 0.82rem;
-      padding: 8px 15px;
+      padding: 8px 14px;
       text-decoration: none;
-      transition: transform 140ms var(--ease-haptic), box-shadow 140ms var(--ease-haptic), border-color 180ms ease, color 180ms ease;
+      transition: transform 130ms var(--ease-haptic), box-shadow 130ms var(--ease-haptic), border-color 160ms ease, color 160ms ease;
     }
 
     .haptic-key:hover {
@@ -170,7 +169,7 @@
         linear-gradient(145deg, #152333, #0e1520);
       border-top-color: rgba(125, 211, 252, 0.55);
       color: #bae6fd;
-      box-shadow: inset 3px 3px 8px rgba(2, 5, 10, 0.82), 0 0 14px rgba(56, 189, 248, 0.16);
+      box-shadow: inset 3px 3px 8px rgba(2, 5, 10, 0.82), 0 0 12px rgba(56, 189, 248, 0.15);
     }
 
     .haptic-primary {
@@ -182,12 +181,11 @@
       border-bottom: 1.5px solid rgba(2, 32, 54, 0.95);
       color: #031019;
       font-weight: 800;
-      box-shadow: 7px 7px 18px #020306, 0 0 20px rgba(56, 189, 248, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.65);
+      box-shadow: 6px 6px 16px #020306, 0 0 18px rgba(56, 189, 248, 0.24), inset 0 1px 2px rgba(255, 255, 255, 0.65);
     }
 
     .haptic-primary:hover {
       color: #02080d;
-      box-shadow: 9px 9px 22px #020306, 0 0 26px rgba(56, 189, 248, 0.38);
     }
 
     .haptic-round {
@@ -195,13 +193,15 @@
       height: 42px;
       padding: 0;
       border-radius: 50%;
+      flex-shrink: 0;
     }
 
     .haptic-master-play {
-      width: 58px;
-      height: 58px;
+      width: 56px;
+      height: 56px;
       padding: 0;
       border-radius: 50%;
+      flex-shrink: 0;
       background:
         radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.08) 42%, transparent 70%),
         linear-gradient(145deg, #38bdf8 0%, #0284c7 52%, #0369a1 100%);
@@ -211,15 +211,9 @@
       border-bottom: 1.5px solid rgba(2, 32, 54, 0.95);
       color: #041019;
       box-shadow:
-        8px 8px 20px #020306,
-        -5px -5px 14px rgba(56, 189, 248, 0.14),
-        0 0 22px rgba(56, 189, 248, 0.3),
+        6px 6px 16px #020306,
+        0 0 20px rgba(56, 189, 248, 0.28),
         inset 0 2px 3px rgba(255, 255, 255, 0.65);
-    }
-
-    .haptic-master-play:hover {
-      transform: translateY(-1px) scale(1.03);
-      color: #02080d;
     }
 
     .haptic-master-play:active,
@@ -229,7 +223,7 @@
     }
 
     .mini-key {
-      padding: 5px 11px;
+      padding: 5px 10px;
       font-size: 0.74rem;
     }
 
@@ -238,63 +232,71 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      padding: 12px 20px;
+      gap: 10px;
+      padding: 11px 16px;
       border-radius: var(--r-pill);
     }
 
     .brand-cluster {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       min-width: 0;
     }
 
     .brand-badge {
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       flex-shrink: 0;
-      border-radius: 12px;
+      border-radius: 11px;
       padding: 3px;
       background: linear-gradient(145deg, #1f2636, #0d1017);
       border-top: 1px solid rgba(255, 255, 255, 0.24);
-      box-shadow: 4px 4px 10px #030407, -2px -2px 8px rgba(40, 48, 66, 0.25);
+      box-shadow: 4px 4px 10px #030407;
       overflow: hidden;
     }
 
     .brand-badge img {
       width: 100%;
       height: 100%;
-      border-radius: 9px;
+      border-radius: 8px;
       object-fit: cover;
     }
 
+    .brand-text {
+      min-width: 0;
+    }
+
     .brand-name {
-      font-size: 1.18rem;
+      font-size: 1.12rem;
       font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--chrome-bright);
+      white-space: nowrap;
     }
 
     .brand-sub {
-      font-size: 0.75rem;
+      font-size: 0.73rem;
       color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       flex-shrink: 0;
     }
 
     .free-pill {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 6px 13px;
+      gap: 6px;
+      padding: 6px 12px;
       border-radius: var(--r-pill);
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       font-weight: 600;
       color: #a7f3d0;
     }
@@ -315,18 +317,19 @@
       transform: rotate(360deg);
     }
 
-    /* Tight, Locked-Grid Main Workspace */
+    /* Main Workspace Grid */
     .workspace-grid {
       display: grid;
-      grid-template-columns: 1.12fr 0.88fr;
-      gap: 16px;
-      align-items: stretch;
+      grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+      gap: 14px;
+      align-items: start;
     }
 
     .col-stack {
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
     /* Section Header & Short Explanation */
@@ -334,45 +337,45 @@
       display: flex;
       align-items: baseline;
       justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
+      gap: 8px;
+      margin-bottom: 10px;
       flex-wrap: wrap;
     }
 
     .section-title {
-      font-size: 0.98rem;
+      font-size: 0.96rem;
       font-weight: 800;
       color: var(--chrome-bright);
       letter-spacing: -0.01em;
     }
 
     .section-hint {
-      font-size: 0.76rem;
+      font-size: 0.75rem;
       color: var(--text-dim);
     }
 
     /* Player Deck */
     .deck-card {
-      padding: 20px 22px;
+      padding: 18px;
     }
 
     .now-playing-row {
       display: grid;
-      grid-template-columns: 136px 1fr;
-      gap: 20px;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 16px;
       align-items: center;
     }
 
     .platter-well {
       position: relative;
-      width: 136px;
-      height: 136px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
-      padding: 8px;
+      padding: 7px;
       background: linear-gradient(145deg, #06080c, #131823);
       border-top: 1px solid rgba(0, 0, 0, 0.9);
       border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-      box-shadow: inset 6px 6px 14px #020305, inset -4px -4px 10px rgba(36, 44, 60, 0.25);
+      box-shadow: inset 5px 5px 12px #020305, inset -3px -3px 8px rgba(36, 44, 60, 0.25);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -395,7 +398,7 @@
 
     .platter-gloss {
       position: absolute;
-      inset: 8px;
+      inset: 7px;
       border-radius: 50%;
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.02) 45%, transparent 60%);
       pointer-events: none;
@@ -403,8 +406,8 @@
 
     .platter-cap {
       position: absolute;
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.45), transparent 55%), linear-gradient(145deg, #273042, #0b0e14);
       border: 1.5px solid rgba(255, 255, 255, 0.28);
@@ -420,7 +423,7 @@
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
     }
 
     .tag-row {
@@ -431,11 +434,11 @@
     }
 
     .quality-tag {
-      font-size: 0.68rem;
+      font-size: 0.66rem;
       font-weight: 700;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      padding: 4px 10px;
+      padding: 3px 9px;
       border-radius: var(--r-pill);
       color: #bae6fd;
       background: linear-gradient(180deg, rgba(56, 189, 248, 0.16), rgba(56, 189, 248, 0.05));
@@ -443,9 +446,9 @@
     }
 
     .genre-tag {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 600;
-      padding: 4px 10px;
+      padding: 3px 9px;
       border-radius: var(--r-pill);
       color: var(--text-dim);
       background: rgba(255, 255, 255, 0.04);
@@ -453,10 +456,10 @@
     }
 
     .hero-title {
-      font-size: clamp(1.25rem, 2vw, 1.65rem);
+      font-size: clamp(1.15rem, 2.2vw, 1.55rem);
       font-weight: 800;
       letter-spacing: -0.02em;
-      line-height: 1.2;
+      line-height: 1.22;
       color: var(--chrome-bright);
       white-space: nowrap;
       overflow: hidden;
@@ -464,7 +467,7 @@
     }
 
     .hero-artist {
-      font-size: 0.94rem;
+      font-size: 0.9rem;
       font-weight: 600;
       color: var(--text-dim);
       white-space: nowrap;
@@ -473,41 +476,42 @@
     }
 
     .hero-album {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       color: var(--text-mute);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    /* Fixed-Height Visualizer Window (Prevents Layout Shift) */
+    /* Fixed-Height Visualizer Window */
     .scope-box {
-      margin-top: 16px;
-      padding: 10px 12px;
+      margin-top: 14px;
+      padding: 10px;
     }
 
     .scope-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      flex-wrap: wrap;
+      gap: 6px;
       margin-bottom: 8px;
     }
 
     .scope-hint {
-      font-size: 0.73rem;
+      font-size: 0.72rem;
       font-weight: 600;
       color: var(--text-dim);
     }
 
     .scope-modes {
       display: flex;
-      gap: 6px;
+      gap: 5px;
     }
 
     #gpuVisualizer {
       width: 100%;
-      height: 86px;
+      height: 78px;
       display: block;
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.05);
@@ -523,13 +527,14 @@
 
     .scrubber-groove {
       position: relative;
-      height: 12px;
+      height: 14px;
       border-radius: var(--r-pill);
       background: #05070a;
       border-top: 1px solid rgba(0, 0, 0, 0.9);
       border-bottom: 1px solid rgba(255, 255, 255, 0.11);
       box-shadow: inset 3px 3px 7px #010203;
       cursor: pointer;
+      touch-action: none;
     }
 
     .scrubber-buffer {
@@ -569,7 +574,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.74rem;
+      gap: 8px;
+      font-size: 0.72rem;
       font-weight: 600;
       color: var(--text-dim);
     }
@@ -581,20 +587,20 @@
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
 
     .transport-keys {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .volume-pod {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 5px 14px 5px 6px;
+      padding: 4px 12px 4px 5px;
       border-radius: var(--r-pill);
     }
 
@@ -612,8 +618,8 @@
 
     input[type="range"].fader-track::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 17px;
+      height: 17px;
       border-radius: 50%;
       background: radial-gradient(circle at 35% 30%, #ffffff, #94a3b8);
       border: 2px solid #0b0d12;
@@ -622,8 +628,8 @@
     }
 
     input[type="range"].fader-track::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
+      width: 17px;
+      height: 17px;
       border-radius: 50%;
       background: radial-gradient(circle at 35% 30%, #ffffff, #94a3b8);
       border: 2px solid #0b0d12;
@@ -632,7 +638,7 @@
 
     /* Sound Equalizer & Tuning Card */
     .eq-card {
-      padding: 18px 22px;
+      padding: 18px;
     }
 
     .preset-strip {
@@ -644,54 +650,60 @@
 
     .eq-bank {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
       margin-bottom: 12px;
     }
 
     .eq-channel {
-      padding: 10px 6px;
+      padding: 9px 4px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      touch-action: pan-y;
     }
 
     .eq-gain-val {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
       color: var(--accent-sky);
+      white-space: nowrap;
     }
 
     .eq-slot {
-      height: 74px;
+      height: 72px;
+      width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     input[type="range"].eq-vertical {
-      width: 70px;
+      width: 68px;
       transform: rotate(-90deg);
+      touch-action: none;
     }
 
     .eq-label {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 600;
       color: var(--text-dim);
       text-align: center;
+      white-space: nowrap;
     }
 
     .stage-row {
       display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 14px;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
       align-items: center;
       padding-top: 12px;
       border-top: 1px solid rgba(255, 255, 255, 0.07);
     }
 
     .stage-box {
+      min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 5px;
@@ -700,18 +712,18 @@
     .stage-labels {
       display: flex;
       justify-content: space-between;
-      font-size: 0.75rem;
+      gap: 8px;
+      font-size: 0.74rem;
       font-weight: 600;
       color: var(--text-dim);
     }
 
     /* Right Column: Music Library + Song Request Card */
     .library-card {
-      padding: 18px 20px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      flex: 1;
     }
 
     .search-well {
@@ -720,9 +732,11 @@
       align-items: center;
     }
 
+    /* 16px font-size prevents mobile Safari/Chrome input auto-zoom */
     .neu-input {
       width: 100%;
-      padding: 10px 16px;
+      min-width: 0;
+      padding: 10px 15px;
       border-radius: var(--r-pill);
       background: #06080c;
       border-top: 1px solid rgba(0, 0, 0, 0.9);
@@ -732,9 +746,14 @@
       box-shadow: var(--shadow-well);
       color: var(--text-main);
       font-family: inherit;
-      font-size: 0.84rem;
+      font-size: 16px;
       outline: none;
       transition: border-color 180ms ease;
+    }
+
+    .neu-input::placeholder {
+      font-size: 0.85rem;
+      color: var(--text-mute);
     }
 
     .neu-input:focus {
@@ -770,14 +789,15 @@
       color: var(--text-dim);
     }
 
-    /* Fixed-Height Scroll Container (Zero Page Jump) */
+    /* Desktop bounded list; mobile flows naturally with page scroll (zero scroll trap) */
     .track-scroll {
       display: flex;
       flex-direction: column;
       gap: 9px;
-      height: 310px;
+      max-height: 360px;
       overflow-y: auto;
-      padding: 2px 4px 4px 2px;
+      overscroll-behavior: contain;
+      padding: 2px;
     }
 
     .track-scroll::-webkit-scrollbar {
@@ -791,10 +811,10 @@
 
     .track-plate {
       display: grid;
-      grid-template-columns: 48px 1fr auto;
-      gap: 12px;
+      grid-template-columns: 46px minmax(0, 1fr) auto;
+      gap: 11px;
       align-items: center;
-      padding: 9px 12px;
+      padding: 9px 11px;
       border-radius: var(--r-module);
       background:
         linear-gradient(165deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(0, 0, 0, 0.18) 100%),
@@ -803,10 +823,11 @@
       border-left: 1px solid rgba(255, 255, 255, 0.08);
       border-right: 1px solid rgba(0, 0, 0, 0.65);
       border-bottom: 1px solid rgba(0, 0, 0, 0.85);
-      box-shadow: 5px 5px 12px #030407, -3px -3px 8px rgba(36, 44, 60, 0.2);
+      box-shadow: 4px 4px 10px #030407;
       cursor: pointer;
       user-select: none;
-      transition: transform 140ms var(--ease-haptic), border-color 180ms ease;
+      touch-action: manipulation;
+      transition: transform 130ms var(--ease-haptic), border-color 160ms ease;
     }
 
     .track-plate:hover {
@@ -828,9 +849,9 @@
 
     .plate-art-box {
       position: relative;
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
+      width: 46px;
+      height: 46px;
+      border-radius: 11px;
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.14);
     }
@@ -849,7 +870,7 @@
       align-items: flex-end;
       justify-content: center;
       gap: 3px;
-      padding-bottom: 12px;
+      padding-bottom: 11px;
     }
 
     .track-plate.is-current .eq-live-mask {
@@ -869,7 +890,7 @@
 
     @keyframes eqPulse {
       0% { height: 4px; }
-      100% { height: 18px; }
+      100% { height: 17px; }
     }
 
     .plate-meta {
@@ -878,7 +899,7 @@
 
     .plate-title {
       font-weight: 700;
-      font-size: 0.88rem;
+      font-size: 0.87rem;
       color: var(--chrome-bright);
       white-space: nowrap;
       overflow: hidden;
@@ -886,7 +907,7 @@
     }
 
     .plate-sub {
-      font-size: 0.76rem;
+      font-size: 0.75rem;
       color: var(--text-dim);
       white-space: nowrap;
       overflow: hidden;
@@ -894,27 +915,26 @@
     }
 
     .plate-time {
-      font-size: 0.73rem;
+      font-size: 0.72rem;
       font-weight: 600;
       color: var(--text-dim);
     }
 
     .empty-box {
-      height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 20px;
+      padding: 24px 16px;
       color: var(--text-dim);
-      font-size: 0.84rem;
-      gap: 6px;
+      font-size: 0.83rem;
+      gap: 5px;
     }
 
     /* Request a Song Card */
     .request-card {
-      padding: 18px 20px;
+      padding: 18px;
     }
 
     .request-form {
@@ -925,8 +945,8 @@
 
     .request-row {
       display: grid;
-      grid-template-columns: 1fr 1.25fr auto;
-      gap: 10px;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) auto;
+      gap: 9px;
       align-items: center;
     }
 
@@ -944,19 +964,20 @@
     /* Toast */
     .toast-pill {
       position: fixed;
-      bottom: 22px;
+      bottom: calc(18px + env(safe-area-inset-bottom));
       left: 50%;
-      transform: translateX(-50%) translateY(130%);
+      transform: translateX(-50%) translateY(150%);
       z-index: 99;
-      padding: 10px 20px;
+      padding: 9px 18px;
       border-radius: var(--r-pill);
       background: linear-gradient(160deg, #1b2230, #0d1017);
       border-top: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.85);
-      font-size: 0.82rem;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.85);
+      font-size: 0.8rem;
       font-weight: 600;
       color: var(--chrome-bright);
-      transition: transform 240ms var(--ease-haptic);
+      white-space: nowrap;
+      transition: transform 220ms var(--ease-haptic);
       pointer-events: none;
     }
 
@@ -965,53 +986,71 @@
     }
 
     .app-footer {
-      margin-top: auto;
-      padding-top: 10px;
+      padding-top: 8px;
       text-align: center;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       color: var(--text-mute);
     }
 
     @media (max-width: 1024px) {
       .workspace-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
+      /* Eliminate inner scroll trap on mobile/tablet so page scrolls seamlessly */
       .track-scroll {
-        height: 280px;
+        max-height: none;
+        overflow: visible;
       }
     }
 
     @media (max-width: 680px) {
       .app-shell {
-        padding: 12px 12px 24px;
+        padding: 10px 10px calc(24px + env(safe-area-inset-bottom));
         gap: 12px;
       }
       .topbar {
-        border-radius: var(--r-chassis);
-        padding: 12px 16px;
+        border-radius: 20px;
+        padding: 10px 14px;
       }
       .free-pill {
         display: none;
       }
+      .deck-card, .eq-card, .library-card, .request-card {
+        padding: 15px 14px;
+      }
       .now-playing-row {
-        grid-template-columns: 104px 1fr;
-        gap: 14px;
+        grid-template-columns: 92px minmax(0, 1fr);
+        gap: 12px;
       }
       .platter-well {
-        width: 104px;
-        height: 104px;
+        width: 92px;
+        height: 92px;
       }
       .transport-row {
         justify-content: center;
       }
+      .transport-keys {
+        gap: 7px;
+      }
+      .haptic-round {
+        width: 39px;
+        height: 39px;
+      }
+      .haptic-master-play {
+        width: 52px;
+        height: 52px;
+      }
       .eq-bank {
-        gap: 6px;
+        gap: 5px;
+      }
+      .eq-label {
+        font-size: 0.63rem;
       }
       .stage-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
       .request-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
     }
   </style>
@@ -1024,7 +1063,7 @@
         <div class="brand-badge">
           <img src="favicon.png" alt="Play Mine" onerror="this.style.display='none'" />
         </div>
-        <div>
+        <div class="brand-text">
           <div class="brand-name">Play Mine</div>
           <div class="brand-sub">Free High-Resolution Music Streaming</div>
         </div>
@@ -1042,7 +1081,7 @@
       </div>
     </header>
 
-    <!-- Main Compact Workspace -->
+    <!-- Main Responsive Workspace -->
     <main class="workspace-grid">
       <!-- Left Column: Music Player + Sound Equalizer -->
       <section class="col-stack">
@@ -1076,7 +1115,7 @@
                 <div class="haptic-key mini-key" role="button" tabindex="0" data-viz="wave">Line</div>
               </div>
             </div>
-            <canvas id="gpuVisualizer" width="800" height="120"></canvas>
+            <canvas id="gpuVisualizer" width="800" height="110"></canvas>
           </div>
 
           <!-- Timeline Scrubber -->
@@ -1097,32 +1136,32 @@
           <div class="transport-row">
             <div class="transport-keys">
               <div class="haptic-key haptic-round" id="btnShuffle" role="button" tabindex="0" aria-label="Shuffle playlist" title="Shuffle songs">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
               </div>
 
               <div class="haptic-key haptic-round" id="btnPrev" role="button" tabindex="0" aria-label="Previous song" title="Previous song">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
               </div>
 
               <div class="haptic-key haptic-master-play" id="btnPlayPause" role="button" tabindex="0" aria-label="Play or Pause" title="Play / Pause">
-                <svg id="glyphPlay" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20 7 4"/></svg>
-                <svg id="glyphPause" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16" rx="1.2"/><rect x="14" y="4" width="4" height="16" rx="1.2"/></svg>
+                <svg id="glyphPlay" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20 7 4"/></svg>
+                <svg id="glyphPause" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16" rx="1.2"/><rect x="14" y="4" width="4" height="16" rx="1.2"/></svg>
               </div>
 
               <div class="haptic-key haptic-round" id="btnNext" role="button" tabindex="0" aria-label="Next song" title="Next song">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
               </div>
 
               <div class="haptic-key haptic-round" id="btnLoop" role="button" tabindex="0" aria-label="Repeat mode" title="Repeat playlist or song">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
               </div>
             </div>
 
             <div class="volume-pod neu-well">
-              <div class="haptic-key haptic-round" id="btnMute" style="width:34px;height:34px;" role="button" tabindex="0" aria-label="Mute or unmute" title="Mute / Unmute">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+              <div class="haptic-key haptic-round" id="btnMute" style="width:32px;height:32px;" role="button" tabindex="0" aria-label="Mute or unmute" title="Mute / Unmute">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
               </div>
-              <input type="range" id="volumeFader" class="fader-track" min="0" max="1" step="0.01" value="0.95" style="width: 92px;" aria-label="Volume level" title="Adjust volume" />
+              <input type="range" id="volumeFader" class="fader-track" min="0" max="1" step="0.01" value="0.95" style="width: 88px;" aria-label="Volume level" title="Adjust volume" />
             </div>
           </div>
         </div>
@@ -1131,7 +1170,7 @@
         <div class="eq-card neu-chassis">
           <div class="section-head">
             <div class="section-title">Sound Equalizer</div>
-            <div class="section-hint">Shape bass, vocals, and treble for your speakers or headphones</div>
+            <div class="section-hint">Adjust bass, vocals, and treble to match your headphones</div>
           </div>
 
           <div class="preset-strip" id="presetBar">
@@ -1189,7 +1228,7 @@
               <input type="range" id="stereoFader" class="fader-track" min="0" max="1.6" step="0.05" value="1.15" aria-label="Stereo Surround" />
             </div>
 
-            <div class="haptic-key mini-key is-engaged" id="btnLimiter" role="button" tabindex="0" title="Prevents audio clipping at high bass">
+            <div class="haptic-key mini-key is-engaged" id="btnLimiter" role="button" tabindex="0" title="Prevents distortion when bass is boosted">
               Volume Guard: ON
             </div>
           </div>
@@ -1227,7 +1266,7 @@
         <div class="request-card neu-chassis">
           <div class="section-head" style="margin-bottom:8px;">
             <div class="section-title">Request a Song</div>
-            <div class="section-hint">Want a track added? Drop your email and song name below</div>
+            <div class="section-hint">Want a track added? Enter your email and song request below</div>
           </div>
 
           <div class="request-form">
@@ -1306,7 +1345,7 @@
 
     function bindHapticKey(el, handler) {
       if (!el) return;
-      el.addEventListener("pointerdown", () => triggerHaptic(10));
+      el.addEventListener("pointerdown", () => triggerHaptic(10), { passive: true });
       el.addEventListener("click", handler);
       el.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -1449,7 +1488,7 @@
         masterGainNode.gain.value = parseFloat($("volumeFader").value);
 
         analyserNode = audioCtx.createAnalyser();
-        analyserNode.fftSize = 4096;
+        analyserNode.fftSize = 2048;
         analyserNode.smoothingTimeConstant = 0.82;
 
         dspGraphReady = true;
@@ -1625,6 +1664,7 @@
 
     function renderGpuFrame(nowMs) {
       requestAnimationFrame(renderGpuFrame);
+      if (document.hidden) return;
       const t = nowMs * 0.001;
 
       if (isPlaying && usingCorsDspEngine && analyserNode) {
@@ -1643,10 +1683,10 @@
       }
 
       if (gl && glProgram) {
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
         const w = Math.floor(canvas.clientWidth * dpr);
         const h = Math.floor(canvas.clientHeight * dpr);
-        if (canvas.width !== w || canvas.height !== h) {
+        if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
           canvas.width = w;
           canvas.height = h;
           gl.viewport(0, 0, w, h);
@@ -2030,7 +2070,6 @@
           createdAt: Date.now()
         });
 
-        // Clear inputs immediately & confirm submission
         emailEl.value = "";
         msgEl.value = "";
         feedbackEl.textContent = "Submitted! Your song request has been received.";
