@@ -7,9 +7,9 @@
   <meta name="description" content="Play Mine — Free high-resolution music streaming with custom sound tuning, live audio visualizer, and instant song requests." />
   <meta name="theme-color" content="#0b0d12" />
   <link rel="canonical" href="https://play-mine.pages.dev/" />
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <link rel="apple-touch-icon" href="favicon.png" />
-  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
+  <link rel="manifest" href="/manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -1089,7 +1089,7 @@
     <header class="topbar neu-chassis">
       <div class="brand-cluster">
         <div class="brand-badge">
-          <img src="favicon.png" alt="Play Mine" onerror="this.style.display='none'" />
+          <img src="/favicon.png" alt="Play Mine" onerror="this.style.display='none'" />
         </div>
         <div class="brand-text">
           <div class="brand-name">Play Mine</div>
@@ -1320,7 +1320,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-    import { getDatabase, ref, onValue, get, push, set } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+    import { getDatabase, ref, onValue, get, push, set, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
     // =========================================================================
     // 1. CLOUD DATABASE CONNECTION
@@ -1339,13 +1339,16 @@
     const db = getDatabase(app);
     const tracksRef = ref(db, "play_mine/tracks");
     const requestsRef = ref(db, "play_mine/requests");
+    const shortLinksByTrackRef = (trackKey) => ref(db, `play_mine/short_links/by_track/${trackKey}`);
+    const shortLinksByCodeRef = (code) => ref(db, `play_mine/short_links/by_code/${code}`);
 
     // =========================================================================
     // 2. STATE & HELPERS
     // =========================================================================
-    const PUBLIC_BASE_URL = "https://play-mine.pages.dev/";
-    const requestedSongId = new URLSearchParams(window.location.search).get("song");
-    let initialDeepLinkHandled = false;
+    const SHORT_CODE_ALPHABET = "23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ";
+    const SHORT_CODE_REGEX = /^[a-zA-Z0-9_-]{4,24}$/;
+    const shortCodeMemoryCache = new Map();
+    const pendingShareRequests = new Map();
 
     let allTracks = [];
     let filteredTracks = [];
@@ -1358,6 +1361,11 @@
     let vizMode = "aurora";
     let limiterEnabled = true;
     let usingCorsDspEngine = false;
+
+    let tracksSnapshotLoaded = false;
+    let sharedLinkLookupDone = false;
+    let sharedLinkHandled = false;
+    let resolvedSharedTrackId = null;
 
     const $ = (id) => document.getElementById(id);
 
@@ -1390,19 +1398,129 @@
       });
     }
 
-    function buildSongShareUrl(trackId) {
-      const url = new URL(PUBLIC_BASE_URL);
-      url.searchParams.set("song", trackId);
-      return url.toString();
+    function sanitizeRtdbKey(raw) {
+      return String(raw || "").replace(/[.#$\[\]\/]/g, "").trim();
     }
 
-    function syncUrlQueryParam(trackId) {
-      if (!trackId || !window.location.protocol.startsWith("http")) return;
+    function getWebsiteOrigin() {
+      if (window.location.origin && /^https?:\/\//i.test(window.location.origin)) {
+        return window.location.origin.replace(/\/+$/, "");
+      }
+      return "https://play-mine.pages.dev";
+    }
+
+    function buildShortSongUrl(shortCode) {
+      return `${getWebsiteOrigin()}/${encodeURIComponent(shortCode)}`;
+    }
+
+    function syncBrowserShortPath(shortCode) {
+      if (!shortCode || !window.location.protocol.startsWith("http")) return;
       try {
-        const nextUrl = new URL(window.location.href);
-        nextUrl.searchParams.set("song", trackId);
-        window.history.replaceState(null, "", nextUrl.pathname + nextUrl.search);
+        window.history.replaceState(null, "", `/${encodeURIComponent(shortCode)}`);
       } catch (_) {}
+    }
+
+    function generateShortSongCode(length = 6) {
+      const bytes = new Uint8Array(length);
+      crypto.getRandomValues(bytes);
+      let code = "";
+      for (let i = 0; i < length; i++) {
+        code += SHORT_CODE_ALPHABET[bytes[i] % SHORT_CODE_ALPHABET.length];
+      }
+      return code;
+    }
+
+    async function getOrCreateShortSongCode(rawTrackId) {
+      const trackKey = sanitizeRtdbKey(rawTrackId);
+      if (!trackKey) throw new Error("Invalid track identifier");
+
+      if (shortCodeMemoryCache.has(trackKey)) {
+        return shortCodeMemoryCache.get(trackKey);
+      }
+
+      if (pendingShareRequests.has(trackKey)) {
+        return pendingShareRequests.get(trackKey);
+      }
+
+      const task = (async () => {
+        // 1. Check RTDB first if a short link already exists for this song
+        const existingSnap = await get(shortLinksByTrackRef(trackKey));
+        if (existingSnap.exists()) {
+          const existingVal = existingSnap.val();
+          const existingCode = typeof existingVal === "string" ? existingVal : existingVal?.code;
+          if (existingCode && SHORT_CODE_REGEX.test(existingCode)) {
+            shortCodeMemoryCache.set(trackKey, existingCode);
+            // Ensure reverse code-to-track mapping exists
+            const codeSnap = await get(shortLinksByCodeRef(existingCode));
+            if (!codeSnap.exists()) {
+              await set(shortLinksByCodeRef(existingCode), {
+                trackId: trackKey,
+                code: existingCode,
+                createdAt: Date.now()
+              });
+            }
+            return existingCode;
+          }
+        }
+
+        // 2. Atomically reserve an unused shortSongCode
+        let reservedCode = null;
+        for (let attempt = 0; attempt < 6; attempt++) {
+          const candidate = generateShortSongCode(6);
+          const codeTx = await runTransaction(shortLinksByCodeRef(candidate), (current) => {
+            if (current !== null) return;
+            return {
+              trackId: trackKey,
+              code: candidate,
+              createdAt: Date.now()
+            };
+          });
+          if (codeTx.committed) {
+            reservedCode = candidate;
+            break;
+          }
+        }
+
+        if (!reservedCode) {
+          throw new Error("Could not allocate a unique short code");
+        }
+
+        // 3. Atomically bind reservedCode to this song so duplicate codes are impossible
+        const trackTx = await runTransaction(shortLinksByTrackRef(trackKey), (current) => {
+          const currentCode = typeof current === "string" ? current : current?.code;
+          if (current !== null && currentCode && SHORT_CODE_REGEX.test(currentCode)) {
+            return;
+          }
+          return {
+            code: reservedCode,
+            trackId: trackKey,
+            createdAt: Date.now()
+          };
+        });
+
+        if (trackTx.committed) {
+          shortCodeMemoryCache.set(trackKey, reservedCode);
+          return reservedCode;
+        }
+
+        // Another concurrent request created a code first — reuse it and clean up unused candidate
+        const winnerVal = trackTx.snapshot.val();
+        const winnerCode = typeof winnerVal === "string" ? winnerVal : winnerVal?.code;
+        await set(shortLinksByCodeRef(reservedCode), null).catch(() => {});
+        if (winnerCode && SHORT_CODE_REGEX.test(winnerCode)) {
+          shortCodeMemoryCache.set(trackKey, winnerCode);
+          return winnerCode;
+        }
+
+        throw new Error("Failed to resolve canonical short code");
+      })();
+
+      pendingShareRequests.set(trackKey, task);
+      try {
+        return await task;
+      } finally {
+        pendingShareRequests.delete(trackKey);
+      }
     }
 
     async function copyTextToClipboard(text) {
@@ -1799,7 +1917,10 @@
       $("scrubberFill").style.width = "0%";
       $("scrubberKnob").style.left = "0%";
 
-      syncUrlQueryParam(track.id);
+      if (shortCodeMemoryCache.has(track.id)) {
+        syncBrowserShortPath(shortCodeMemoryCache.get(track.id));
+      }
+
       renderTrackList();
 
       if ("mediaSession" in navigator) {
@@ -1978,19 +2099,107 @@
     });
 
     // =========================================================================
-    // 6. LIBRARY SYNC, DEEP-LINK AUTO-LOAD & MANUAL REFRESH BUTTON
+    // 6. SHARED SHORT-LINK RESOLUTION & LIBRARY SYNC
     // =========================================================================
+    function extractSharedTokenFromLocation() {
+      const querySong = new URLSearchParams(window.location.search).get("song");
+      if (querySong && querySong.trim()) {
+        return { source: "query", value: querySong.trim() };
+      }
+      const cleanPath = window.location.pathname.replace(/^\/+|\/+$/g, "");
+      if (cleanPath && cleanPath.toLowerCase() !== "index.html" && SHORT_CODE_REGEX.test(cleanPath)) {
+        return { source: "path", value: cleanPath };
+      }
+      return null;
+    }
+
+    const initialSharedToken = extractSharedTokenFromLocation();
+    if (!initialSharedToken) {
+      sharedLinkLookupDone = true;
+      sharedLinkHandled = true;
+    } else {
+      (async () => {
+        try {
+          const safeToken = sanitizeRtdbKey(initialSharedToken.value);
+          if (safeToken) {
+            const codeSnap = await get(shortLinksByCodeRef(safeToken));
+            if (codeSnap.exists()) {
+              const codeData = codeSnap.val();
+              const targetTrackId = typeof codeData === "string" ? codeData : codeData?.trackId;
+              if (targetTrackId) {
+                resolvedSharedTrackId = String(targetTrackId);
+                shortCodeMemoryCache.set(resolvedSharedTrackId, safeToken);
+                syncBrowserShortPath(safeToken);
+              }
+            } else if (initialSharedToken.source === "query") {
+              // Backwards compatibility for legacy ?song=TRACK_ID links
+              resolvedSharedTrackId = safeToken;
+            }
+          }
+        } catch (err) {
+          console.error("Short link lookup error:", err);
+        } finally {
+          sharedLinkLookupDone = true;
+          tryAutoLoadSharedTrack();
+        }
+      })();
+    }
+
+    function tryAutoLoadSharedTrack() {
+      if (sharedLinkHandled || !sharedLinkLookupDone || !tracksSnapshotLoaded) return;
+      if (allTracks.length === 0) return;
+
+      sharedLinkHandled = true;
+
+      if (!resolvedSharedTrackId) {
+        showToast("Shared song was not found.");
+        return;
+      }
+
+      const sharedIdx = allTracks.findIndex(
+        (t) =>
+          t.id === resolvedSharedTrackId ||
+          (t.legacyId !== undefined && t.legacyId !== null && String(t.legacyId) === resolvedSharedTrackId)
+      );
+
+      if (sharedIdx !== -1) {
+        activeFilter = "all";
+        searchQuery = "";
+        $("searchField").value = "";
+        document.querySelectorAll("#filterBar .mini-key").forEach((p) => {
+          p.classList.toggle("is-engaged", p.dataset.filter === "all");
+        });
+        applyFilters();
+        loadAndPlayTrack(sharedIdx, true);
+        requestAnimationFrame(() => {
+          const activePlate = $("trackScroll").querySelector(".track-plate.is-current");
+          if (activePlate) {
+            activePlate.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          }
+        });
+      } else {
+        showToast("Shared song was not found in the playlist.");
+      }
+    }
+
     function syncTracksFromSnapshot(snapshot) {
       const val = snapshot.val();
       const prevId = currentTrackIndex >= 0 && allTracks[currentTrackIndex] ? allTracks[currentTrackIndex].id : null;
 
       if (val && typeof val === "object") {
         allTracks = Object.entries(val)
-          .map(([id, item]) => ({ id, ...item }))
+          .filter(([, item]) => item && typeof item === "object")
+          .map(([firebaseKey, item]) => ({
+            ...item,
+            legacyId: item.id,
+            id: firebaseKey
+          }))
           .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.createdAt || 0) - (a.createdAt || 0));
       } else {
         allTracks = [];
       }
+
+      tracksSnapshotLoaded = true;
 
       if (allTracks.length === 0) {
         stopAllPlayers();
@@ -2006,17 +2215,10 @@
         return;
       }
 
-      // Auto-load shared song when ?song=TRACK_ID is opened
-      if (!initialDeepLinkHandled && requestedSongId) {
-        initialDeepLinkHandled = true;
-        const sharedIdx = allTracks.findIndex((t) => t.id === requestedSongId);
-        if (sharedIdx !== -1) {
-          applyFilters();
-          loadAndPlayTrack(sharedIdx, true);
-          return;
-        } else {
-          showToast("Shared song was not found in the playlist.");
-        }
+      if (!sharedLinkHandled && sharedLinkLookupDone) {
+        applyFilters();
+        tryAutoLoadSharedTrack();
+        return;
       }
 
       if (prevId) {
@@ -2113,7 +2315,7 @@
           </div>
           <div class="plate-right">
             <span class="plate-time">${escapeHtml(track.duration || "--:--")}</span>
-            <div class="haptic-key share-key" role="button" tabindex="0" aria-label="Share ${escapeHtml(track.title || "song")}" title="Copy direct link to this song">
+            <div class="haptic-key share-key" role="button" tabindex="0" aria-label="Share ${escapeHtml(track.title || "song")}" title="Copy direct short link to this song">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
               <span>Share</span>
             </div>
@@ -2128,20 +2330,34 @@
 
         const triggerShare = async (e) => {
           e.stopPropagation();
-          const shareUrl = buildSongShareUrl(track.id);
-          syncUrlQueryParam(track.id);
-          const ok = await copyTextToClipboard(shareUrl);
-          if (ok) {
-            shareBtn.classList.add("is-copied");
-            const labelSpan = shareBtn.querySelector("span");
-            if (labelSpan) labelSpan.textContent = "Copied";
-            showToast("Song link copied to clipboard!");
-            setTimeout(() => {
-              shareBtn.classList.remove("is-copied");
+          const labelSpan = shareBtn.querySelector("span");
+          if (shareBtn.dataset.busy === "1") return;
+          shareBtn.dataset.busy = "1";
+          if (labelSpan) labelSpan.textContent = "…";
+
+          try {
+            const shortCode = await getOrCreateShortSongCode(track.id);
+            const shareUrl = buildShortSongUrl(shortCode);
+            syncBrowserShortPath(shortCode);
+            const ok = await copyTextToClipboard(shareUrl);
+            if (ok) {
+              shareBtn.classList.add("is-copied");
+              if (labelSpan) labelSpan.textContent = "Copied";
+              showToast(`Copied: ${shareUrl}`);
+              setTimeout(() => {
+                shareBtn.classList.remove("is-copied");
+                if (labelSpan) labelSpan.textContent = "Share";
+              }, 1800);
+            } else {
               if (labelSpan) labelSpan.textContent = "Share";
-            }, 1800);
-          } else {
-            showToast(shareUrl);
+              showToast(shareUrl);
+            }
+          } catch (err) {
+            console.error("Share link error:", err);
+            if (labelSpan) labelSpan.textContent = "Share";
+            showToast("Could not create short link. Please try again.");
+          } finally {
+            shareBtn.dataset.busy = "0";
           }
         };
 
