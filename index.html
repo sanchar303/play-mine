@@ -1241,7 +1241,7 @@
           <!-- Live Audio Visualizer -->
           <div class="scope-box neu-well">
             <div class="scope-bar">
-              <span class="scope-hint">Visuals — reacts live to album &amp; beat</span>
+              <span class="scope-hint">Visualizer</span>
               <div class="scope-modes">
                 <div class="haptic-key mini-key is-engaged" role="button" tabindex="0" data-viz="aurora">Wave</div>
                 <div class="haptic-key mini-key" role="button" tabindex="0" data-viz="bars">Bars</div>
@@ -1260,7 +1260,7 @@
             </div>
             <div class="time-row">
               <span id="curTimeText">00:00</span>
-              <span id="playbackHint">Drag bar to skip forward or back</span>
+              <span id="playbackHint"></span>
               <span id="totTimeText">00:00</span>
             </div>
           </div>
@@ -1321,7 +1321,7 @@
         <div class="eq-card neu-chassis">
           <div class="section-head">
             <div class="section-title">Sound Equalizer</div>
-            <div class="section-hint">Adjust bass, vocals, 8D orbit, and ambient layers</div>
+            <div class="section-hint"></div>
           </div>
 
           <div class="preset-strip" id="presetBar">
@@ -1415,7 +1415,7 @@
         <div class="library-card neu-chassis">
           <div class="section-head" style="margin-bottom:0;">
             <div class="section-title">Music Library</div>
-            <div class="section-hint">Play, save offline, or share a short link</div>
+            <div class="section-hint"></div>
           </div>
 
           <div class="search-well">
@@ -2659,7 +2659,7 @@
 
       $("heroTitle").textContent = track.title || "Untitled Track";
       $("heroArtist").textContent = track.artist || "Unknown Artist";
-      $("heroAlbum").textContent = track.album ? `Album: ${track.album}` : "Streaming free on Play Mine";
+      $("heroAlbum").textContent = track.album ? `Album: ${track.album}` : "ꜱᴛʀᴇᴀᴍɪɴɢ ꜰʀᴇᴇ ᴏɴ ᴘʟᴀʏ ᴍɪɴᴇ";
       $("heroQuality").textContent = isOffline
         ? "OFFLINE VAULT • LOSSLESS"
         : (track.quality || "HIGH-RES AUDIO").toUpperCase();
