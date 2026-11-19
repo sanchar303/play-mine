@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
   <title>Play Mine</title>
-  <meta name="description" content="Play Mine — Free high-resolution music streaming with custom sound tuning, live audio visualizer, and instant song requests." />
+  <meta name="description" content="Play Mine — Free high-resolution music streaming with custom sound tuning, live audio visualizer, offline vault, and instant song requests." />
   <meta name="theme-color" content="#0b0d12" />
   <link rel="canonical" href="https://play-mine.pages.dev/" />
   <link rel="icon" type="image/png" href="/favicon.png" />
@@ -23,6 +23,12 @@
       --bevel-bottom: rgba(0, 0, 0, 0.8);
       --gloss-sheen: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 45%, rgba(255, 255, 255, 0.025) 100%);
 
+      /* Album-Art Reactive Dynamic Theme Variables */
+      --dyn-primary: #38bdf8;
+      --dyn-primary-rgb: 56, 189, 248;
+      --dyn-secondary: #f59e0b;
+      --dyn-secondary-rgb: 245, 158, 11;
+
       --shadow-extrude:
         10px 10px 22px #030407,
         -6px -6px 16px rgba(34, 41, 56, 0.24),
@@ -38,9 +44,10 @@
         inset 4px 4px 10px #030407,
         inset -2px -2px 7px rgba(35, 42, 56, 0.18);
 
-      --accent-sky: #38bdf8;
-      --accent-amber: #f59e0b;
+      --accent-sky: var(--dyn-primary);
+      --accent-amber: var(--dyn-secondary);
       --accent-green: #10b981;
+      --accent-rose: #fb7185;
       --chrome-bright: #f8fafc;
       --text-main: #eef2f7;
       --text-dim: #9aa6b8;
@@ -75,13 +82,14 @@
       touch-action: pan-y;
       background-color: var(--chassis-bg);
       background-image:
-        radial-gradient(ellipse 80% 45% at 15% 0%, rgba(56, 189, 248, 0.07), transparent 60%),
-        radial-gradient(ellipse 70% 40% at 85% 100%, rgba(245, 158, 11, 0.045), transparent 60%),
+        radial-gradient(ellipse 80% 45% at 15% 0%, rgba(var(--dyn-primary-rgb), 0.10), transparent 60%),
+        radial-gradient(ellipse 70% 40% at 85% 100%, rgba(var(--dyn-secondary-rgb), 0.075), transparent 60%),
         linear-gradient(180deg, #0d1017 0%, #090b10 100%);
       color: var(--text-main);
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       font-variant-numeric: tabular-nums;
       line-height: 1.45;
+      transition: background-image 650ms ease;
     }
 
     .app-shell {
@@ -94,17 +102,20 @@
       gap: 14px;
     }
 
-    /* Extruded Glossy Chassis */
+    /* Extruded Glossy Chassis with Album-Art Reactive Rim Glow */
     .neu-chassis {
       width: 100%;
       min-width: 0;
       background: var(--gloss-sheen), linear-gradient(160deg, #161b26 0%, #0e1118 100%);
       border-radius: var(--r-chassis);
-      border-top: 1px solid var(--bevel-top);
-      border-left: 1px solid var(--bevel-left);
+      border-top: 1px solid rgba(var(--dyn-primary-rgb), 0.28);
+      border-left: 1px solid rgba(var(--dyn-primary-rgb), 0.12);
       border-right: 1px solid var(--bevel-right);
       border-bottom: 1px solid var(--bevel-bottom);
-      box-shadow: var(--shadow-extrude);
+      box-shadow:
+        var(--shadow-extrude),
+        0 0 28px rgba(var(--dyn-primary-rgb), 0.06);
+      transition: border-color 650ms ease, box-shadow 650ms ease;
     }
 
     /* Concave Recessed Well */
@@ -142,7 +153,7 @@
       font-size: 0.82rem;
       padding: 8px 14px;
       text-decoration: none;
-      transition: transform 130ms var(--ease-haptic), box-shadow 130ms var(--ease-haptic), border-color 160ms ease, color 160ms ease;
+      transition: transform 130ms var(--ease-haptic), box-shadow 130ms var(--ease-haptic), border-color 260ms ease, color 260ms ease, background 450ms ease;
     }
 
     .haptic-key:hover {
@@ -159,20 +170,21 @@
     }
 
     .haptic-key:focus-visible {
-      outline: 2px solid var(--accent-sky);
+      outline: 2px solid var(--dyn-primary);
       outline-offset: 2px;
     }
 
     .haptic-key.is-engaged {
       background:
-        linear-gradient(180deg, rgba(56, 189, 248, 0.22) 0%, rgba(56, 189, 248, 0.04) 55%, rgba(0, 0, 0, 0.22) 100%),
-        linear-gradient(145deg, #152333, #0e1520);
-      border-top-color: rgba(125, 211, 252, 0.55);
-      color: #bae6fd;
-      box-shadow: inset 3px 3px 8px rgba(2, 5, 10, 0.82), 0 0 12px rgba(56, 189, 248, 0.15);
+        linear-gradient(180deg, rgba(var(--dyn-primary-rgb), 0.25) 0%, rgba(var(--dyn-primary-rgb), 0.05) 55%, rgba(0, 0, 0, 0.22) 100%),
+        linear-gradient(145deg, #162231, #0e1520);
+      border-top-color: rgba(var(--dyn-primary-rgb), 0.65);
+      color: #f0f9ff;
+      box-shadow: inset 3px 3px 8px rgba(2, 5, 10, 0.82), 0 0 14px rgba(var(--dyn-primary-rgb), 0.22);
     }
 
-    .haptic-key.is-copied {
+    .haptic-key.is-copied,
+    .haptic-key.is-saved {
       background:
         linear-gradient(180deg, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.06) 55%, rgba(0, 0, 0, 0.22) 100%),
         linear-gradient(145deg, #122922, #0c1714);
@@ -180,16 +192,24 @@
       color: #a7f3d0;
     }
 
+    .haptic-key.is-danger {
+      background:
+        linear-gradient(180deg, rgba(251, 113, 133, 0.18) 0%, rgba(251, 113, 133, 0.04) 55%, rgba(0, 0, 0, 0.22) 100%),
+        linear-gradient(145deg, #27151c, #160d11);
+      border-top-color: rgba(251, 113, 133, 0.45);
+      color: #fecdd3;
+    }
+
     .haptic-primary {
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.04) 48%, rgba(0, 0, 0, 0.18) 100%),
-        linear-gradient(145deg, #38bdf8 0%, #0284c7 60%, #0369a1 100%);
+        linear-gradient(145deg, var(--dyn-primary) 0%, rgba(var(--dyn-primary-rgb), 0.72) 100%);
       border-top: 1.5px solid rgba(255, 255, 255, 0.72);
       border-left: 1px solid rgba(255, 255, 255, 0.4);
       border-bottom: 1.5px solid rgba(2, 32, 54, 0.95);
       color: #031019;
       font-weight: 800;
-      box-shadow: 6px 6px 16px #020306, 0 0 18px rgba(56, 189, 248, 0.24), inset 0 1px 2px rgba(255, 255, 255, 0.65);
+      box-shadow: 6px 6px 16px #020306, 0 0 18px rgba(var(--dyn-primary-rgb), 0.26), inset 0 1px 2px rgba(255, 255, 255, 0.65);
     }
 
     .haptic-primary:hover {
@@ -211,17 +231,18 @@
       border-radius: 50%;
       flex-shrink: 0;
       background:
-        radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.08) 42%, transparent 70%),
-        linear-gradient(145deg, #38bdf8 0%, #0284c7 52%, #0369a1 100%);
-      border-top: 1.5px solid rgba(255, 255, 255, 0.72);
+        radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.58) 0%, rgba(255, 255, 255, 0.08) 42%, transparent 70%),
+        linear-gradient(145deg, var(--dyn-primary) 0%, rgba(var(--dyn-primary-rgb), 0.72) 100%);
+      border-top: 1.5px solid rgba(255, 255, 255, 0.75);
       border-left: 1px solid rgba(255, 255, 255, 0.42);
       border-right: 1px solid rgba(3, 45, 72, 0.85);
       border-bottom: 1.5px solid rgba(2, 32, 54, 0.95);
       color: #041019;
       box-shadow:
         6px 6px 16px #020306,
-        0 0 20px rgba(56, 189, 248, 0.28),
+        0 0 22px rgba(var(--dyn-primary-rgb), 0.32),
         inset 0 2px 3px rgba(255, 255, 255, 0.65);
+      transition: transform 130ms var(--ease-haptic), box-shadow 500ms ease, background 500ms ease;
     }
 
     .haptic-master-play:active,
@@ -235,9 +256,9 @@
       font-size: 0.74rem;
     }
 
-    .share-key {
-      padding: 5px 10px;
-      font-size: 0.72rem;
+    .action-key {
+      padding: 5px 9px;
+      font-size: 0.71rem;
       gap: 4px;
       flex-shrink: 0;
     }
@@ -266,7 +287,7 @@
       border-radius: 11px;
       padding: 3px;
       background: linear-gradient(145deg, #1f2636, #0d1017);
-      border-top: 1px solid rgba(255, 255, 255, 0.24);
+      border-top: 1px solid rgba(var(--dyn-primary-rgb), 0.38);
       box-shadow: 4px 4px 10px #030407;
       overflow: hidden;
     }
@@ -389,12 +410,16 @@
       padding: 7px;
       background: linear-gradient(145deg, #06080c, #131823);
       border-top: 1px solid rgba(0, 0, 0, 0.9);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-      box-shadow: inset 5px 5px 12px #020305, inset -3px -3px 8px rgba(36, 44, 60, 0.25);
+      border-bottom: 1px solid rgba(var(--dyn-primary-rgb), 0.35);
+      box-shadow:
+        inset 5px 5px 12px #020305,
+        inset -3px -3px 8px rgba(36, 44, 60, 0.25),
+        0 0 22px rgba(var(--dyn-primary-rgb), 0.18);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      transition: box-shadow 650ms ease, border-color 650ms ease;
     }
 
     .platter-disc {
@@ -455,9 +480,10 @@
       text-transform: uppercase;
       padding: 3px 9px;
       border-radius: var(--r-pill);
-      color: #bae6fd;
-      background: linear-gradient(180deg, rgba(56, 189, 248, 0.16), rgba(56, 189, 248, 0.05));
-      border-top: 1px solid rgba(125, 211, 252, 0.35);
+      color: #f0f9ff;
+      background: linear-gradient(180deg, rgba(var(--dyn-primary-rgb), 0.24), rgba(var(--dyn-primary-rgb), 0.07));
+      border-top: 1px solid rgba(var(--dyn-primary-rgb), 0.48);
+      transition: background 500ms ease, border-color 500ms ease;
     }
 
     .genre-tag {
@@ -567,8 +593,9 @@
       width: 0%;
       max-width: calc(100% - 4px);
       border-radius: var(--r-pill);
-      background: linear-gradient(90deg, #0284c7, #38bdf8, #bae6fd);
+      background: linear-gradient(90deg, rgba(var(--dyn-primary-rgb), 0.75), var(--dyn-primary), var(--dyn-secondary));
       pointer-events: none;
+      transition: background 500ms ease;
     }
 
     .scrubber-knob {
@@ -609,6 +636,39 @@
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+
+    .deck-utility-row {
+      margin-top: 11px;
+      padding-top: 11px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .preload-pill {
+      font-size: 0.71rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .preload-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-mute);
+      transition: background 300ms ease, box-shadow 300ms ease;
+    }
+
+    .preload-pill.is-ready .preload-dot {
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
     }
 
     .volume-pod {
@@ -682,8 +742,9 @@
     .eq-gain-val {
       font-size: 0.68rem;
       font-weight: 700;
-      color: var(--accent-sky);
+      color: var(--dyn-primary);
       white-space: nowrap;
+      transition: color 500ms ease;
     }
 
     .eq-slot {
@@ -711,10 +772,17 @@
     .stage-row {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
-      gap: 12px;
+      gap: 10px;
       align-items: center;
       padding-top: 12px;
       border-top: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .stage-toggles {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
     .stage-box {
@@ -731,6 +799,23 @@
       font-size: 0.74rem;
       font-weight: 600;
       color: var(--text-dim);
+    }
+
+    /* Ambient Layering Sub-Strip inside Equalizer */
+    .ambient-row {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+    }
+
+    .ambient-modes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
     }
 
     /* Right Column: Music Library + Song Request Card */
@@ -772,7 +857,7 @@
     }
 
     .neu-input:focus {
-      border-bottom-color: rgba(56, 189, 248, 0.55);
+      border-bottom-color: rgba(var(--dyn-primary-rgb), 0.65);
     }
 
     .search-input-padded {
@@ -790,12 +875,31 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
       gap: 8px;
     }
 
     .filter-strip {
       display: flex;
+      flex-wrap: wrap;
       gap: 6px;
+    }
+
+    .vault-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: var(--r-pill);
+      font-size: 0.73rem;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+
+    .vault-storage-badge {
+      color: #a7f3d0;
+      font-weight: 700;
     }
 
     .count-text {
@@ -842,11 +946,11 @@
       cursor: pointer;
       user-select: none;
       touch-action: manipulation;
-      transition: transform 130ms var(--ease-haptic), border-color 160ms ease;
+      transition: transform 130ms var(--ease-haptic), border-color 200ms ease;
     }
 
     .track-plate:hover {
-      border-top-color: rgba(125, 211, 252, 0.42);
+      border-top-color: rgba(var(--dyn-primary-rgb), 0.48);
     }
 
     .track-plate:active {
@@ -856,9 +960,9 @@
 
     .track-plate.is-current {
       background:
-        linear-gradient(165deg, rgba(56, 189, 248, 0.18) 0%, rgba(56, 189, 248, 0.04) 55%, rgba(0, 0, 0, 0.25) 100%),
+        linear-gradient(165deg, rgba(var(--dyn-primary-rgb), 0.20) 0%, rgba(var(--dyn-primary-rgb), 0.04) 55%, rgba(0, 0, 0, 0.25) 100%),
         linear-gradient(145deg, #152333, #0d141f);
-      border-top-color: rgba(125, 211, 252, 0.6);
+      border-top-color: rgba(var(--dyn-primary-rgb), 0.68);
       box-shadow: inset 3px 3px 8px rgba(2, 5, 10, 0.82);
     }
 
@@ -896,11 +1000,11 @@
       width: 3px;
       height: 12px;
       border-radius: 99px;
-      background: var(--accent-sky);
+      background: var(--dyn-primary);
       animation: eqPulse 0.72s ease-in-out infinite alternate;
     }
 
-    .eq-needle:nth-child(2) { animation-delay: 0.22s; background: #bae6fd; }
+    .eq-needle:nth-child(2) { animation-delay: 0.22s; background: var(--dyn-secondary); }
     .eq-needle:nth-child(3) { animation-delay: 0.44s; }
 
     @keyframes eqPulse {
@@ -932,12 +1036,12 @@
     .plate-right {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-shrink: 0;
     }
 
     .plate-time {
-      font-size: 0.72rem;
+      font-size: 0.71rem;
       font-weight: 600;
       color: var(--text-dim);
     }
@@ -993,12 +1097,15 @@
       padding: 9px 18px;
       border-radius: var(--r-pill);
       background: linear-gradient(160deg, #1b2230, #0d1017);
-      border-top: 1px solid rgba(255, 255, 255, 0.25);
+      border-top: 1px solid rgba(var(--dyn-primary-rgb), 0.45);
       box-shadow: 0 12px 28px rgba(0, 0, 0, 0.85);
       font-size: 0.8rem;
       font-weight: 600;
       color: var(--chrome-bright);
       white-space: nowrap;
+      max-width: calc(100vw - 24px);
+      overflow: hidden;
+      text-overflow: ellipsis;
       transition: transform 220ms var(--ease-haptic);
       pointer-events: none;
     }
@@ -1068,7 +1175,7 @@
       .eq-label {
         font-size: 0.63rem;
       }
-      .stage-row {
+      .stage-row, .ambient-row {
         grid-template-columns: minmax(0, 1fr);
       }
       .request-row {
@@ -1076,7 +1183,7 @@
       }
     }
 
-    @media (max-width: 380px) {
+    @media (max-width: 440px) {
       .plate-time {
         display: none;
       }
@@ -1136,7 +1243,7 @@
           <!-- Live Audio Visualizer -->
           <div class="scope-box neu-well">
             <div class="scope-bar">
-              <span class="scope-hint">Visuals — reacts live to the beat</span>
+              <span class="scope-hint">Visuals — reacts live to album &amp; beat</span>
               <div class="scope-modes">
                 <div class="haptic-key mini-key is-engaged" role="button" tabindex="0" data-viz="aurora">Wave</div>
                 <div class="haptic-key mini-key" role="button" tabindex="0" data-viz="bars">Bars</div>
@@ -1192,13 +1299,31 @@
               <input type="range" id="volumeFader" class="fader-track" min="0" max="1" step="0.01" value="0.95" style="width: 88px;" aria-label="Volume level" title="Adjust volume" />
             </div>
           </div>
+
+          <!-- Gapless Crossfade + Timestamp Clip Share Bar -->
+          <div class="deck-utility-row">
+            <div class="preload-pill" id="preloadStatus">
+              <span class="preload-dot"></span>
+              <span id="preloadText">Gapless queue ready</span>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <div class="haptic-key mini-key is-engaged" id="btnCrossfade" role="button" tabindex="0" title="Smooth 5-second DJ blend between songs">
+                Crossfade 5s: ON
+              </div>
+              <div class="haptic-key mini-key" id="btnShareClip" role="button" tabindex="0" title="Copy short link starting at current timestamp">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span id="shareClipLabel">Share @ 00:00</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Sound Equalizer Card -->
         <div class="eq-card neu-chassis">
           <div class="section-head">
             <div class="section-title">Sound Equalizer</div>
-            <div class="section-hint">Adjust bass, vocals, and treble to match your headphones</div>
+            <div class="section-hint">Adjust bass, vocals, 8D orbit, and ambient layers</div>
           </div>
 
           <div class="preset-strip" id="presetBar">
@@ -1251,13 +1376,36 @@
             <div class="stage-box">
               <div class="stage-labels">
                 <span>Stereo Surround — widens left &amp; right channels</span>
-                <span id="stageReadout" style="color: var(--accent-sky);">115%</span>
+                <span id="stageReadout" style="color: var(--dyn-primary);">115%</span>
               </div>
               <input type="range" id="stereoFader" class="fader-track" min="0" max="1.6" step="0.05" value="1.15" aria-label="Stereo Surround" />
             </div>
 
-            <div class="haptic-key mini-key is-engaged" id="btnLimiter" role="button" tabindex="0" title="Prevents distortion when bass is boosted">
-              Volume Guard: ON
+            <div class="stage-toggles">
+              <div class="haptic-key mini-key" id="btn8D" role="button" tabindex="0" title="Gently orbits stereo sound around your headphones">
+                8D Orbital: OFF
+              </div>
+              <div class="haptic-key mini-key is-engaged" id="btnLimiter" role="button" tabindex="0" title="Prevents distortion when bass is boosted">
+                Volume Guard: ON
+              </div>
+            </div>
+          </div>
+
+          <!-- Procedural Ambient Soundscape Layering -->
+          <div class="ambient-row">
+            <div class="ambient-modes" id="ambientBar">
+              <div class="haptic-key mini-key is-engaged" role="button" tabindex="0" data-ambient="off">No Ambience</div>
+              <div class="haptic-key mini-key" role="button" tabindex="0" data-ambient="rain">Rain</div>
+              <div class="haptic-key mini-key" role="button" tabindex="0" data-ambient="vinyl">Vinyl</div>
+              <div class="haptic-key mini-key" role="button" tabindex="0" data-ambient="cafe">Café</div>
+            </div>
+
+            <div class="stage-box">
+              <div class="stage-labels">
+                <span>Atmosphere Mix</span>
+                <span id="ambientReadout" style="color: var(--dyn-primary);">35%</span>
+              </div>
+              <input type="range" id="ambientFader" class="fader-track" min="0" max="1" step="0.02" value="0.35" aria-label="Atmosphere Mix Volume" />
             </div>
           </div>
         </div>
@@ -1269,7 +1417,7 @@
         <div class="library-card neu-chassis">
           <div class="section-head" style="margin-bottom:0;">
             <div class="section-title">Music Library</div>
-            <div class="section-hint">Tap any song to play or share a direct link</div>
+            <div class="section-hint">Play, save offline, or share a short link</div>
           </div>
 
           <div class="search-well">
@@ -1281,8 +1429,14 @@
             <div class="filter-strip" id="filterBar">
               <div class="haptic-key mini-key is-engaged" role="button" tabindex="0" data-filter="all">All Songs</div>
               <div class="haptic-key mini-key" role="button" tabindex="0" data-filter="featured">Featured</div>
+              <div class="haptic-key mini-key" role="button" tabindex="0" data-filter="offline">Offline Vault</div>
             </div>
             <span class="count-text" id="countPill">0 songs</span>
+          </div>
+
+          <div class="vault-status-row neu-well">
+            <span>Offline Storage Used</span>
+            <span class="vault-storage-badge" id="vaultStorageText">0 songs • 0.0 MB</span>
           </div>
 
           <div class="track-scroll" id="trackScroll">
@@ -1360,12 +1514,19 @@
     let searchQuery = "";
     let vizMode = "aurora";
     let limiterEnabled = true;
-    let usingCorsDspEngine = false;
+    let crossfadeEnabled = true;
+    let orbital8DEnabled = false;
+    let ambientMode = "off";
 
     let tracksSnapshotLoaded = false;
     let sharedLinkLookupDone = false;
     let sharedLinkHandled = false;
     let resolvedSharedTrackId = null;
+    let pendingStartSeconds = 0;
+
+    // Album-Art Reactive Palette State (normalized RGB for WebGL2 + 0..255 for CSS)
+    let reactivePrimaryRgb = [56, 189, 248];
+    let reactiveSecondaryRgb = [245, 158, 11];
 
     const $ = (id) => document.getElementById(id);
 
@@ -1409,14 +1570,18 @@
       return "https://play-mine.pages.dev";
     }
 
-    function buildShortSongUrl(shortCode) {
-      return `${getWebsiteOrigin()}/${encodeURIComponent(shortCode)}`;
+    function buildShortSongUrl(shortCode, timestampSec = 0) {
+      const base = `${getWebsiteOrigin()}/${encodeURIComponent(shortCode)}`;
+      const sec = Math.floor(Number(timestampSec) || 0);
+      return sec > 0 ? `${base}?t=${sec}` : base;
     }
 
-    function syncBrowserShortPath(shortCode) {
+    function syncBrowserShortPath(shortCode, timestampSec = 0) {
       if (!shortCode || !window.location.protocol.startsWith("http")) return;
       try {
-        window.history.replaceState(null, "", `/${encodeURIComponent(shortCode)}`);
+        const sec = Math.floor(Number(timestampSec) || 0);
+        const path = `/${encodeURIComponent(shortCode)}${sec > 0 ? `?t=${sec}` : ""}`;
+        window.history.replaceState(null, "", path);
       } catch (_) {}
     }
 
@@ -1443,14 +1608,12 @@
       }
 
       const task = (async () => {
-        // 1. Check RTDB first if a short link already exists for this song
         const existingSnap = await get(shortLinksByTrackRef(trackKey));
         if (existingSnap.exists()) {
           const existingVal = existingSnap.val();
           const existingCode = typeof existingVal === "string" ? existingVal : existingVal?.code;
           if (existingCode && SHORT_CODE_REGEX.test(existingCode)) {
             shortCodeMemoryCache.set(trackKey, existingCode);
-            // Ensure reverse code-to-track mapping exists
             const codeSnap = await get(shortLinksByCodeRef(existingCode));
             if (!codeSnap.exists()) {
               await set(shortLinksByCodeRef(existingCode), {
@@ -1463,7 +1626,6 @@
           }
         }
 
-        // 2. Atomically reserve an unused shortSongCode
         let reservedCode = null;
         for (let attempt = 0; attempt < 6; attempt++) {
           const candidate = generateShortSongCode(6);
@@ -1485,7 +1647,6 @@
           throw new Error("Could not allocate a unique short code");
         }
 
-        // 3. Atomically bind reservedCode to this song so duplicate codes are impossible
         const trackTx = await runTransaction(shortLinksByTrackRef(trackKey), (current) => {
           const currentCode = typeof current === "string" ? current : current?.code;
           if (current !== null && currentCode && SHORT_CODE_REGEX.test(currentCode)) {
@@ -1503,7 +1664,6 @@
           return reservedCode;
         }
 
-        // Another concurrent request created a code first — reuse it and clean up unused candidate
         const winnerVal = trackTx.snapshot.val();
         const winnerCode = typeof winnerVal === "string" ? winnerVal : winnerVal?.code;
         await set(shortLinksByCodeRef(reservedCode), null).catch(() => {});
@@ -1552,6 +1712,14 @@
       return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
     }
 
+    function formatBytes(bytes) {
+      const b = Number(bytes) || 0;
+      if (b <= 0) return "0.0 MB";
+      if (b < 1024 * 1024) return `${(b / 1024).toFixed(0)} KB`;
+      if (b < 1024 * 1024 * 1024) return `${(b / (1024 * 1024)).toFixed(1)} MB`;
+      return `${(b / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+    }
+
     function escapeHtml(str) {
       return String(str)
         .replace(/&/g, "&amp;")
@@ -1564,53 +1732,433 @@
       let hash = 0;
       for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
       const hue = Math.abs(hash % 360);
+      const hue2 = (hue + 48) % 360;
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
         <defs>
           <radialGradient id="disc" cx="35%" cy="30%" r="75%">
-            <stop offset="0%" stop-color="hsl(${hue}, 52%, 34%)" />
-            <stop offset="55%" stop-color="#141923" />
+            <stop offset="0%" stop-color="hsl(${hue}, 68%, 48%)" />
+            <stop offset="52%" stop-color="hsl(${hue2}, 42%, 18%)" />
             <stop offset="100%" stop-color="#07090d" />
           </radialGradient>
         </defs>
         <rect width="320" height="320" fill="url(#disc)"/>
-        <circle cx="160" cy="160" r="126" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
-        <circle cx="160" cy="160" r="96" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-        <circle cx="160" cy="160" r="68" fill="none" stroke="rgba(56,189,248,0.28)" stroke-width="2"/>
+        <circle cx="160" cy="160" r="126" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="1.5"/>
+        <circle cx="160" cy="160" r="96" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="1"/>
+        <circle cx="160" cy="160" r="68" fill="none" stroke="hsl(${hue2}, 82%, 62%)" stroke-opacity="0.45" stroke-width="2.5"/>
       </svg>`;
       return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    }
+
+    // =========================================================================
+    // 3. ALBUM-ART REACTIVE CHASSIS LIGHTING (OFFSCREEN CANVAS SAMPLER)
+    // =========================================================================
+    function hslToRgb(h, s, l) {
+      h = ((h % 360) + 360) % 360 / 360;
+      s = Math.max(0, Math.min(1, s));
+      l = Math.max(0, Math.min(1, l));
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      };
+      if (s === 0) {
+        const v = Math.round(l * 255);
+        return [v, v, v];
+      }
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      return [
+        Math.round(hue2rgb(p, q, h + 1 / 3) * 255),
+        Math.round(hue2rgb(p, q, h) * 255),
+        Math.round(hue2rgb(p, q, h - 1 / 3) * 255)
+      ];
+    }
+
+    function boostNeonColor([r, g, b]) {
+      const max = Math.max(r, g, b) / 255;
+      const min = Math.min(r, g, b) / 255;
+      let h = 0, s = 0, l = (max + min) / 2;
+      if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max * 255) {
+          case r: h = ((g - b) / 255 / d + (g < b ? 6 : 0)) * 60; break;
+          case g: h = ((b - r) / 255 / d + 2) * 60; break;
+          default: h = ((r - g) / 255 / d + 4) * 60; break;
+        }
+      }
+      // Keep saturation vivid and lightness readable against dark neumorphic chassis
+      return hslToRgb(h, Math.max(0.65, Math.min(0.95, s)), Math.max(0.54, Math.min(0.68, l)));
+    }
+
+    function applyReactivePalette(primary, secondary) {
+      reactivePrimaryRgb = primary;
+      reactiveSecondaryRgb = secondary;
+      const root = document.documentElement.style;
+      root.setProperty("--dyn-primary", `rgb(${primary[0]}, ${primary[1]}, ${primary[2]})`);
+      root.setProperty("--dyn-primary-rgb", `${primary[0]}, ${primary[1]}, ${primary[2]}`);
+      root.setProperty("--dyn-secondary", `rgb(${secondary[0]}, ${secondary[1]}, ${secondary[2]})`);
+      root.setProperty("--dyn-secondary-rgb", `${secondary[0]}, ${secondary[1]}, ${secondary[2]}`);
+    }
+
+    function fallbackPaletteFromSeed(seed) {
+      let hash = 0;
+      for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+      const h1 = Math.abs(hash % 360);
+      const h2 = (h1 + 55) % 360;
+      return [hslToRgb(h1, 0.85, 0.6), hslToRgb(h2, 0.85, 0.58)];
+    }
+
+    function sampleAlbumCoverColors(imgSrc, fallbackSeed = "Play Mine") {
+      if (!imgSrc) {
+        const [p, s] = fallbackPaletteFromSeed(fallbackSeed);
+        applyReactivePalette(p, s);
+        return;
+      }
+
+      const probe = new Image();
+      if (!imgSrc.startsWith("data:") && !imgSrc.startsWith("blob:")) {
+        probe.crossOrigin = "anonymous";
+      }
+
+      probe.onload = () => {
+        try {
+          const sampleCanvas = document.createElement("canvas");
+          sampleCanvas.width = 24;
+          sampleCanvas.height = 24;
+          const ctx = sampleCanvas.getContext("2d", { willReadFrequently: true });
+          ctx.drawImage(probe, 0, 0, 24, 24);
+          const data = ctx.getImageData(0, 0, 24, 24).data;
+
+          // Quantize into 12 hue buckets weighted by saturation & mid-luminance
+          const buckets = Array.from({ length: 12 }, () => ({ weight: 0, r: 0, g: 0, b: 0 }));
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+            if (a < 128) continue;
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const delta = max - min;
+            const lum = (max + min) / 510;
+            if (lum < 0.08 || lum > 0.94) continue;
+            const sat = max === 0 ? 0 : delta / max;
+            let hue = 0;
+            if (delta > 0) {
+              if (max === r) hue = ((g - b) / delta + (g < b ? 6 : 0)) * 60;
+              else if (max === g) hue = ((b - r) / delta + 2) * 60;
+              else hue = ((r - g) / delta + 4) * 60;
+            }
+            const idx = Math.floor(hue / 30) % 12;
+            const weight = 0.25 + sat * sat * 2.5;
+            buckets[idx].weight += weight;
+            buckets[idx].r += r * weight;
+            buckets[idx].g += g * weight;
+            buckets[idx].b += b * weight;
+          }
+
+          const ranked = buckets
+            .map((bk, idx) => ({ ...bk, idx }))
+            .filter((bk) => bk.weight > 0)
+            .sort((a, b) => b.weight - a.weight);
+
+          if (ranked.length === 0) {
+            const [p, s] = fallbackPaletteFromSeed(fallbackSeed);
+            applyReactivePalette(p, s);
+            return;
+          }
+
+          const top = ranked[0];
+          const primary = boostNeonColor([
+            Math.round(top.r / top.weight),
+            Math.round(top.g / top.weight),
+            Math.round(top.b / top.weight)
+          ]);
+
+          // Pick second color from a distinct hue bucket (>= 2 buckets apart)
+          const distinct = ranked.find((bk) => {
+            const diff = Math.abs(bk.idx - top.idx);
+            return Math.min(diff, 12 - diff) >= 2;
+          }) || ranked[1];
+
+          let secondary;
+          if (distinct) {
+            secondary = boostNeonColor([
+              Math.round(distinct.r / distinct.weight),
+              Math.round(distinct.g / distinct.weight),
+              Math.round(distinct.b / distinct.weight)
+            ]);
+          } else {
+            secondary = boostNeonColor([primary[2], primary[0], primary[1]]);
+          }
+
+          applyReactivePalette(primary, secondary);
+        } catch (_) {
+          // Cross-origin tainted canvas fallback
+          const [p, s] = fallbackPaletteFromSeed(fallbackSeed);
+          applyReactivePalette(p, s);
+        }
+      };
+
+      probe.onerror = () => {
+        const [p, s] = fallbackPaletteFromSeed(fallbackSeed);
+        applyReactivePalette(p, s);
+      };
+
+      probe.src = imgSrc;
     }
 
     $("heroCover").src = buildVinylDiscSvg("Play Mine");
 
     // =========================================================================
-    // 3. DUAL-ENGINE HIGH-RESOLUTION AUDIO PIPELINE
+    // 4. OFFLINE VAULT VIA INDEXEDDB (SAVE, PLAY OFFLINE, DELETE & STORAGE METER)
     // =========================================================================
-    const corsAudio = new Audio();
-    corsAudio.preload = "auto";
-    corsAudio.crossOrigin = "anonymous";
+    const VAULT_DB_NAME = "play_mine_offline_vault";
+    const VAULT_DB_VERSION = 1;
+    let vaultDbPromise = null;
+    const offlineMetaMap = new Map(); // trackId -> metadata object
+    const downloadingTrackIds = new Set();
+    let activeAudioObjectUrl = null;
+    let activeCoverObjectUrl = null;
+    let preloadedAudioObjectUrl = null;
 
-    const nativeAudio = new Audio();
-    nativeAudio.preload = "auto";
-
-    function getActivePlayer() {
-      return usingCorsDspEngine ? corsAudio : nativeAudio;
+    function openVaultDb() {
+      if (vaultDbPromise) return vaultDbPromise;
+      vaultDbPromise = new Promise((resolve, reject) => {
+        if (!("indexedDB" in window)) {
+          reject(new Error("IndexedDB not supported"));
+          return;
+        }
+        const req = indexedDB.open(VAULT_DB_NAME, VAULT_DB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const idb = e.target.result;
+          if (!idb.objectStoreNames.contains("tracks_meta")) {
+            idb.createObjectStore("tracks_meta", { keyPath: "id" });
+          }
+          if (!idb.objectStoreNames.contains("tracks_blobs")) {
+            idb.createObjectStore("tracks_blobs", { keyPath: "id" });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+      return vaultDbPromise;
     }
 
-    function stopAllPlayers() {
-      corsAudio.pause();
-      nativeAudio.pause();
+    async function refreshOfflineVaultIndex() {
+      try {
+        const idb = await openVaultDb();
+        const items = await new Promise((resolve, reject) => {
+          const tx = idb.transaction("tracks_meta", "readonly");
+          const store = tx.objectStore("tracks_meta");
+          const req = store.getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => reject(req.error);
+        });
+
+        offlineMetaMap.clear();
+        let totalBytes = 0;
+        for (const item of items) {
+          offlineMetaMap.set(item.id, item);
+          totalBytes += Number(item.totalBytes) || 0;
+        }
+
+        const count = offlineMetaMap.size;
+        $("vaultStorageText").textContent = `${count} ${count === 1 ? "song" : "songs"} • ${formatBytes(totalBytes)}`;
+
+        // If offline and RTDB hasn't loaded any tracks, populate library directly from Vault
+        if (allTracks.length === 0 && count > 0) {
+          allTracks = items
+            .map((m) => ({ ...m }))
+            .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.savedAt || 0) - (a.savedAt || 0));
+          applyFilters();
+        } else {
+          renderTrackList();
+        }
+      } catch (err) {
+        console.warn("Offline vault index read:", err);
+      }
     }
 
+    async function getOfflineBlobs(trackId) {
+      try {
+        const idb = await openVaultDb();
+        return await new Promise((resolve, reject) => {
+          const tx = idb.transaction("tracks_blobs", "readonly");
+          const req = tx.objectStore("tracks_blobs").get(trackId);
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => reject(req.error);
+        });
+      } catch (_) {
+        return null;
+      }
+    }
+
+    async function saveTrackOffline(track) {
+      if (!track || !track.id || !track.url) return;
+      if (downloadingTrackIds.has(track.id)) return;
+
+      downloadingTrackIds.add(track.id);
+      renderTrackList();
+      showToast(`Saving "${track.title || "song"}" offline…`);
+
+      try {
+        const audioRes = await fetch(track.url, { mode: "cors" });
+        if (!audioRes.ok) throw new Error(`HTTP ${audioRes.status}`);
+        const audioBlob = await audioRes.blob();
+        if (!audioBlob || audioBlob.size === 0) throw new Error("Empty audio stream");
+
+        let coverBlob = null;
+        if (track.coverUrl && track.coverUrl.trim() && !track.coverUrl.startsWith("data:")) {
+          try {
+            const coverRes = await fetch(track.coverUrl.trim(), { mode: "cors" });
+            if (coverRes.ok) coverBlob = await coverRes.blob();
+          } catch (_) {}
+        }
+
+        const audioSize = audioBlob.size;
+        const coverSize = coverBlob ? coverBlob.size : 0;
+        const totalBytes = audioSize + coverSize;
+
+        const metaRecord = {
+          id: track.id,
+          title: track.title || "Untitled",
+          artist: track.artist || "Unknown Artist",
+          album: track.album || "",
+          genre: track.genre || "Music",
+          quality: track.quality || "HIGH-RES AUDIO",
+          duration: track.duration || "--:--",
+          featured: Boolean(track.featured),
+          url: track.url,
+          coverUrl: track.coverUrl || "",
+          audioSize,
+          coverSize,
+          totalBytes,
+          savedAt: Date.now()
+        };
+
+        const idb = await openVaultDb();
+        await new Promise((resolve, reject) => {
+          const tx = idb.transaction(["tracks_meta", "tracks_blobs"], "readwrite");
+          tx.objectStore("tracks_meta").put(metaRecord);
+          tx.objectStore("tracks_blobs").put({
+            id: track.id,
+            audioBlob,
+            coverBlob
+          });
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+
+        downloadingTrackIds.delete(track.id);
+        await refreshOfflineVaultIndex();
+        showToast(`Saved "${track.title}" (${formatBytes(totalBytes)}) for offline playback!`);
+      } catch (err) {
+        downloadingTrackIds.delete(track.id);
+        renderTrackList();
+        console.error("Offline save error:", err);
+        showToast("Could not save offline (stream host blocks direct download).");
+      }
+    }
+
+    async function deleteOfflineTrack(track) {
+      if (!track || !track.id) return;
+      try {
+        const idb = await openVaultDb();
+        await new Promise((resolve, reject) => {
+          const tx = idb.transaction(["tracks_meta", "tracks_blobs"], "readwrite");
+          tx.objectStore("tracks_meta").delete(track.id);
+          tx.objectStore("tracks_blobs").delete(track.id);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+
+        await refreshOfflineVaultIndex();
+        showToast(`Removed "${track.title || "song"}" from offline storage.`);
+      } catch (err) {
+        console.error("Offline delete error:", err);
+        showToast("Could not delete offline song.");
+      }
+    }
+
+    // =========================================================================
+    // 5. DUAL-DECK A/B WEB AUDIO DSP, 8D ORBITAL, AMBIENT LAYER & CROSSFADE
+    // =========================================================================
     let audioCtx = null;
-    let sourceNode = null;
+    let sharedDspInput = null;
     let eqNodes = [];
     let splitterNode = null;
     let mergerNode = null;
     let midGain = null;
+    let orbitalPanner = null;
     let limiterNode = null;
     let masterGainNode = null;
     let analyserNode = null;
     let dspGraphReady = false;
+
+    // Procedural Ambient Soundscape Nodes
+    let ambientMasterGain = null;
+    let ambientActiveSource = null;
+    let ambientLfo = null;
+
+    // Dual Decks (A & B) for 15s Background Preload + 5s DJ Crossfade
+    function createAudioDeck(name) {
+      const corsEl = new Audio();
+      corsEl.preload = "auto";
+      corsEl.crossOrigin = "anonymous";
+
+      const nativeEl = new Audio();
+      nativeEl.preload = "auto";
+
+      return {
+        name,
+        corsEl,
+        nativeEl,
+        usingCors: false,
+        sourceNode: null,
+        gainNode: null,
+        trackId: null,
+        trackIndex: -1,
+        preloadedForId: null,
+        objectUrl: null
+      };
+    }
+
+    const deckA = createAudioDeck("A");
+    const deckB = createAudioDeck("B");
+    let activeDeck = deckA;
+    let standbyDeck = deckB;
+    let crossfadeTimer = null;
+    let isCrossfading = false;
+    let preloadedNextIndex = -1;
+
+    function getDeckElement(deck) {
+      return deck.usingCors ? deck.corsEl : deck.nativeEl;
+    }
+
+    function getActivePlayer() {
+      return getDeckElement(activeDeck);
+    }
+
+    function cancelCrossfade() {
+      if (crossfadeTimer) {
+        clearInterval(crossfadeTimer);
+        crossfadeTimer = null;
+      }
+      isCrossfading = false;
+    }
+
+    function stopDeck(deck) {
+      deck.corsEl.pause();
+      deck.nativeEl.pause();
+    }
+
+    function stopAllPlayers() {
+      cancelCrossfade();
+      stopDeck(deckA);
+      stopDeck(deckB);
+    }
 
     const EQ_FREQS = [32, 125, 1000, 4000, 14000];
     const EQ_TYPES = ["lowshelf", "peaking", "peaking", "peaking", "highshelf"];
@@ -1633,7 +2181,16 @@
       if (dspGraphReady) return;
 
       try {
-        sourceNode = audioCtx.createMediaElementSource(corsAudio);
+        sharedDspInput = audioCtx.createGain();
+        sharedDspInput.gain.value = 1.0;
+
+        [deckA, deckB].forEach((deck) => {
+          deck.sourceNode = audioCtx.createMediaElementSource(deck.corsEl);
+          deck.gainNode = audioCtx.createGain();
+          deck.gainNode.gain.value = 1.0;
+          deck.sourceNode.connect(deck.gainNode);
+          deck.gainNode.connect(sharedDspInput);
+        });
 
         eqNodes = EQ_FREQS.map((freq, idx) => {
           const f = audioCtx.createBiquadFilter();
@@ -1664,6 +2221,10 @@
         crossRfromR.connect(mergerNode, 0, 1);
         crossRfromL.connect(mergerNode, 0, 1);
 
+        // 8D Orbital Spatial Stereo Panner
+        orbitalPanner = audioCtx.createStereoPanner();
+        orbitalPanner.pan.value = 0;
+
         limiterNode = audioCtx.createDynamicsCompressor();
         limiterNode.threshold.value = -1.5;
         limiterNode.knee.value = 6.0;
@@ -1673,6 +2234,10 @@
 
         masterGainNode = audioCtx.createGain();
         masterGainNode.gain.value = parseFloat($("volumeFader").value);
+
+        // Procedural Ambient Master Bus (feeds into limiter/master & visualizer)
+        ambientMasterGain = audioCtx.createGain();
+        ambientMasterGain.gain.value = parseFloat($("ambientFader").value) * 0.28;
 
         analyserNode = audioCtx.createAnalyser();
         analyserNode.fftSize = 2048;
@@ -1686,26 +2251,32 @@
     }
 
     function rebuildDspRouting() {
-      if (!dspGraphReady || !sourceNode) return;
+      if (!dspGraphReady || !sharedDspInput) return;
       try {
-        sourceNode.disconnect();
+        sharedDspInput.disconnect();
         eqNodes.forEach((n) => n.disconnect());
         mergerNode.disconnect();
+        orbitalPanner.disconnect();
+        ambientMasterGain.disconnect();
         limiterNode.disconnect();
         masterGainNode.disconnect();
       } catch (_) {}
 
-      let head = sourceNode;
+      let head = sharedDspInput;
       for (const f of eqNodes) {
         head.connect(f);
         head = f;
       }
       head.connect(splitterNode);
+      mergerNode.connect(orbitalPanner);
+
       if (limiterEnabled) {
-        mergerNode.connect(limiterNode);
+        orbitalPanner.connect(limiterNode);
+        ambientMasterGain.connect(limiterNode);
         limiterNode.connect(masterGainNode);
       } else {
-        mergerNode.connect(masterGainNode);
+        orbitalPanner.connect(masterGainNode);
+        ambientMasterGain.connect(masterGainNode);
       }
       masterGainNode.connect(analyserNode);
       masterGainNode.connect(audioCtx.destination);
@@ -1721,7 +2292,102 @@
       midGain.crossRfromL.gain.value = opp;
     }
 
+    // Procedural Ambient Soundscape Generator (Rain / Vinyl / Café)
+    function stopAmbientSoundscape() {
+      if (ambientActiveSource) {
+        try { ambientActiveSource.stop(); } catch (_) {}
+        try { ambientActiveSource.disconnect(); } catch (_) {}
+        ambientActiveSource = null;
+      }
+      if (ambientLfo) {
+        try { ambientLfo.stop(); } catch (_) {}
+        try { ambientLfo.disconnect(); } catch (_) {}
+        ambientLfo = null;
+      }
+    }
+
+    function setAmbientSoundscape(mode) {
+      ambientMode = mode;
+      stopAmbientSoundscape();
+      if (mode === "off") return;
+
+      ensureWebAudioDsp();
+      if (!audioCtx || !ambientMasterGain) return;
+
+      const sr = audioCtx.sampleRate;
+      const lengthSec = 5;
+      const frames = sr * lengthSec;
+      const buffer = audioCtx.createBuffer(2, frames, sr);
+
+      for (let ch = 0; ch < 2; ch++) {
+        const out = buffer.getChannelData(ch);
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        let lastOut = 0;
+
+        for (let i = 0; i < frames; i++) {
+          const white = Math.random() * 2 - 1;
+          // Paul Kellet pink noise filter
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          const pink = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.04;
+          b6 = white * 0.115926;
+
+          if (mode === "rain") {
+            const droplet = Math.random() < 0.0018 ? (Math.random() * 0.35 - 0.175) : 0;
+            out[i] = pink * 1.45 + droplet;
+          } else if (mode === "vinyl") {
+            const pop = Math.random() < 0.00055 ? (Math.random() * 0.85 - 0.425) : 0;
+            const dust = Math.random() < 0.004 ? (Math.random() * 0.14 - 0.07) : 0;
+            out[i] = pink * 0.28 + pop + dust;
+          } else {
+            // Warm Café murmur
+            lastOut = (lastOut + 0.03 * pink) / 1.03;
+            out[i] = lastOut * 3.8 + pink * 0.32;
+          }
+        }
+      }
+
+      const src = audioCtx.createBufferSource();
+      src.buffer = buffer;
+      src.loop = true;
+
+      const filter = audioCtx.createBiquadFilter();
+      if (mode === "rain") {
+        filter.type = "bandpass";
+        filter.frequency.value = 1050;
+        filter.Q.value = 0.55;
+      } else if (mode === "vinyl") {
+        filter.type = "highpass";
+        filter.frequency.value = 420;
+      } else {
+        filter.type = "lowpass";
+        filter.frequency.value = 680;
+      }
+
+      src.connect(filter);
+      filter.connect(ambientMasterGain);
+      src.start();
+      ambientActiveSource = src;
+
+      if (mode === "cafe") {
+        const lfo = audioCtx.createOscillator();
+        const lfoGain = audioCtx.createGain();
+        lfo.frequency.value = 0.22;
+        lfoGain.gain.value = 140;
+        lfo.connect(lfoGain);
+        lfoGain.connect(filter.frequency);
+        lfo.start();
+        ambientLfo = lfo;
+      }
+    }
+
     async function checkUrlSupportsCors(url) {
+      if (!url) return false;
+      if (url.startsWith("blob:") || url.startsWith("data:")) return true;
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 1100);
       try {
@@ -1739,7 +2405,7 @@
     }
 
     // =========================================================================
-    // 4. GPU-ACCELERATED VISUALIZER
+    // 6. GPU-ACCELERATED VISUALIZER (WITH ALBUM-ART REACTIVE COLORS)
     // =========================================================================
     const canvas = $("gpuVisualizer");
     let gl = null;
@@ -1747,6 +2413,8 @@
     let freqTex = null;
     let timeLoc = null;
     let modeLoc = null;
+    let colorALoc = null;
+    let colorBLoc = null;
     const freqBins = new Uint8Array(256);
 
     function initGpuShader() {
@@ -1773,17 +2441,17 @@
         uniform sampler2D u_fft;
         uniform float u_time;
         uniform int u_mode;
+        uniform vec3 u_colorA;
+        uniform vec3 u_colorB;
 
         void main() {
           vec2 uv = v_uv;
           float sx = pow(uv.x, 1.4);
           float amp = texture(u_fft, vec2(sx, 0.5)).r;
 
-          vec3 ice = vec3(0.22, 0.74, 0.97);
-          vec3 chrome = vec3(0.86, 0.92, 0.98);
-          vec3 amber = vec3(0.96, 0.62, 0.04);
-          vec3 tone = mix(ice, chrome, uv.x * 0.65 + amp * 0.35);
-          tone = mix(tone, amber, pow(amp, 2.2) * 0.45);
+          vec3 chrome = vec3(0.88, 0.93, 0.99);
+          vec3 tone = mix(u_colorA, chrome, uv.x * 0.35 + amp * 0.25);
+          tone = mix(tone, u_colorB, smoothstep(0.25, 0.95, uv.x * 0.55 + pow(amp, 1.8) * 0.55));
 
           vec3 col = vec3(0.024, 0.031, 0.047);
 
@@ -1847,6 +2515,8 @@
 
       timeLoc = gl.getUniformLocation(glProgram, "u_time");
       modeLoc = gl.getUniformLocation(glProgram, "u_mode");
+      colorALoc = gl.getUniformLocation(glProgram, "u_colorA");
+      colorBLoc = gl.getUniformLocation(glProgram, "u_colorB");
     }
 
     function renderGpuFrame(nowMs) {
@@ -1854,12 +2524,20 @@
       if (document.hidden) return;
       const t = nowMs * 0.001;
 
-      if (isPlaying && usingCorsDspEngine && analyserNode) {
+      // Update 8D Orbital Spatial Stereo Panner smoothly
+      if (orbital8DEnabled && orbitalPanner && audioCtx) {
+        const panVal = Math.sin(t * 0.72) * 0.88;
+        orbitalPanner.pan.setTargetAtTime(panVal, audioCtx.currentTime, 0.04);
+      }
+
+      const activeHasAnalyser = (isPlaying && activeDeck.usingCors && analyserNode) || (ambientMode !== "off" && analyserNode);
+
+      if (activeHasAnalyser) {
         const raw = new Uint8Array(analyserNode.frequencyBinCount);
         analyserNode.getByteFrequencyData(raw);
         for (let i = 0; i < 256; i++) freqBins[i] = raw[i * 2] || 0;
       } else if (isPlaying) {
-        const pt = nativeAudio.currentTime || t;
+        const pt = getActivePlayer().currentTime || t;
         for (let i = 0; i < 256; i++) {
           const wave = Math.sin(pt * 5.2 + i * 0.13) * 0.5 + 0.5;
           const sub = Math.exp(-i * 0.022) * (0.62 + 0.38 * Math.sin(pt * 8.4));
@@ -1885,12 +2563,14 @@
         gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 256, 1, gl.RED, gl.UNSIGNED_BYTE, freqBins);
         gl.uniform1f(timeLoc, t);
         gl.uniform1i(modeLoc, vizMode === "aurora" ? 0 : vizMode === "bars" ? 1 : 2);
+        gl.uniform3f(colorALoc, reactivePrimaryRgb[0] / 255, reactivePrimaryRgb[1] / 255, reactivePrimaryRgb[2] / 255);
+        gl.uniform3f(colorBLoc, reactiveSecondaryRgb[0] / 255, reactiveSecondaryRgb[1] / 255, reactiveSecondaryRgb[2] / 255);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
     }
 
     // =========================================================================
-    // 5. PLAYBACK CONTROLLER
+    // 7. DUAL-DECK PLAYBACK, 15S PRELOADING & 5S GAPLESS DJ CROSSFADE
     // =========================================================================
     function syncPlayStateUI(playing) {
       isPlaying = playing;
@@ -1899,66 +2579,286 @@
       $("platterWell").classList.toggle("is-playing", playing);
     }
 
-    async function loadAndPlayTrack(index, autoPlay = true) {
-      if (index < 0 || index >= allTracks.length) return;
-      currentTrackIndex = index;
-      const track = allTracks[index];
+    function updatePreloadIndicator(ready, label) {
+      $("preloadStatus").classList.toggle("is-ready", ready);
+      $("preloadText").textContent = label;
+    }
+
+    function computeNextTrackIndex() {
+      if (allTracks.length === 0) return -1;
+      if (isShuffle && allTracks.length > 1) {
+        let nextIdx;
+        do { nextIdx = Math.floor(Math.random() * allTracks.length); } while (nextIdx === currentTrackIndex);
+        return nextIdx;
+      }
+      if (currentTrackIndex + 1 < allTracks.length) {
+        return currentTrackIndex + 1;
+      }
+      if (loopMode === 1) return 0;
+      return -1;
+    }
+
+    async function resolvePlayableTrackSources(track, isStandby = false) {
+      // Check IndexedDB Offline Vault first for zero-data instant playback
+      if (offlineMetaMap.has(track.id)) {
+        const cached = await getOfflineBlobs(track.id);
+        if (cached && cached.audioBlob) {
+          const audioUrl = URL.createObjectURL(cached.audioBlob);
+          const coverUrl = cached.coverBlob ? URL.createObjectURL(cached.coverBlob) : null;
+          if (isStandby) {
+            if (preloadedAudioObjectUrl) URL.revokeObjectURL(preloadedAudioObjectUrl);
+            preloadedAudioObjectUrl = audioUrl;
+          } else {
+            if (activeAudioObjectUrl) URL.revokeObjectURL(activeAudioObjectUrl);
+            if (activeCoverObjectUrl) URL.revokeObjectURL(activeCoverObjectUrl);
+            activeAudioObjectUrl = audioUrl;
+            activeCoverObjectUrl = coverUrl;
+          }
+          return {
+            audioUrl,
+            coverUrl,
+            isOffline: true,
+            supportsCors: true
+          };
+        }
+      }
+
+      const supportsCors = await checkUrlSupportsCors(track.url);
+      return {
+        audioUrl: track.url,
+        coverUrl: null,
+        isOffline: false,
+        supportsCors
+      };
+    }
+
+    async function preloadNextTrackInBackground() {
+      const nextIdx = computeNextTrackIndex();
+      if (nextIdx < 0 || nextIdx === currentTrackIndex || nextIdx >= allTracks.length) return;
+      const nextTrack = allTracks[nextIdx];
+      if (!nextTrack || standbyDeck.preloadedForId === nextTrack.id) return;
+
+      standbyDeck.preloadedForId = nextTrack.id;
+      standbyDeck.trackId = nextTrack.id;
+      standbyDeck.trackIndex = nextIdx;
+      preloadedNextIndex = nextIdx;
+
+      updatePreloadIndicator(false, `Preloading "${nextTrack.title}"…`);
+
+      try {
+        const resolved = await resolvePlayableTrackSources(nextTrack, true);
+        if (standbyDeck.preloadedForId !== nextTrack.id) return;
+
+        stopDeck(standbyDeck);
+        if (resolved.supportsCors) {
+          ensureWebAudioDsp();
+          standbyDeck.usingCors = true;
+          if (standbyDeck.gainNode) standbyDeck.gainNode.gain.value = 0;
+          standbyDeck.corsEl.src = resolved.audioUrl;
+          standbyDeck.corsEl.load();
+        } else {
+          standbyDeck.usingCors = false;
+          standbyDeck.nativeEl.volume = 0;
+          standbyDeck.nativeEl.src = resolved.audioUrl;
+          standbyDeck.nativeEl.load();
+        }
+        updatePreloadIndicator(true, `Up next ready: ${nextTrack.title}`);
+      } catch (_) {
+        standbyDeck.preloadedForId = null;
+      }
+    }
+
+    function updateDeckHeroMetadata(track, resolvedCoverUrl = null, isOffline = false) {
+      const seed = (track.title || "") + (track.artist || "");
+      const finalCover = resolvedCoverUrl ||
+        (track.coverUrl && track.coverUrl.trim() ? track.coverUrl.trim() : buildVinylDiscSvg(seed));
 
       $("heroTitle").textContent = track.title || "Untitled Track";
       $("heroArtist").textContent = track.artist || "Unknown Artist";
       $("heroAlbum").textContent = track.album ? `Album: ${track.album}` : "Streaming free on Play Mine";
-      $("heroQuality").textContent = (track.quality || "HIGH-RES AUDIO").toUpperCase();
+      $("heroQuality").textContent = isOffline
+        ? "OFFLINE VAULT • LOSSLESS"
+        : (track.quality || "HIGH-RES AUDIO").toUpperCase();
       $("heroGenre").textContent = track.genre || "Music";
-      $("heroCover").src = track.coverUrl && track.coverUrl.trim()
-        ? track.coverUrl.trim()
-        : buildVinylDiscSvg((track.title || "") + (track.artist || ""));
+      $("heroCover").src = finalCover;
       $("totTimeText").textContent = track.duration || "00:00";
-      $("curTimeText").textContent = "00:00";
-      $("scrubberFill").style.width = "0%";
-      $("scrubberKnob").style.left = "0%";
 
-      if (shortCodeMemoryCache.has(track.id)) {
-        syncBrowserShortPath(shortCodeMemoryCache.get(track.id));
-      }
-
-      renderTrackList();
+      sampleAlbumCoverColors(finalCover, seed);
 
       if ("mediaSession" in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: track.title || "Play Mine",
           artist: track.artist || "Play Mine",
           album: track.album || "Play Mine",
-          artwork: [{ src: $("heroCover").src, sizes: "512x512", type: "image/png" }]
+          artwork: [{ src: finalCover, sizes: "512x512", type: "image/png" }]
         });
       }
+    }
+
+    async function beginCrossfadeToPreloaded() {
+      if (isCrossfading || preloadedNextIndex < 0 || preloadedNextIndex >= allTracks.length) return;
+      const nextTrack = allTracks[preloadedNextIndex];
+      if (!nextTrack || standbyDeck.preloadedForId !== nextTrack.id) return;
+
+      isCrossfading = true;
+      const outgoingDeck = activeDeck;
+      const incomingDeck = standbyDeck;
+      const incomingPlayer = getDeckElement(incomingDeck);
+      const outgoingPlayer = getDeckElement(outgoingDeck);
+
+      const masterVol = parseFloat($("volumeFader").value);
+      const muted = $("btnMute").classList.contains("is-engaged");
+
+      if (incomingDeck.usingCors) {
+        ensureWebAudioDsp();
+        incomingDeck.corsEl.volume = 1;
+        incomingDeck.corsEl.muted = muted;
+        if (incomingDeck.gainNode) incomingDeck.gainNode.gain.value = 0.001;
+      } else {
+        incomingDeck.nativeEl.volume = 0.001;
+        incomingDeck.nativeEl.muted = muted;
+      }
+
+      try {
+        incomingPlayer.currentTime = 0;
+        await incomingPlayer.play();
+      } catch (_) {
+        isCrossfading = false;
+        return;
+      }
+
+      // Swap deck roles immediately so UI and scrubber track the incoming song
+      activeDeck = incomingDeck;
+      standbyDeck = outgoingDeck;
+      standbyDeck.preloadedForId = null;
+      currentTrackIndex = preloadedNextIndex;
+      preloadedNextIndex = -1;
+
+      const isOffline = offlineMetaMap.has(nextTrack.id);
+      updateDeckHeroMetadata(nextTrack, null, isOffline);
+      if (shortCodeMemoryCache.has(nextTrack.id)) {
+        syncBrowserShortPath(shortCodeMemoryCache.get(nextTrack.id), 0);
+      }
+      renderTrackList();
+      syncPlayStateUI(true);
+      $("playbackHint").textContent = "Crossfading into next song…";
+      updatePreloadIndicator(true, "5s DJ Crossfade active");
+
+      const FADE_MS = 5000;
+      const STEP_MS = 50;
+      const totalSteps = FADE_MS / STEP_MS;
+      let step = 0;
+
+      crossfadeTimer = setInterval(() => {
+        step++;
+        const progress = Math.min(1, step / totalSteps);
+        // Smooth equal-power cosine crossfade curve
+        const inCurve = Math.sin(progress * Math.PI * 0.5);
+        const outCurve = Math.cos(progress * Math.PI * 0.5);
+
+        if (incomingDeck.usingCors && incomingDeck.gainNode) {
+          incomingDeck.gainNode.gain.value = inCurve;
+        } else {
+          incomingDeck.nativeEl.volume = Math.max(0, Math.min(1, inCurve * masterVol));
+        }
+
+        if (outgoingDeck.usingCors && outgoingDeck.gainNode) {
+          outgoingDeck.gainNode.gain.value = outCurve;
+        } else {
+          outgoingDeck.nativeEl.volume = Math.max(0, Math.min(1, outCurve * masterVol));
+        }
+
+        if (progress >= 1) {
+          cancelCrossfade();
+          stopDeck(outgoingDeck);
+          outgoingPlayer.currentTime = 0;
+          if (outgoingDeck.gainNode) outgoingDeck.gainNode.gain.value = 1;
+          $("playbackHint").textContent = isOffline ? "Playing from Offline Vault" : "Now playing";
+          updatePreloadIndicator(false, "Gapless queue ready");
+        }
+      }, STEP_MS);
+    }
+
+    async function loadAndPlayTrack(index, autoPlay = true, startAtSeconds = 0) {
+      if (index < 0 || index >= allTracks.length) return;
+      cancelCrossfade();
+      stopAllPlayers();
+
+      // If standbyDeck already preloaded this exact track, promote it immediately for zero-delay start!
+      const targetTrack = allTracks[index];
+      const usePromotedStandby =
+        standbyDeck.preloadedForId === targetTrack.id &&
+        getDeckElement(standbyDeck).src;
+
+      if (usePromotedStandby) {
+        const temp = activeDeck;
+        activeDeck = standbyDeck;
+        standbyDeck = temp;
+      }
+
+      standbyDeck.preloadedForId = null;
+      preloadedNextIndex = -1;
+      currentTrackIndex = index;
+
+      $("curTimeText").textContent = formatTime(startAtSeconds);
+      $("scrubberFill").style.width = "0%";
+      $("scrubberKnob").style.left = "0%";
+      $("shareClipLabel").textContent = `Share @ ${formatTime(startAtSeconds)}`;
+
+      const resolved = usePromotedStandby
+        ? {
+            audioUrl: getDeckElement(activeDeck).src,
+            coverUrl: null,
+            isOffline: offlineMetaMap.has(targetTrack.id),
+            supportsCors: activeDeck.usingCors
+          }
+        : await resolvePlayableTrackSources(targetTrack, false);
+
+      updateDeckHeroMetadata(targetTrack, resolved.coverUrl, resolved.isOffline);
+      if (shortCodeMemoryCache.has(targetTrack.id)) {
+        syncBrowserShortPath(shortCodeMemoryCache.get(targetTrack.id), startAtSeconds);
+      }
+      renderTrackList();
+      updatePreloadIndicator(false, "Gapless queue ready");
+
+      const vol = parseFloat($("volumeFader").value);
+      const muted = $("btnMute").classList.contains("is-engaged");
+
+      const applyInitialSeek = (mediaEl) => {
+        if (startAtSeconds <= 0) return;
+        const doSeek = () => {
+          if (Number.isFinite(mediaEl.duration) && mediaEl.duration > 1) {
+            mediaEl.currentTime = Math.min(startAtSeconds, Math.max(0, mediaEl.duration - 1));
+          }
+        };
+        if (mediaEl.readyState >= 1) doSeek();
+        else mediaEl.addEventListener("loadedmetadata", doSeek, { once: true });
+      };
 
       if (!autoPlay) {
-        stopAllPlayers();
         syncPlayStateUI(false);
-        nativeAudio.src = track.url;
-        usingCorsDspEngine = false;
+        activeDeck.usingCors = false;
+        activeDeck.nativeEl.src = resolved.audioUrl;
+        applyInitialSeek(activeDeck.nativeEl);
         $("playbackHint").textContent = "Tap Play to listen";
         return;
       }
 
-      stopAllPlayers();
-      $("playbackHint").textContent = "Loading song…";
+      $("playbackHint").textContent = resolved.isOffline ? "Opening from Offline Vault…" : "Loading song…";
 
-      const vol = parseFloat($("volumeFader").value);
-      const muted = $("btnMute").classList.contains("is-engaged");
-      const supportsCors = await checkUrlSupportsCors(track.url);
-
-      if (supportsCors) {
+      if (resolved.supportsCors) {
         try {
           ensureWebAudioDsp();
-          usingCorsDspEngine = true;
-          corsAudio.volume = 1;
-          corsAudio.muted = muted;
+          activeDeck.usingCors = true;
+          activeDeck.corsEl.volume = 1;
+          activeDeck.corsEl.muted = muted;
+          if (activeDeck.gainNode) activeDeck.gainNode.gain.value = 1;
           if (masterGainNode) masterGainNode.gain.value = vol;
-          corsAudio.src = track.url;
-          await corsAudio.play();
+          if (!usePromotedStandby) activeDeck.corsEl.src = resolved.audioUrl;
+          applyInitialSeek(activeDeck.corsEl);
+          await activeDeck.corsEl.play();
           syncPlayStateUI(true);
-          $("playbackHint").textContent = "Now playing";
+          $("playbackHint").textContent = resolved.isOffline ? "Playing from Offline Vault" : "Now playing";
           return;
         } catch (corsErr) {
           if (corsErr && corsErr.name === "NotAllowedError") {
@@ -1970,13 +2870,14 @@
       }
 
       try {
-        usingCorsDspEngine = false;
-        nativeAudio.volume = vol;
-        nativeAudio.muted = muted;
-        nativeAudio.src = track.url;
-        await nativeAudio.play();
+        activeDeck.usingCors = false;
+        activeDeck.nativeEl.volume = vol;
+        activeDeck.nativeEl.muted = muted;
+        if (!usePromotedStandby) activeDeck.nativeEl.src = resolved.audioUrl;
+        applyInitialSeek(activeDeck.nativeEl);
+        await activeDeck.nativeEl.play();
         syncPlayStateUI(true);
-        $("playbackHint").textContent = "Now playing";
+        $("playbackHint").textContent = resolved.isOffline ? "Playing from Offline Vault" : "Now playing";
       } catch (err) {
         syncPlayStateUI(false);
         if (err && err.name === "NotAllowedError") {
@@ -2004,14 +2905,17 @@
         return;
       }
       if (player.paused) {
-        if (usingCorsDspEngine && audioCtx && audioCtx.state === "suspended") {
+        if (audioCtx && audioCtx.state === "suspended") {
           audioCtx.resume().catch(() => {});
         }
         player.play().then(() => {
           syncPlayStateUI(true);
-          $("playbackHint").textContent = "Now playing";
+          $("playbackHint").textContent = offlineMetaMap.has(allTracks[currentTrackIndex]?.id)
+            ? "Playing from Offline Vault"
+            : "Now playing";
         }).catch(() => loadAndPlayTrack(currentTrackIndex, true));
       } else {
+        cancelCrossfade();
         player.pause();
         syncPlayStateUI(false);
         $("playbackHint").textContent = "Paused";
@@ -2039,18 +2943,33 @@
       loadAndPlayTrack((currentTrackIndex - 1 + allTracks.length) % allTracks.length, true);
     }
 
-    [corsAudio, nativeAudio].forEach((el) => {
+    // Wire events across all 4 underlying Audio elements (Deck A & Deck B)
+    [deckA.corsEl, deckA.nativeEl, deckB.corsEl, deckB.nativeEl].forEach((el) => {
       el.addEventListener("timeupdate", () => {
         if (el !== getActivePlayer()) return;
         const cur = el.currentTime || 0;
         const dur = el.duration || 0;
         $("curTimeText").textContent = formatTime(cur);
+        $("shareClipLabel").textContent = `Share @ ${formatTime(cur)}`;
+
         if (dur > 0) {
           $("totTimeText").textContent = formatTime(dur);
           const pct = Math.min(100, (cur / dur) * 100);
           $("scrubberFill").style.width = `${pct}%`;
           $("scrubberKnob").style.left = `${pct}%`;
           $("scrubberGroove").setAttribute("aria-valuenow", Math.round(pct));
+
+          const remaining = dur - cur;
+          // 15-second silent background preloading
+          if (dur > 20 && remaining <= 15 && remaining > 5.5 && loopMode !== 2) {
+            preloadNextTrackInBackground();
+          }
+          // 5-second gapless DJ crossfade trigger
+          if (crossfadeEnabled && !isCrossfading && dur > 14 && remaining <= 5.0 && remaining > 0.4 && loopMode !== 2) {
+            if (preloadedNextIndex >= 0) {
+              beginCrossfadeToPreloaded();
+            }
+          }
         }
       });
 
@@ -2063,7 +2982,7 @@
       });
 
       el.addEventListener("ended", () => {
-        if (el !== getActivePlayer()) return;
+        if (el !== getActivePlayer() || isCrossfading) return;
         if (loopMode === 2) {
           el.currentTime = 0;
           el.play();
@@ -2079,9 +2998,11 @@
     function seekAtClientX(clientX) {
       const player = getActivePlayer();
       if (!player.duration) return;
+      cancelCrossfade();
       const rect = $("scrubberGroove").getBoundingClientRect();
       const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
       player.currentTime = ratio * player.duration;
+      $("shareClipLabel").textContent = `Share @ ${formatTime(player.currentTime)}`;
     }
 
     let seekingActive = false;
@@ -2099,16 +3020,20 @@
     });
 
     // =========================================================================
-    // 6. SHARED SHORT-LINK RESOLUTION & LIBRARY SYNC
+    // 8. SHARED SHORT-LINK + TIMESTAMP (?t=) RESOLUTION & LIBRARY SYNC
     // =========================================================================
     function extractSharedTokenFromLocation() {
-      const querySong = new URLSearchParams(window.location.search).get("song");
+      const params = new URLSearchParams(window.location.search);
+      const rawT = parseInt(params.get("t") || "0", 10);
+      const startSeconds = Number.isFinite(rawT) && rawT > 0 ? rawT : 0;
+
+      const querySong = params.get("song");
       if (querySong && querySong.trim()) {
-        return { source: "query", value: querySong.trim() };
+        return { source: "query", value: querySong.trim(), startSeconds };
       }
       const cleanPath = window.location.pathname.replace(/^\/+|\/+$/g, "");
       if (cleanPath && cleanPath.toLowerCase() !== "index.html" && SHORT_CODE_REGEX.test(cleanPath)) {
-        return { source: "path", value: cleanPath };
+        return { source: "path", value: cleanPath, startSeconds };
       }
       return null;
     }
@@ -2118,6 +3043,7 @@
       sharedLinkLookupDone = true;
       sharedLinkHandled = true;
     } else {
+      pendingStartSeconds = initialSharedToken.startSeconds;
       (async () => {
         try {
           const safeToken = sanitizeRtdbKey(initialSharedToken.value);
@@ -2129,10 +3055,9 @@
               if (targetTrackId) {
                 resolvedSharedTrackId = String(targetTrackId);
                 shortCodeMemoryCache.set(resolvedSharedTrackId, safeToken);
-                syncBrowserShortPath(safeToken);
+                syncBrowserShortPath(safeToken, pendingStartSeconds);
               }
             } else if (initialSharedToken.source === "query") {
-              // Backwards compatibility for legacy ?song=TRACK_ID links
               resolvedSharedTrackId = safeToken;
             }
           }
@@ -2170,7 +3095,7 @@
           p.classList.toggle("is-engaged", p.dataset.filter === "all");
         });
         applyFilters();
-        loadAndPlayTrack(sharedIdx, true);
+        loadAndPlayTrack(sharedIdx, true, pendingStartSeconds);
         requestAnimationFrame(() => {
           const activePlate = $("trackScroll").querySelector(".track-plate.is-current");
           if (activePlate) {
@@ -2195,6 +3120,9 @@
             id: firebaseKey
           }))
           .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.createdAt || 0) - (a.createdAt || 0));
+      } else if (offlineMetaMap.size > 0) {
+        // Offline resilience: keep downloaded tracks accessible when RTDB is unreachable
+        allTracks = Array.from(offlineMetaMap.values()).map((m) => ({ ...m }));
       } else {
         allTracks = [];
       }
@@ -2229,20 +3157,14 @@
           $("heroTitle").textContent = cur.title || "Untitled";
           $("heroArtist").textContent = cur.artist || "Unknown Artist";
           $("heroAlbum").textContent = cur.album ? `Album: ${cur.album}` : "Streaming free on Play Mine";
-          $("heroQuality").textContent = (cur.quality || "HIGH-RES AUDIO").toUpperCase();
+          $("heroQuality").textContent = offlineMetaMap.has(cur.id)
+            ? "OFFLINE VAULT • LOSSLESS"
+            : (cur.quality || "HIGH-RES AUDIO").toUpperCase();
           $("heroGenre").textContent = cur.genre || "Music";
         }
       } else if (currentTrackIndex === -1) {
         const first = allTracks[0];
-        $("heroTitle").textContent = first.title || "Untitled";
-        $("heroArtist").textContent = first.artist || "Unknown Artist";
-        $("heroAlbum").textContent = first.album ? `Album: ${first.album}` : "Tap Play to listen";
-        $("heroQuality").textContent = (first.quality || "HIGH-RES AUDIO").toUpperCase();
-        $("heroGenre").textContent = first.genre || "Music";
-        $("heroCover").src = first.coverUrl && first.coverUrl.trim()
-          ? first.coverUrl.trim()
-          : buildVinylDiscSvg((first.title || "") + (first.artist || ""));
-        $("totTimeText").textContent = first.duration || "00:00";
+        updateDeckHeroMetadata(first, null, offlineMetaMap.has(first.id));
       }
 
       applyFilters();
@@ -2252,6 +3174,7 @@
       const q = searchQuery.toLowerCase().trim();
       filteredTracks = allTracks.filter((t) => {
         if (activeFilter === "featured" && !t.featured) return false;
+        if (activeFilter === "offline" && !offlineMetaMap.has(t.id)) return false;
         if (!q) return true;
         return (
           (t.title || "").toLowerCase().includes(q) ||
@@ -2281,7 +3204,7 @@
       if (filteredTracks.length === 0) {
         container.innerHTML = `
           <div class="empty-box neu-well">
-            <div>No matching songs found.</div>
+            <div>${activeFilter === "offline" ? "No offline songs saved yet. Tap Save on any track!" : "No matching songs found."}</div>
           </div>
         `;
         return;
@@ -2292,6 +3215,10 @@
       filteredTracks.forEach((track) => {
         const plate = document.createElement("div");
         const isCurrent = track.id === activeId;
+        const offlineMeta = offlineMetaMap.get(track.id);
+        const isSaved = Boolean(offlineMeta);
+        const isSaving = downloadingTrackIds.has(track.id);
+
         plate.className = `track-plate${isCurrent ? " is-current" : ""}`;
         plate.setAttribute("role", "button");
         plate.setAttribute("tabindex", "0");
@@ -2299,6 +3226,23 @@
         const coverSrc = track.coverUrl && track.coverUrl.trim()
           ? track.coverUrl.trim()
           : buildVinylDiscSvg((track.title || "") + (track.artist || ""));
+
+        const offlineActionHtml = isSaved
+          ? `
+            <div class="haptic-key action-key is-saved" data-role="offline-badge" title="Saved offline (${formatBytes(offlineMeta.totalBytes)})">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>${formatBytes(offlineMeta.totalBytes)}</span>
+            </div>
+            <div class="haptic-key action-key is-danger" data-role="offline-delete" role="button" tabindex="0" aria-label="Delete ${escapeHtml(track.title || "song")} from offline storage" title="Remove from offline storage">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            </div>
+          `
+          : `
+            <div class="haptic-key action-key" data-role="offline-save" role="button" tabindex="0" aria-label="Save ${escapeHtml(track.title || "song")} offline" title="Download song to play offline">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>${isSaving ? "Saving…" : "Save"}</span>
+            </div>
+          `;
 
         plate.innerHTML = `
           <div class="plate-art-box">
@@ -2310,19 +3254,63 @@
             </div>
           </div>
           <div class="plate-meta">
-            <div class="plate-title">${escapeHtml(track.title || "Untitled")}${track.featured ? ' <span style="color:var(--accent-amber);">★</span>' : ""}</div>
+            <div class="plate-title">${escapeHtml(track.title || "Untitled")}${track.featured ? ' <span style="color:var(--dyn-secondary);">★</span>' : ""}</div>
             <div class="plate-sub">${escapeHtml(track.artist || "Unknown Artist")}${track.album ? " • " + escapeHtml(track.album) : ""}</div>
           </div>
           <div class="plate-right">
             <span class="plate-time">${escapeHtml(track.duration || "--:--")}</span>
-            <div class="haptic-key share-key" role="button" tabindex="0" aria-label="Share ${escapeHtml(track.title || "song")}" title="Copy direct short link to this song">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            ${offlineActionHtml}
+            <div class="haptic-key action-key" data-role="share" role="button" tabindex="0" aria-label="Share ${escapeHtml(track.title || "song")}" title="Copy direct short link to this song">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
               <span>Share</span>
             </div>
           </div>
         `;
 
-        const shareBtn = plate.querySelector(".share-key");
+        // Wire Offline Save button
+        const saveBtn = plate.querySelector('[data-role="offline-save"]');
+        if (saveBtn) {
+          saveBtn.addEventListener("pointerdown", (e) => { e.stopPropagation(); triggerHaptic(10); }, { passive: true });
+          saveBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            saveTrackOffline(track);
+          });
+          saveBtn.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              e.stopPropagation();
+              saveTrackOffline(track);
+            }
+          });
+        }
+
+        // Wire Offline Delete button
+        const deleteBtn = plate.querySelector('[data-role="offline-delete"]');
+        if (deleteBtn) {
+          deleteBtn.addEventListener("pointerdown", (e) => { e.stopPropagation(); triggerHaptic(10); }, { passive: true });
+          deleteBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            deleteOfflineTrack(track);
+          });
+          deleteBtn.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              e.stopPropagation();
+              deleteOfflineTrack(track);
+            }
+          });
+        }
+
+        const badgeBtn = plate.querySelector('[data-role="offline-badge"]');
+        if (badgeBtn) {
+          badgeBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            showToast(`Stored offline (${formatBytes(offlineMeta.totalBytes)})`);
+          });
+        }
+
+        // Wire Share button
+        const shareBtn = plate.querySelector('[data-role="share"]');
         shareBtn.addEventListener("pointerdown", (e) => {
           e.stopPropagation();
           triggerHaptic(10);
@@ -2337,8 +3325,8 @@
 
           try {
             const shortCode = await getOrCreateShortSongCode(track.id);
-            const shareUrl = buildShortSongUrl(shortCode);
-            syncBrowserShortPath(shortCode);
+            const shareUrl = buildShortSongUrl(shortCode, 0);
+            syncBrowserShortPath(shortCode, 0);
             const ok = await copyTextToClipboard(shareUrl);
             if (ok) {
               shareBtn.classList.add("is-copied");
@@ -2386,6 +3374,8 @@
       });
     }
 
+    // Hydrate IndexedDB Offline Vault immediately on boot, then sync RTDB
+    refreshOfflineVaultIndex();
     onValue(tracksRef, syncTracksFromSnapshot, (err) => console.error(err));
 
     // Manual Refresh Button
@@ -2393,6 +3383,7 @@
       const btn = $("btnRefresh");
       btn.classList.add("is-spinning");
       try {
+        await refreshOfflineVaultIndex();
         const snap = await get(tracksRef);
         syncTracksFromSnapshot(snap);
         showToast("Playlist refreshed");
@@ -2404,7 +3395,7 @@
     });
 
     // =========================================================================
-    // 7. SONG REQUEST SUBMISSION (VALID EMAIL + MESSAGE + AUTO-CLEAR)
+    // 9. SONG REQUEST SUBMISSION (VALID EMAIL + MESSAGE + AUTO-CLEAR)
     // =========================================================================
     function isValidEmail(email) {
       return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
@@ -2466,7 +3457,7 @@
     });
 
     // =========================================================================
-    // 8. WIRE PLAYER & SOUND CONTROLS
+    // 10. WIRE PLAYER, CLIP SHARE, CROSSFADE, 8D ORBITAL & AMBIENT CONTROLS
     // =========================================================================
     bindHapticKey($("btnPlayPause"), togglePlayPause);
     bindHapticKey($("btnNext"), playNextTrack);
@@ -2475,6 +3466,7 @@
     bindHapticKey($("btnShuffle"), () => {
       isShuffle = !isShuffle;
       $("btnShuffle").classList.toggle("is-engaged", isShuffle);
+      standbyDeck.preloadedForId = null;
       showToast(isShuffle ? "Shuffle: ON" : "Shuffle: OFF");
     });
 
@@ -2489,17 +3481,62 @@
     bindHapticKey($("btnMute"), () => {
       const nextMuted = !$("btnMute").classList.contains("is-engaged");
       $("btnMute").classList.toggle("is-engaged", nextMuted);
-      corsAudio.muted = nextMuted;
-      nativeAudio.muted = nextMuted;
+      [deckA.corsEl, deckA.nativeEl, deckB.corsEl, deckB.nativeEl].forEach((el) => {
+        el.muted = nextMuted;
+      });
+      if (ambientMasterGain && audioCtx) {
+        ambientMasterGain.gain.setTargetAtTime(
+          nextMuted ? 0 : parseFloat($("ambientFader").value) * 0.28,
+          audioCtx.currentTime,
+          0.03
+        );
+      }
       showToast(nextMuted ? "Muted" : "Unmuted");
     });
 
     $("volumeFader").addEventListener("input", (e) => {
       const v = parseFloat(e.target.value);
-      nativeAudio.volume = v;
+      if (!activeDeck.usingCors) {
+        activeDeck.nativeEl.volume = v;
+      }
       if (masterGainNode) masterGainNode.gain.value = v;
     });
 
+    // Toggle 5-second DJ Crossfade
+    bindHapticKey($("btnCrossfade"), () => {
+      crossfadeEnabled = !crossfadeEnabled;
+      $("btnCrossfade").classList.toggle("is-engaged", crossfadeEnabled);
+      $("btnCrossfade").textContent = `Crossfade 5s: ${crossfadeEnabled ? "ON" : "OFF"}`;
+      showToast(crossfadeEnabled ? "5-second DJ Crossfade: ON" : "Gapless instant switch: ON");
+    });
+
+    // Share Timestamp Clip (?t=74) from current playback second
+    bindHapticKey($("btnShareClip"), async () => {
+      const idx = currentTrackIndex >= 0 ? currentTrackIndex : (allTracks.length > 0 ? 0 : -1);
+      if (idx < 0) {
+        showToast("Pick a song first to share a timestamp clip!");
+        return;
+      }
+      const track = allTracks[idx];
+      const sec = Math.floor(getActivePlayer().currentTime || 0);
+      try {
+        const shortCode = await getOrCreateShortSongCode(track.id);
+        const clipUrl = buildShortSongUrl(shortCode, sec);
+        syncBrowserShortPath(shortCode, sec);
+        const ok = await copyTextToClipboard(clipUrl);
+        if (ok) {
+          $("btnShareClip").classList.add("is-copied");
+          showToast(`Clip link copied: ${clipUrl}`);
+          setTimeout(() => $("btnShareClip").classList.remove("is-copied"), 1800);
+        } else {
+          showToast(clipUrl);
+        }
+      } catch (_) {
+        showToast("Could not create timestamp link right now.");
+      }
+    });
+
+    // Equalizer Faders & Presets
     document.querySelectorAll(".eq-vertical").forEach((fader) => {
       fader.addEventListener("input", (e) => {
         const band = parseInt(e.target.dataset.band, 10);
@@ -2530,11 +3567,42 @@
       updateStereoWidth(w);
     });
 
+    // 8D Orbital Spatial Toggle
+    bindHapticKey($("btn8D"), () => {
+      orbital8DEnabled = !orbital8DEnabled;
+      $("btn8D").classList.toggle("is-engaged", orbital8DEnabled);
+      $("btn8D").textContent = `8D Orbital: ${orbital8DEnabled ? "ON" : "OFF"}`;
+      if (!orbital8DEnabled && orbitalPanner && audioCtx) {
+        orbitalPanner.pan.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+      }
+      showToast(orbital8DEnabled ? "8D Orbital Surround: ON" : "8D Orbital Surround: OFF");
+    });
+
     bindHapticKey($("btnLimiter"), () => {
       limiterEnabled = !limiterEnabled;
       $("btnLimiter").classList.toggle("is-engaged", limiterEnabled);
       $("btnLimiter").textContent = `Volume Guard: ${limiterEnabled ? "ON" : "OFF"}`;
       rebuildDspRouting();
+    });
+
+    // Procedural Ambient Soundscape Controls
+    document.querySelectorAll("#ambientBar .mini-key").forEach((pill) => {
+      bindHapticKey(pill, () => {
+        document.querySelectorAll("#ambientBar .mini-key").forEach((p) => p.classList.remove("is-engaged"));
+        pill.classList.add("is-engaged");
+        const mode = pill.dataset.ambient || "off";
+        setAmbientSoundscape(mode);
+        showToast(mode === "off" ? "Ambient layer: OFF" : `Atmosphere: ${pill.textContent}`);
+      });
+    });
+
+    $("ambientFader").addEventListener("input", (e) => {
+      const val = parseFloat(e.target.value);
+      $("ambientReadout").textContent = `${Math.round(val * 100)}%`;
+      if (ambientMasterGain && audioCtx) {
+        const muted = $("btnMute").classList.contains("is-engaged");
+        ambientMasterGain.gain.setTargetAtTime(muted ? 0 : val * 0.28, audioCtx.currentTime, 0.03);
+      }
     });
 
     document.querySelectorAll(".scope-modes .mini-key").forEach((pill) => {
