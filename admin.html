@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
-  <title>Play Mine — Studio Admin</title>
+  <title>Admin</title>
   <meta name="robots" content="noindex, nofollow" />
   <meta name="theme-color" content="#0b0d12" />
   <link rel="icon" type="image/png" href="/favicon.png" />
@@ -573,7 +573,7 @@
       display: flex;
       flex-direction: column;
       gap: 9px;
-      max-height: 440px;
+      max-height: 540px;
       overflow-y: auto;
       overscroll-behavior: contain;
       padding: 2px;
@@ -951,9 +951,8 @@
         </div>
       </section>
 
-      <!-- Right Column: Published Catalog & Database Connection -->
+      <!-- Right Column: Published Catalog -->
       <section class="col-stack">
-        <!-- Published Tracks Catalog -->
         <div class="module-card neu-chassis">
           <div class="section-head">
             <div class="section-title">Published Music Library</div>
@@ -977,21 +976,6 @@
             <!-- Dynamically loaded tracks -->
           </div>
         </div>
-
-        <!-- Cloud Database Endpoint Card -->
-        <div class="module-card neu-chassis">
-          <div class="section-head">
-            <div class="section-title">Cloud Database Endpoint</div>
-            <div class="section-hint">Firebase Realtime Database URL</div>
-          </div>
-
-          <div class="url-action-row">
-            <input type="url" id="dbUrlInput" class="neu-input" placeholder="https://cloud-db-studio-default-rtdb.firebaseio.com" />
-            <div class="haptic-key mini-key" id="btnSaveDbUrl" role="button" tabindex="0">
-              Apply
-            </div>
-          </div>
-        </div>
       </section>
     </main>
 
@@ -1008,15 +992,12 @@
     import { getDatabase, ref, onValue, get, push, set, update, remove, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
     // =========================================================================
-    // 1. FIREBASE CONFIGURATION & REFERENCES
+    // 1. LOCKED FIREBASE CONFIGURATION & REFERENCES
     // =========================================================================
-    const DEFAULT_DB_URL = "https://cloud-db-studio-default-rtdb.firebaseio.com";
-    const activeDbUrl = localStorage.getItem("play_mine_rtdb_url") || DEFAULT_DB_URL;
-
     const firebaseConfig = {
       apiKey: "AIzaSyDpCAXfhldRc1nCZDWlWNRbcMFjqAh8uPc",
       authDomain: "cloud-db-studio.firebaseapp.com",
-      databaseURL: activeDbUrl,
+      databaseURL: "https://cloud-db-studio-default-rtdb.firebaseio.com",
       projectId: "cloud-db-studio"
     };
 
@@ -1050,7 +1031,6 @@
     let isPreviewPlaying = false;
 
     const $ = (id) => document.getElementById(id);
-    $("dbUrlInput").value = activeDbUrl;
 
     function triggerHaptic(ms = 10) {
       if (navigator.vibrate) {
@@ -1716,7 +1696,6 @@
           clearTimeout(pendingDeleteTimer);
           pendingDeleteTrackId = null;
           try {
-            // Clean up any associated short link first
             const linkSnap = await get(shortLinksByTrackRef(track.id));
             if (linkSnap.exists()) {
               const val = linkSnap.val();
@@ -1802,18 +1781,6 @@
         adminFilter = pill.dataset.filter;
         renderAdminTracks();
       });
-    });
-
-    // Database URL Configuration
-    bindHapticKey($("btnSaveDbUrl"), () => {
-      const nextUrl = $("dbUrlInput").value.trim().replace(/\/+$/, "");
-      if (!nextUrl || !/^https:\/\/.+/i.test(nextUrl)) {
-        showToast("Enter a valid https:// Firebase RTDB URL.");
-        return;
-      }
-      localStorage.setItem("play_mine_rtdb_url", nextUrl);
-      showToast("Database URL saved — reloading…");
-      setTimeout(() => window.location.reload(), 650);
     });
   </script>
 </body>
