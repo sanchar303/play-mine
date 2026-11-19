@@ -1427,7 +1427,7 @@
             <div class="filter-strip" id="filterBar">
               <div class="haptic-key mini-key is-engaged" role="button" tabindex="0" data-filter="all">All Songs</div>
               <div class="haptic-key mini-key" role="button" tabindex="0" data-filter="featured">Featured</div>
-              <div class="haptic-key mini-key" role="button" tabindex="0" data-filter="offline">Offline Vault</div>
+              <div class="haptic-key mini-key" role="button" tabindex="0" data-filter="offline">Saved</div>
             </div>
             <span class="count-text" id="countPill">0 songs</span>
           </div>
@@ -2661,7 +2661,7 @@
       $("heroArtist").textContent = track.artist || "Unknown Artist";
       $("heroAlbum").textContent = track.album ? `Album: ${track.album}` : "ꜱᴛʀᴇᴀᴍɪɴɢ ꜰʀᴇᴇ ᴏɴ ᴘʟᴀʏ ᴍɪɴᴇ";
       $("heroQuality").textContent = isOffline
-        ? "OFFLINE VAULT • LOSSLESS"
+        ? "SAVED • LOSSLESS"
         : (track.quality || "HIGH-RES AUDIO").toUpperCase();
       $("heroGenre").textContent = track.genre || "Music";
       $("heroCover").src = finalCover;
