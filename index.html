@@ -68,18 +68,15 @@
     }
 
     html {
+      height: auto;
       min-height: 100%;
-      overflow-x: clip;
       background-color: var(--chassis-bg);
     }
 
     body {
+      height: auto;
       min-height: 100dvh;
-      overflow-x: clip;
-      overflow-y: auto;
-      overscroll-behavior-y: contain;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
+      overflow: visible;
       background-color: var(--chassis-bg);
       background-image:
         radial-gradient(ellipse 80% 45% at 15% 0%, rgba(var(--dyn-primary-rgb), 0.10), transparent 60%),
@@ -96,6 +93,7 @@
       width: 100%;
       max-width: 1320px;
       margin: 0 auto;
+      overflow-x: clip;
       padding: 14px 16px calc(28px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
@@ -736,7 +734,6 @@
       flex-direction: column;
       align-items: center;
       gap: 6px;
-      touch-action: pan-y;
     }
 
     .eq-gain-val {
@@ -1129,6 +1126,7 @@
       .track-scroll {
         max-height: none;
         overflow: visible;
+        overscroll-behavior: auto;
       }
     }
 
@@ -1790,7 +1788,6 @@
           default: h = ((r - g) / 255 / d + 4) * 60; break;
         }
       }
-      // Keep saturation vivid and lightness readable against dark neumorphic chassis
       return hslToRgb(h, Math.max(0.65, Math.min(0.95, s)), Math.max(0.54, Math.min(0.68, l)));
     }
 
@@ -1833,7 +1830,6 @@
           ctx.drawImage(probe, 0, 0, 24, 24);
           const data = ctx.getImageData(0, 0, 24, 24).data;
 
-          // Quantize into 12 hue buckets weighted by saturation & mid-luminance
           const buckets = Array.from({ length: 12 }, () => ({ weight: 0, r: 0, g: 0, b: 0 }));
           for (let i = 0; i < data.length; i += 4) {
             const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
@@ -1876,7 +1872,6 @@
             Math.round(top.b / top.weight)
           ]);
 
-          // Pick second color from a distinct hue bucket (>= 2 buckets apart)
           const distinct = ranked.find((bk) => {
             const diff = Math.abs(bk.idx - top.idx);
             return Math.min(diff, 12 - diff) >= 2;
@@ -1895,7 +1890,6 @@
 
           applyReactivePalette(primary, secondary);
         } catch (_) {
-          // Cross-origin tainted canvas fallback
           const [p, s] = fallbackPaletteFromSeed(fallbackSeed);
           applyReactivePalette(p, s);
         }
@@ -1917,7 +1911,7 @@
     const VAULT_DB_NAME = "play_mine_offline_vault";
     const VAULT_DB_VERSION = 1;
     let vaultDbPromise = null;
-    const offlineMetaMap = new Map(); // trackId -> metadata object
+    const offlineMetaMap = new Map();
     const downloadingTrackIds = new Set();
     let activeAudioObjectUrl = null;
     let activeCoverObjectUrl = null;
@@ -1967,7 +1961,6 @@
         const count = offlineMetaMap.size;
         $("vaultStorageText").textContent = `${count} ${count === 1 ? "song" : "songs"} • ${formatBytes(totalBytes)}`;
 
-        // If offline and RTDB hasn't loaded any tracks, populate library directly from Vault
         if (allTracks.length === 0 && count > 0) {
           allTracks = items
             .map((m) => ({ ...m }))
@@ -2097,12 +2090,10 @@
     let analyserNode = null;
     let dspGraphReady = false;
 
-    // Procedural Ambient Soundscape Nodes
     let ambientMasterGain = null;
     let ambientActiveSource = null;
     let ambientLfo = null;
 
-    // Dual Decks (A & B) for 15s Background Preload + 5s DJ Crossfade
     function createAudioDeck(name) {
       const corsEl = new Audio();
       corsEl.preload = "auto";
@@ -2221,7 +2212,6 @@
         crossRfromR.connect(mergerNode, 0, 1);
         crossRfromL.connect(mergerNode, 0, 1);
 
-        // 8D Orbital Spatial Stereo Panner
         orbitalPanner = audioCtx.createStereoPanner();
         orbitalPanner.pan.value = 0;
 
@@ -2235,7 +2225,6 @@
         masterGainNode = audioCtx.createGain();
         masterGainNode.gain.value = parseFloat($("volumeFader").value);
 
-        // Procedural Ambient Master Bus (feeds into limiter/master & visualizer)
         ambientMasterGain = audioCtx.createGain();
         ambientMasterGain.gain.value = parseFloat($("ambientFader").value) * 0.28;
 
@@ -2292,7 +2281,6 @@
       midGain.crossRfromL.gain.value = opp;
     }
 
-    // Procedural Ambient Soundscape Generator (Rain / Vinyl / Café)
     function stopAmbientSoundscape() {
       if (ambientActiveSource) {
         try { ambientActiveSource.stop(); } catch (_) {}
@@ -2326,7 +2314,6 @@
 
         for (let i = 0; i < frames; i++) {
           const white = Math.random() * 2 - 1;
-          // Paul Kellet pink noise filter
           b0 = 0.99886 * b0 + white * 0.0555179;
           b1 = 0.99332 * b1 + white * 0.0750759;
           b2 = 0.96900 * b2 + white * 0.1538520;
@@ -2344,7 +2331,6 @@
             const dust = Math.random() < 0.004 ? (Math.random() * 0.14 - 0.07) : 0;
             out[i] = pink * 0.28 + pop + dust;
           } else {
-            // Warm Café murmur
             lastOut = (lastOut + 0.03 * pink) / 1.03;
             out[i] = lastOut * 3.8 + pink * 0.32;
           }
@@ -2524,7 +2510,6 @@
       if (document.hidden) return;
       const t = nowMs * 0.001;
 
-      // Update 8D Orbital Spatial Stereo Panner smoothly
       if (orbital8DEnabled && orbitalPanner && audioCtx) {
         const panVal = Math.sin(t * 0.72) * 0.88;
         orbitalPanner.pan.setTargetAtTime(panVal, audioCtx.currentTime, 0.04);
@@ -2599,7 +2584,6 @@
     }
 
     async function resolvePlayableTrackSources(track, isStandby = false) {
-      // Check IndexedDB Offline Vault first for zero-data instant playback
       if (offlineMetaMap.has(track.id)) {
         const cached = await getOfflineBlobs(track.id);
         if (cached && cached.audioBlob) {
@@ -2727,7 +2711,6 @@
         return;
       }
 
-      // Swap deck roles immediately so UI and scrubber track the incoming song
       activeDeck = incomingDeck;
       standbyDeck = outgoingDeck;
       standbyDeck.preloadedForId = null;
@@ -2752,7 +2735,6 @@
       crossfadeTimer = setInterval(() => {
         step++;
         const progress = Math.min(1, step / totalSteps);
-        // Smooth equal-power cosine crossfade curve
         const inCurve = Math.sin(progress * Math.PI * 0.5);
         const outCurve = Math.cos(progress * Math.PI * 0.5);
 
@@ -2784,7 +2766,6 @@
       cancelCrossfade();
       stopAllPlayers();
 
-      // If standbyDeck already preloaded this exact track, promote it immediately for zero-delay start!
       const targetTrack = allTracks[index];
       const usePromotedStandby =
         standbyDeck.preloadedForId === targetTrack.id &&
@@ -2943,7 +2924,6 @@
       loadAndPlayTrack((currentTrackIndex - 1 + allTracks.length) % allTracks.length, true);
     }
 
-    // Wire events across all 4 underlying Audio elements (Deck A & Deck B)
     [deckA.corsEl, deckA.nativeEl, deckB.corsEl, deckB.nativeEl].forEach((el) => {
       el.addEventListener("timeupdate", () => {
         if (el !== getActivePlayer()) return;
@@ -2960,11 +2940,9 @@
           $("scrubberGroove").setAttribute("aria-valuenow", Math.round(pct));
 
           const remaining = dur - cur;
-          // 15-second silent background preloading
           if (dur > 20 && remaining <= 15 && remaining > 5.5 && loopMode !== 2) {
             preloadNextTrackInBackground();
           }
-          // 5-second gapless DJ crossfade trigger
           if (crossfadeEnabled && !isCrossfading && dur > 14 && remaining <= 5.0 && remaining > 0.4 && loopMode !== 2) {
             if (preloadedNextIndex >= 0) {
               beginCrossfadeToPreloaded();
@@ -3121,7 +3099,6 @@
           }))
           .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.createdAt || 0) - (a.createdAt || 0));
       } else if (offlineMetaMap.size > 0) {
-        // Offline resilience: keep downloaded tracks accessible when RTDB is unreachable
         allTracks = Array.from(offlineMetaMap.values()).map((m) => ({ ...m }));
       } else {
         allTracks = [];
@@ -3267,7 +3244,6 @@
           </div>
         `;
 
-        // Wire Offline Save button
         const saveBtn = plate.querySelector('[data-role="offline-save"]');
         if (saveBtn) {
           saveBtn.addEventListener("pointerdown", (e) => { e.stopPropagation(); triggerHaptic(10); }, { passive: true });
@@ -3284,7 +3260,6 @@
           });
         }
 
-        // Wire Offline Delete button
         const deleteBtn = plate.querySelector('[data-role="offline-delete"]');
         if (deleteBtn) {
           deleteBtn.addEventListener("pointerdown", (e) => { e.stopPropagation(); triggerHaptic(10); }, { passive: true });
@@ -3309,7 +3284,6 @@
           });
         }
 
-        // Wire Share button
         const shareBtn = plate.querySelector('[data-role="share"]');
         shareBtn.addEventListener("pointerdown", (e) => {
           e.stopPropagation();
@@ -3374,11 +3348,9 @@
       });
     }
 
-    // Hydrate IndexedDB Offline Vault immediately on boot, then sync RTDB
     refreshOfflineVaultIndex();
     onValue(tracksRef, syncTracksFromSnapshot, (err) => console.error(err));
 
-    // Manual Refresh Button
     bindHapticKey($("btnRefresh"), async () => {
       const btn = $("btnRefresh");
       btn.classList.add("is-spinning");
@@ -3502,7 +3474,6 @@
       if (masterGainNode) masterGainNode.gain.value = v;
     });
 
-    // Toggle 5-second DJ Crossfade
     bindHapticKey($("btnCrossfade"), () => {
       crossfadeEnabled = !crossfadeEnabled;
       $("btnCrossfade").classList.toggle("is-engaged", crossfadeEnabled);
@@ -3510,7 +3481,6 @@
       showToast(crossfadeEnabled ? "5-second DJ Crossfade: ON" : "Gapless instant switch: ON");
     });
 
-    // Share Timestamp Clip (?t=74) from current playback second
     bindHapticKey($("btnShareClip"), async () => {
       const idx = currentTrackIndex >= 0 ? currentTrackIndex : (allTracks.length > 0 ? 0 : -1);
       if (idx < 0) {
@@ -3536,7 +3506,6 @@
       }
     });
 
-    // Equalizer Faders & Presets
     document.querySelectorAll(".eq-vertical").forEach((fader) => {
       fader.addEventListener("input", (e) => {
         const band = parseInt(e.target.dataset.band, 10);
@@ -3567,7 +3536,6 @@
       updateStereoWidth(w);
     });
 
-    // 8D Orbital Spatial Toggle
     bindHapticKey($("btn8D"), () => {
       orbital8DEnabled = !orbital8DEnabled;
       $("btn8D").classList.toggle("is-engaged", orbital8DEnabled);
@@ -3585,7 +3553,6 @@
       rebuildDspRouting();
     });
 
-    // Procedural Ambient Soundscape Controls
     document.querySelectorAll("#ambientBar .mini-key").forEach((pill) => {
       bindHapticKey(pill, () => {
         document.querySelectorAll("#ambientBar .mini-key").forEach((p) => p.classList.remove("is-engaged"));
