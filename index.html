@@ -172,6 +172,14 @@
       box-shadow: inset 3px 3px 8px rgba(2, 5, 10, 0.82), 0 0 12px rgba(56, 189, 248, 0.15);
     }
 
+    .haptic-key.is-copied {
+      background:
+        linear-gradient(180deg, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.06) 55%, rgba(0, 0, 0, 0.22) 100%),
+        linear-gradient(145deg, #122922, #0c1714);
+      border-top-color: rgba(110, 231, 183, 0.6);
+      color: #a7f3d0;
+    }
+
     .haptic-primary {
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.04) 48%, rgba(0, 0, 0, 0.18) 100%),
@@ -225,6 +233,13 @@
     .mini-key {
       padding: 5px 10px;
       font-size: 0.74rem;
+    }
+
+    .share-key {
+      padding: 5px 10px;
+      font-size: 0.72rem;
+      gap: 4px;
+      flex-shrink: 0;
     }
 
     /* Top Header Bar */
@@ -812,7 +827,7 @@
     .track-plate {
       display: grid;
       grid-template-columns: 46px minmax(0, 1fr) auto;
-      gap: 11px;
+      gap: 10px;
       align-items: center;
       padding: 9px 11px;
       border-radius: var(--r-module);
@@ -912,6 +927,13 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .plate-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
     }
 
     .plate-time {
@@ -1051,6 +1073,12 @@
       }
       .request-row {
         grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 380px) {
+      .plate-time {
+        display: none;
       }
     }
   </style>
@@ -1241,7 +1269,7 @@
         <div class="library-card neu-chassis">
           <div class="section-head" style="margin-bottom:0;">
             <div class="section-title">Music Library</div>
-            <div class="section-hint">Tap any song to play immediately</div>
+            <div class="section-hint">Tap any song to play or share a direct link</div>
           </div>
 
           <div class="search-well">
@@ -1315,6 +1343,10 @@
     // =========================================================================
     // 2. STATE & HELPERS
     // =========================================================================
+    const PUBLIC_BASE_URL = "https://play-mine.pages.dev/";
+    const requestedSongId = new URLSearchParams(window.location.search).get("song");
+    let initialDeepLinkHandled = false;
+
     let allTracks = [];
     let filteredTracks = [];
     let currentTrackIndex = -1;
@@ -1356,6 +1388,43 @@
           handler(e);
         }
       });
+    }
+
+    function buildSongShareUrl(trackId) {
+      const url = new URL(PUBLIC_BASE_URL);
+      url.searchParams.set("song", trackId);
+      return url.toString();
+    }
+
+    function syncUrlQueryParam(trackId) {
+      if (!trackId || !window.location.protocol.startsWith("http")) return;
+      try {
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set("song", trackId);
+        window.history.replaceState(null, "", nextUrl.pathname + nextUrl.search);
+      } catch (_) {}
+    }
+
+    async function copyTextToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (_) {}
+      }
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      let copied = false;
+      try {
+        copied = document.execCommand("copy");
+      } catch (_) {}
+      document.body.removeChild(ta);
+      return copied;
     }
 
     function formatTime(sec) {
@@ -1725,7 +1794,12 @@
       $("heroCover").src = track.coverUrl && track.coverUrl.trim()
         ? track.coverUrl.trim()
         : buildVinylDiscSvg((track.title || "") + (track.artist || ""));
+      $("totTimeText").textContent = track.duration || "00:00";
+      $("curTimeText").textContent = "00:00";
+      $("scrubberFill").style.width = "0%";
+      $("scrubberKnob").style.left = "0%";
 
+      syncUrlQueryParam(track.id);
       renderTrackList();
 
       if ("mediaSession" in navigator) {
@@ -1737,7 +1811,14 @@
         });
       }
 
-      if (!autoPlay) return;
+      if (!autoPlay) {
+        stopAllPlayers();
+        syncPlayStateUI(false);
+        nativeAudio.src = track.url;
+        usingCorsDspEngine = false;
+        $("playbackHint").textContent = "Tap Play to listen";
+        return;
+      }
 
       stopAllPlayers();
       $("playbackHint").textContent = "Loading song…";
@@ -1758,7 +1839,13 @@
           syncPlayStateUI(true);
           $("playbackHint").textContent = "Now playing";
           return;
-        } catch (_) {}
+        } catch (corsErr) {
+          if (corsErr && corsErr.name === "NotAllowedError") {
+            syncPlayStateUI(false);
+            $("playbackHint").textContent = "Tap Play to start listening";
+            return;
+          }
+        }
       }
 
       try {
@@ -1770,10 +1857,14 @@
         syncPlayStateUI(true);
         $("playbackHint").textContent = "Now playing";
       } catch (err) {
-        console.error("Playback error:", err);
         syncPlayStateUI(false);
-        $("playbackHint").textContent = "Unable to play this song right now";
-        showToast("Could not play this audio stream.");
+        if (err && err.name === "NotAllowedError") {
+          $("playbackHint").textContent = "Tap Play to start listening";
+        } else {
+          console.error("Playback error:", err);
+          $("playbackHint").textContent = "Unable to play this song right now";
+          showToast("Could not play this audio stream.");
+        }
       }
     }
 
@@ -1787,6 +1878,10 @@
         return;
       }
       const player = getActivePlayer();
+      if (!player.src) {
+        loadAndPlayTrack(currentTrackIndex, true);
+        return;
+      }
       if (player.paused) {
         if (usingCorsDspEngine && audioCtx && audioCtx.state === "suspended") {
           audioCtx.resume().catch(() => {});
@@ -1883,7 +1978,7 @@
     });
 
     // =========================================================================
-    // 6. LIBRARY SYNC & MANUAL REFRESH BUTTON
+    // 6. LIBRARY SYNC, DEEP-LINK AUTO-LOAD & MANUAL REFRESH BUTTON
     // =========================================================================
     function syncTracksFromSnapshot(snapshot) {
       const val = snapshot.val();
@@ -1907,7 +2002,24 @@
         $("heroQuality").textContent = "FREE STREAM";
         $("heroGenre").textContent = "Library";
         $("heroCover").src = buildVinylDiscSvg("Play Mine");
-      } else if (prevId) {
+        applyFilters();
+        return;
+      }
+
+      // Auto-load shared song when ?song=TRACK_ID is opened
+      if (!initialDeepLinkHandled && requestedSongId) {
+        initialDeepLinkHandled = true;
+        const sharedIdx = allTracks.findIndex((t) => t.id === requestedSongId);
+        if (sharedIdx !== -1) {
+          applyFilters();
+          loadAndPlayTrack(sharedIdx, true);
+          return;
+        } else {
+          showToast("Shared song was not found in the playlist.");
+        }
+      }
+
+      if (prevId) {
         const nextIdx = allTracks.findIndex((t) => t.id === prevId);
         currentTrackIndex = nextIdx;
         if (nextIdx >= 0) {
@@ -1999,8 +2111,51 @@
             <div class="plate-title">${escapeHtml(track.title || "Untitled")}${track.featured ? ' <span style="color:var(--accent-amber);">★</span>' : ""}</div>
             <div class="plate-sub">${escapeHtml(track.artist || "Unknown Artist")}${track.album ? " • " + escapeHtml(track.album) : ""}</div>
           </div>
-          <span class="plate-time">${escapeHtml(track.duration || "--:--")}</span>
+          <div class="plate-right">
+            <span class="plate-time">${escapeHtml(track.duration || "--:--")}</span>
+            <div class="haptic-key share-key" role="button" tabindex="0" aria-label="Share ${escapeHtml(track.title || "song")}" title="Copy direct link to this song">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              <span>Share</span>
+            </div>
+          </div>
         `;
+
+        const shareBtn = plate.querySelector(".share-key");
+        shareBtn.addEventListener("pointerdown", (e) => {
+          e.stopPropagation();
+          triggerHaptic(10);
+        }, { passive: true });
+
+        const triggerShare = async (e) => {
+          e.stopPropagation();
+          const shareUrl = buildSongShareUrl(track.id);
+          syncUrlQueryParam(track.id);
+          const ok = await copyTextToClipboard(shareUrl);
+          if (ok) {
+            shareBtn.classList.add("is-copied");
+            const labelSpan = shareBtn.querySelector("span");
+            if (labelSpan) labelSpan.textContent = "Copied";
+            showToast("Song link copied to clipboard!");
+            setTimeout(() => {
+              shareBtn.classList.remove("is-copied");
+              if (labelSpan) labelSpan.textContent = "Share";
+            }, 1800);
+          } else {
+            showToast(shareUrl);
+          }
+        };
+
+        shareBtn.addEventListener("click", triggerShare);
+        shareBtn.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            e.stopPropagation();
+            triggerHaptic(12);
+            shareBtn.classList.add("is-pressed");
+            setTimeout(() => shareBtn.classList.remove("is-pressed"), 140);
+            triggerShare(e);
+          }
+        });
 
         bindHapticKey(plate, () => {
           const idx = allTracks.findIndex((item) => item.id === track.id);
