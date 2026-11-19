@@ -6,8 +6,8 @@
   <title>Play Mine — Studio Admin</title>
   <meta name="robots" content="noindex, nofollow" />
   <meta name="theme-color" content="#0b0d12" />
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <link rel="apple-touch-icon" href="favicon.png" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -20,6 +20,13 @@
       --bevel-right: rgba(0, 0, 0, 0.55);
       --bevel-bottom: rgba(0, 0, 0, 0.8);
       --gloss-sheen: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 45%, rgba(255, 255, 255, 0.025) 100%);
+
+      /* Album-Art Reactive Dynamic Theme Variables */
+      --dyn-primary: #38bdf8;
+      --dyn-primary-rgb: 56, 189, 248;
+      --dyn-secondary: #f59e0b;
+      --dyn-secondary-rgb: 245, 158, 11;
+
       --shadow-extrude:
         10px 10px 22px #030407,
         -6px -6px 16px rgba(34, 41, 56, 0.24),
@@ -35,10 +42,8 @@
         inset 4px 4px 10px #030407,
         inset -2px -2px 7px rgba(35, 42, 56, 0.18);
 
-      --accent-sky: #38bdf8;
-      --accent-amber: #f59e0b;
       --accent-green: #10b981;
-      --accent-rose: #f43f5e;
+      --accent-rose: #fb7185;
       --chrome-bright: #f8fafc;
       --text-main: #eef2f7;
       --text-dim: #9aa6b8;
@@ -59,51 +64,55 @@
     }
 
     html {
+      height: auto;
       min-height: 100%;
-      overflow-x: clip;
       background-color: var(--chassis-bg);
     }
 
     body {
+      height: auto;
       min-height: 100dvh;
-      overflow-x: clip;
-      overflow-y: auto;
-      overscroll-behavior-y: contain;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
+      overflow: visible;
       background-color: var(--chassis-bg);
       background-image:
-        radial-gradient(ellipse 80% 45% at 15% 0%, rgba(56, 189, 248, 0.07), transparent 60%),
-        radial-gradient(ellipse 70% 40% at 85% 100%, rgba(245, 158, 11, 0.045), transparent 60%),
+        radial-gradient(ellipse 80% 45% at 15% 0%, rgba(var(--dyn-primary-rgb), 0.10), transparent 60%),
+        radial-gradient(ellipse 70% 40% at 85% 100%, rgba(var(--dyn-secondary-rgb), 0.075), transparent 60%),
         linear-gradient(180deg, #0d1017 0%, #090b10 100%);
       color: var(--text-main);
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       font-variant-numeric: tabular-nums;
       line-height: 1.45;
+      transition: background-image 650ms ease;
     }
 
-    .shell {
+    .app-shell {
       width: 100%;
       max-width: 1320px;
       margin: 0 auto;
+      overflow-x: clip;
       padding: 14px 16px calc(28px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
+    /* Extruded Glossy Chassis */
     .neu-chassis {
       width: 100%;
       min-width: 0;
       background: var(--gloss-sheen), linear-gradient(160deg, #161b26 0%, #0e1118 100%);
       border-radius: var(--r-chassis);
-      border-top: 1px solid var(--bevel-top);
-      border-left: 1px solid var(--bevel-left);
+      border-top: 1px solid rgba(var(--dyn-primary-rgb), 0.28);
+      border-left: 1px solid rgba(var(--dyn-primary-rgb), 0.12);
       border-right: 1px solid var(--bevel-right);
       border-bottom: 1px solid var(--bevel-bottom);
-      box-shadow: var(--shadow-extrude);
+      box-shadow:
+        var(--shadow-extrude),
+        0 0 28px rgba(var(--dyn-primary-rgb), 0.06);
+      transition: border-color 650ms ease, box-shadow 650ms ease;
     }
 
+    /* Concave Recessed Well */
     .neu-well {
       min-width: 0;
       background: linear-gradient(180deg, #06080c 0%, #0b0e14 100%);
@@ -115,7 +124,7 @@
       box-shadow: var(--shadow-well);
     }
 
-    /* Haptic Tactile Keys (Zero <button> Tags) */
+    /* Haptic Tactile Key (Zero <button> Tags) */
     .haptic-key {
       display: inline-flex;
       align-items: center;
@@ -138,7 +147,7 @@
       font-size: 0.82rem;
       padding: 8px 14px;
       text-decoration: none;
-      transition: transform 130ms var(--ease-haptic), box-shadow 130ms var(--ease-haptic), border-color 160ms ease, color 160ms ease;
+      transition: transform 130ms var(--ease-haptic), box-shadow 130ms var(--ease-haptic), border-color 260ms ease, color 260ms ease, background 450ms ease;
     }
 
     .haptic-key:hover {
@@ -155,59 +164,89 @@
     }
 
     .haptic-key:focus-visible {
-      outline: 2px solid var(--accent-sky);
+      outline: 2px solid var(--dyn-primary);
       outline-offset: 2px;
     }
 
     .haptic-key.is-engaged {
       background:
-        linear-gradient(180deg, rgba(56, 189, 248, 0.22) 0%, rgba(56, 189, 248, 0.04) 55%, rgba(0, 0, 0, 0.22) 100%),
-        linear-gradient(145deg, #152333, #0e1520);
-      border-top-color: rgba(125, 211, 252, 0.55);
-      color: #bae6fd;
-      box-shadow: inset 3px 3px 8px rgba(2, 5, 10, 0.82);
+        linear-gradient(180deg, rgba(var(--dyn-primary-rgb), 0.25) 0%, rgba(var(--dyn-primary-rgb), 0.05) 55%, rgba(0, 0, 0, 0.22) 100%),
+        linear-gradient(145deg, #162231, #0e1520);
+      border-top-color: rgba(var(--dyn-primary-rgb), 0.65);
+      color: #f0f9ff;
+      box-shadow: inset 3px 3px 8px rgba(2, 5, 10, 0.82), 0 0 14px rgba(var(--dyn-primary-rgb), 0.22);
+    }
+
+    .haptic-key.is-featured {
+      background:
+        linear-gradient(180deg, rgba(var(--dyn-secondary-rgb), 0.28) 0%, rgba(var(--dyn-secondary-rgb), 0.06) 55%, rgba(0, 0, 0, 0.22) 100%),
+        linear-gradient(145deg, #2b2214, #17120b);
+      border-top-color: rgba(var(--dyn-secondary-rgb), 0.68);
+      color: #fef3c7;
+    }
+
+    .haptic-key.is-copied,
+    .haptic-key.is-saved {
+      background:
+        linear-gradient(180deg, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.06) 55%, rgba(0, 0, 0, 0.22) 100%),
+        linear-gradient(145deg, #122922, #0c1714);
+      border-top-color: rgba(110, 231, 183, 0.6);
+      color: #a7f3d0;
+    }
+
+    .haptic-key.is-danger {
+      background:
+        linear-gradient(180deg, rgba(251, 113, 133, 0.18) 0%, rgba(251, 113, 133, 0.04) 55%, rgba(0, 0, 0, 0.22) 100%),
+        linear-gradient(145deg, #27151c, #160d11);
+      border-top-color: rgba(251, 113, 133, 0.45);
+      color: #fecdd3;
+    }
+
+    .haptic-key.is-confirm-delete {
+      background:
+        linear-gradient(180deg, rgba(244, 63, 94, 0.42) 0%, rgba(225, 29, 72, 0.18) 55%, rgba(0, 0, 0, 0.25) 100%),
+        linear-gradient(145deg, #4c1122, #250811);
+      border-top-color: rgba(253, 164, 175, 0.85);
+      color: #ffffff;
     }
 
     .haptic-primary {
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.04) 48%, rgba(0, 0, 0, 0.18) 100%),
-        linear-gradient(145deg, #38bdf8 0%, #0284c7 60%, #0369a1 100%);
+        linear-gradient(145deg, var(--dyn-primary) 0%, rgba(var(--dyn-primary-rgb), 0.72) 100%);
       border-top: 1.5px solid rgba(255, 255, 255, 0.72);
       border-left: 1px solid rgba(255, 255, 255, 0.4);
       border-bottom: 1.5px solid rgba(2, 32, 54, 0.95);
       color: #031019;
       font-weight: 800;
-      box-shadow: 6px 6px 16px #020306, 0 0 18px rgba(56, 189, 248, 0.24), inset 0 1px 2px rgba(255, 255, 255, 0.65);
+      box-shadow: 6px 6px 16px #020306, 0 0 18px rgba(var(--dyn-primary-rgb), 0.26), inset 0 1px 2px rgba(255, 255, 255, 0.65);
     }
 
     .haptic-primary:hover {
       color: #02080d;
     }
 
-    .haptic-danger {
-      color: #fda4af;
-      border-top-color: rgba(244, 63, 94, 0.35);
-    }
-
-    .haptic-danger:hover {
-      color: #ffffff;
-      border-top-color: rgba(244, 63, 94, 0.7);
-    }
-
     .mini-key {
-      padding: 5px 10px;
+      padding: 5px 11px;
       font-size: 0.74rem;
     }
 
-    /* Top Header */
+    .action-key {
+      padding: 5px 9px;
+      font-size: 0.71rem;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Top Header Bar */
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
       gap: 10px;
       padding: 11px 16px;
       border-radius: var(--r-pill);
+      flex-wrap: wrap;
     }
 
     .brand-cluster {
@@ -224,7 +263,7 @@
       border-radius: 11px;
       padding: 3px;
       background: linear-gradient(145deg, #1f2636, #0d1017);
-      border-top: 1px solid rgba(255, 255, 255, 0.24);
+      border-top: 1px solid rgba(var(--dyn-primary-rgb), 0.38);
       box-shadow: 4px 4px 10px #030407;
       overflow: hidden;
     }
@@ -236,22 +275,31 @@
       object-fit: cover;
     }
 
+    .brand-text {
+      min-width: 0;
+    }
+
     .brand-name {
       font-size: 1.12rem;
       font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--chrome-bright);
+      white-space: nowrap;
     }
 
     .brand-sub {
       font-size: 0.73rem;
       color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .header-actions {
+    .header-right {
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     .status-pill {
@@ -262,10 +310,14 @@
       border-radius: var(--r-pill);
       font-size: 0.74rem;
       font-weight: 600;
-      color: var(--text-dim);
+      color: #a7f3d0;
     }
 
-    .status-dot {
+    .status-pill.is-locked {
+      color: #fde68a;
+    }
+
+    .live-dot {
       width: 7px;
       height: 7px;
       border-radius: 50%;
@@ -273,58 +325,72 @@
       box-shadow: 0 0 8px var(--accent-green);
     }
 
-    /* Admin Grid */
-    .admin-grid {
+    .status-pill.is-locked .live-dot {
+      background: var(--dyn-secondary);
+      box-shadow: 0 0 8px var(--dyn-secondary);
+    }
+
+    /* Auth Gate Card */
+    .auth-shell {
+      max-width: 460px;
+      margin: 26px auto;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .auth-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Main Responsive Workspace */
+    .workspace-grid {
       display: grid;
-      grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
-      gap: 16px;
+      grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+      gap: 14px;
       align-items: start;
     }
 
-    .editor-chassis {
+    .col-stack {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .module-card {
       padding: 18px;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .panel-head {
+    .section-head {
       display: flex;
-      align-items: center;
+      align-items: baseline;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .panel-title {
+    .section-title {
       font-size: 0.98rem;
       font-weight: 800;
       color: var(--chrome-bright);
+      letter-spacing: -0.01em;
     }
 
-    .panel-hint {
-      font-size: 0.74rem;
+    .section-hint {
+      font-size: 0.75rem;
       color: var(--text-dim);
     }
 
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .form-row-2 {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 10px;
-    }
-
-    label {
-      font-size: 0.74rem;
-      font-weight: 700;
-      color: var(--text-dim);
-    }
-
-    .neu-input, .neu-select {
+    /* 16px font-size prevents mobile Safari/Chrome input auto-zoom */
+    .neu-input,
+    .neu-select {
       width: 100%;
       min-width: 0;
       padding: 10px 15px;
@@ -339,6 +405,7 @@
       font-family: inherit;
       font-size: 16px;
       outline: none;
+      transition: border-color 180ms ease;
     }
 
     .neu-input::placeholder {
@@ -346,58 +413,189 @@
       color: var(--text-mute);
     }
 
-    .neu-input:focus, .neu-select:focus {
-      border-bottom-color: rgba(56, 189, 248, 0.55);
+    .neu-input:focus,
+    .neu-select:focus {
+      border-bottom-color: rgba(var(--dyn-primary-rgb), 0.65);
     }
 
     .neu-select option {
-      background: #0f131c;
-      color: #ffffff;
+      background: #10141d;
+      color: var(--text-main);
     }
 
-    .toggle-well {
+    .field-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .field-label {
+      font-size: 0.73rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      padding-left: 8px;
+    }
+
+    .url-action-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* Live Preview Card inside Editor */
+    .preview-strip {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 12px;
+    }
+
+    .preview-disc {
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      object-fit: cover;
+      border: 1px solid rgba(var(--dyn-primary-rgb), 0.35);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+    }
+
+    .preview-meta {
+      min-width: 0;
+    }
+
+    .preview-title {
+      font-weight: 800;
+      font-size: 0.92rem;
+      color: var(--chrome-bright);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .preview-sub {
+      font-size: 0.76rem;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .preview-tags {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 8px 14px;
+      gap: 6px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .mini-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 2px 8px;
       border-radius: var(--r-pill);
+      color: #f0f9ff;
+      background: rgba(var(--dyn-primary-rgb), 0.22);
+      border-top: 1px solid rgba(var(--dyn-primary-rgb), 0.45);
     }
 
-    /* Right Column Stack */
-    .right-stack {
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .catalog-chassis {
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .catalog-top {
+    .form-footer-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
+      padding-top: 4px;
     }
 
-    .admin-list {
+    .feedback-line {
+      font-size: 0.76rem;
+      font-weight: 600;
+      min-height: 1.1em;
+      color: var(--accent-green);
+    }
+
+    .feedback-line.is-error {
+      color: #fda4af;
+    }
+
+    /* Search & Filter */
+    .search-well {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input-padded {
+      padding-left: 38px;
+    }
+
+    .search-glyph {
+      position: absolute;
+      left: 14px;
+      color: var(--text-mute);
+      pointer-events: none;
+    }
+
+    .filter-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .count-text {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--text-dim);
+    }
+
+    /* Desktop bounded list; mobile flows naturally with page scroll (zero scroll trap) */
+    .track-scroll,
+    .request-scroll {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 9px;
+      max-height: 440px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 2px;
+    }
+
+    .track-scroll::-webkit-scrollbar,
+    .request-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .track-scroll::-webkit-scrollbar-thumb,
+    .request-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: var(--r-pill);
     }
 
     .track-plate {
       display: grid;
-      grid-template-columns: 48px minmax(0, 1fr) auto;
-      gap: 12px;
+      grid-template-columns: 46px minmax(0, 1fr) auto;
+      gap: 10px;
       align-items: center;
-      padding: 10px 12px;
+      padding: 9px 11px;
       border-radius: var(--r-module);
       background:
         linear-gradient(165deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(0, 0, 0, 0.18) 100%),
@@ -407,16 +605,19 @@
       border-right: 1px solid rgba(0, 0, 0, 0.65);
       border-bottom: 1px solid rgba(0, 0, 0, 0.85);
       box-shadow: 4px 4px 10px #030407;
+      transition: border-color 200ms ease;
     }
 
     .track-plate.is-editing {
-      border-top-color: rgba(125, 211, 252, 0.65);
-      box-shadow: inset 3px 3px 8px rgba(2, 5, 10, 0.82);
+      background:
+        linear-gradient(165deg, rgba(var(--dyn-primary-rgb), 0.22) 0%, rgba(var(--dyn-primary-rgb), 0.04) 55%, rgba(0, 0, 0, 0.25) 100%),
+        linear-gradient(145deg, #152333, #0d141f);
+      border-top-color: rgba(var(--dyn-primary-rgb), 0.72);
     }
 
     .plate-art {
-      width: 48px;
-      height: 48px;
+      width: 46px;
+      height: 46px;
       border-radius: 11px;
       object-fit: cover;
       border: 1px solid rgba(255, 255, 255, 0.14);
@@ -428,18 +629,16 @@
 
     .plate-title {
       font-weight: 700;
-      font-size: 0.88rem;
+      font-size: 0.87rem;
       color: var(--chrome-bright);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .plate-sub {
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       color: var(--text-dim);
-    }
-
-    .plate-url {
-      font-size: 0.7rem;
-      color: var(--text-mute);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -448,37 +647,59 @@
     .plate-actions {
       display: flex;
       align-items: center;
+      gap: 5px;
       flex-wrap: wrap;
-      gap: 6px;
+      justify-content: flex-end;
     }
 
-    /* User Song Requests Card */
+    /* Request Plate */
     .request-plate {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 12px;
+      display: flex;
       align-items: center;
-      padding: 12px 14px;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
       border-radius: var(--r-module);
-      background: linear-gradient(145deg, #151a24, #0e1118);
+      background:
+        linear-gradient(165deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(0, 0, 0, 0.18) 100%),
+        linear-gradient(145deg, #171c27, #0f131b);
       border-top: 1px solid rgba(255, 255, 255, 0.12);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.82);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.85);
+    }
+
+    .req-info {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
     .req-msg {
       font-weight: 700;
-      font-size: 0.87rem;
+      font-size: 0.85rem;
       color: var(--chrome-bright);
       word-break: break-word;
     }
 
-    .req-meta {
-      font-size: 0.74rem;
+    .req-sender {
+      font-size: 0.72rem;
       color: var(--text-dim);
-      margin-top: 2px;
-      word-break: break-word;
+      word-break: break-all;
     }
 
+    .empty-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 22px 14px;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      gap: 4px;
+    }
+
+    /* Toast */
     .toast-pill {
       position: fixed;
       bottom: calc(18px + env(safe-area-inset-bottom));
@@ -488,12 +709,15 @@
       padding: 9px 18px;
       border-radius: var(--r-pill);
       background: linear-gradient(160deg, #1b2230, #0d1017);
-      border-top: 1px solid rgba(255, 255, 255, 0.25);
+      border-top: 1px solid rgba(var(--dyn-primary-rgb), 0.45);
       box-shadow: 0 12px 28px rgba(0, 0, 0, 0.85);
       font-size: 0.8rem;
       font-weight: 600;
       color: var(--chrome-bright);
       white-space: nowrap;
+      max-width: calc(100vw - 24px);
+      overflow: hidden;
+      text-overflow: ellipsis;
       transition: transform 220ms var(--ease-haptic);
       pointer-events: none;
     }
@@ -509,156 +733,264 @@
       color: var(--text-mute);
     }
 
+    .is-hidden {
+      display: none !important;
+    }
+
     @media (max-width: 1024px) {
-      .admin-grid {
+      .workspace-grid {
         grid-template-columns: minmax(0, 1fr);
+      }
+      /* Eliminate inner scroll traps on mobile/tablet so page scrolls seamlessly */
+      .track-scroll,
+      .request-scroll {
+        max-height: none;
+        overflow: visible;
+        overscroll-behavior: auto;
       }
     }
 
-    @media (max-width: 640px) {
-      .shell {
+    @media (max-width: 680px) {
+      .app-shell {
         padding: 10px 10px calc(24px + env(safe-area-inset-bottom));
+        gap: 12px;
       }
       .topbar {
         border-radius: 20px;
+        padding: 10px 14px;
       }
-      .form-row-2 {
+      .module-card {
+        padding: 15px 14px;
+      }
+      .field-grid-2 {
         grid-template-columns: minmax(0, 1fr);
       }
       .track-plate {
-        grid-template-columns: minmax(0, 1fr);
+        grid-template-columns: 44px minmax(0, 1fr);
+      }
+      .plate-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+        padding-top: 4px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .request-plate {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <!-- Top Header -->
+  <div class="app-shell">
+    <!-- Top Header Bar -->
     <header class="topbar neu-chassis">
       <div class="brand-cluster">
         <div class="brand-badge">
-          <img src="favicon.png" alt="Play Mine" onerror="this.style.display='none'" />
+          <img src="/favicon.png" alt="Play Mine" onerror="this.style.display='none'" />
         </div>
-        <div>
-          <div class="brand-name">Play Mine — Studio Admin</div>
-          <div class="brand-sub">Manage published music and listener requests</div>
+        <div class="brand-text">
+          <div class="brand-name">Play Mine Admin</div>
+          <div class="brand-sub">Library Publisher &amp; Request Console</div>
         </div>
       </div>
 
-      <div class="header-actions">
-        <div class="status-pill neu-well">
-          <span class="status-dot" id="connLed"></span>
-          <span id="connLabel">Connected</span>
+      <div class="header-right">
+        <div class="status-pill neu-well is-locked" id="authStatusPill">
+          <span class="live-dot"></span>
+          <span id="authStatusText">Sign-in Required</span>
         </div>
-        <a href="https://play-mine.pages.dev" class="haptic-key" target="_blank" rel="noopener">
-          Open Play Mine ↗
+
+        <a class="haptic-key mini-key" href="/" title="Open public Play Mine player">
+          <span>Open Player</span>
         </a>
+
+        <div class="haptic-key mini-key is-danger is-hidden" id="btnSignOut" role="button" tabindex="0">
+          <span>Sign Out</span>
+        </div>
       </div>
     </header>
 
-    <!-- Main Workspace -->
-    <main class="admin-grid">
-      <!-- Left: Add / Edit Track Form -->
-      <section class="editor-chassis neu-chassis">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title" id="editorHeading">Add New Track</div>
-            <div class="panel-hint">Paste your direct audio link and publish live</div>
-          </div>
-          <div class="haptic-key mini-key" id="btnResetForm" role="button" tabindex="0">Clear</div>
+    <!-- Admin Sign-In Gate -->
+    <section class="auth-shell neu-chassis" id="authGateCard">
+      <div class="section-head">
+        <div class="section-title">Studio Authentication</div>
+        <div class="section-hint">Sign in with your Firebase admin credentials</div>
+      </div>
+
+      <form class="auth-fields" id="adminLoginForm" onsubmit="return false;">
+        <div class="field-group">
+          <label class="field-label" for="adminEmail">Admin Email</label>
+          <input type="email" id="adminEmail" class="neu-input" placeholder="admin@play-mine.pages.dev" autocomplete="email" required />
         </div>
 
-        <input type="hidden" id="editTrackId" value="" />
+        <div class="field-group">
+          <label class="field-label" for="adminPass">Password</label>
+          <input type="password" id="adminPass" class="neu-input" placeholder="Enter password" autocomplete="current-password" required />
+        </div>
 
-        <div class="form-group">
-          <label for="trackUrl">Direct Audio URL (MP3 / FLAC / WAV) *</label>
-          <input type="url" id="trackUrl" class="neu-input" placeholder="https://.../audio.mp3" required />
-          <div style="margin-top:2px;">
-            <div class="haptic-key mini-key" id="btnProbeAudio" role="button" tabindex="0">
-              Auto-Detect Duration
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-top:4px;">
+          <div class="feedback-line" id="authFeedback" aria-live="polite"></div>
+          <div class="haptic-key haptic-primary" id="btnAdminLogin" role="button" tabindex="0">
+            Unlock Studio
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- Authenticated Studio Workspace -->
+    <main class="workspace-grid is-hidden" id="studioWorkspace">
+      <!-- Left Column: Track Publisher & Editor + Listener Requests -->
+      <section class="col-stack">
+        <!-- Track Publisher / Editor Card -->
+        <div class="module-card neu-chassis" id="editorCard">
+          <div class="section-head">
+            <div class="section-title" id="editorHeading">Publish New Song</div>
+            <div class="section-hint" id="editorSubhint">Syncs instantly to Play Mine</div>
+          </div>
+
+          <!-- Live Reactive Preview Strip -->
+          <div class="preview-strip neu-well">
+            <img id="previewCover" class="preview-disc" alt="Cover preview" />
+            <div class="preview-meta">
+              <div class="preview-title" id="previewTitle">Song Title Preview</div>
+              <div class="preview-sub" id="previewArtist">Artist Name • Album</div>
+              <div class="preview-tags">
+                <span class="mini-badge" id="previewQuality">HIGH-RES AUDIO</span>
+                <span class="mini-badge" id="previewGenre" style="background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.14);">Music</span>
+                <span class="mini-badge" id="previewDuration">00:00</span>
+              </div>
+            </div>
+            <div class="haptic-key mini-key" id="btnPreviewAudio" role="button" tabindex="0" title="Listen & auto-detect duration">
+              Preview
             </div>
           </div>
+
+          <div class="field-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="fTitle">Song Title *</label>
+              <input type="text" id="fTitle" class="neu-input" placeholder="e.g. Midnight Horizon" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="fArtist">Artist *</label>
+              <input type="text" id="fArtist" class="neu-input" placeholder="e.g. Sanchar" />
+            </div>
+          </div>
+
+          <div class="field-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="fAlbum">Album</label>
+              <input type="text" id="fAlbum" class="neu-input" placeholder="e.g. Kathmandu Nights" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="fGenre">Genre</label>
+              <input type="text" id="fGenre" class="neu-input" placeholder="e.g. Synthwave, Pop, Lo-Fi" />
+            </div>
+          </div>
+
+          <div class="field-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="fQuality">Audio Quality Badge</label>
+              <select id="fQuality" class="neu-select">
+                <option value="HIGH-RES AUDIO">HIGH-RES AUDIO</option>
+                <option value="24-BIT LOSSLESS">24-BIT LOSSLESS</option>
+                <option value="STUDIO MASTER">STUDIO MASTER</option>
+                <option value="FLAC STREAM">FLAC STREAM</option>
+                <option value="320KBPS HQ">320KBPS HQ</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="fDuration">Duration (MM:SS)</label>
+              <input type="text" id="fDuration" class="neu-input" placeholder="03:45" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="fAudioUrl">Direct Audio Stream URL *</label>
+            <div class="url-action-row">
+              <input type="url" id="fAudioUrl" class="neu-input" placeholder="https://.../song.mp3 or .flac" />
+              <div class="haptic-key mini-key" id="btnDetectDuration" role="button" tabindex="0" title="Auto-read track length from stream URL">
+                Auto Time
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="fCoverUrl">Cover Artwork URL (optional)</label>
+            <input type="url" id="fCoverUrl" class="neu-input" placeholder="https://.../cover.jpg" />
+          </div>
+
+          <div class="form-footer-bar">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <div class="haptic-key mini-key" id="btnToggleFeatured" role="button" tabindex="0">
+                ★ Featured: OFF
+              </div>
+              <div class="haptic-key mini-key is-hidden" id="btnCancelEdit" role="button" tabindex="0">
+                Cancel Edit
+              </div>
+            </div>
+
+            <div class="haptic-key haptic-primary" id="btnSaveTrack" role="button" tabindex="0">
+              Publish Song
+            </div>
+          </div>
+
+          <div class="feedback-line" id="editorFeedback" aria-live="polite"></div>
         </div>
 
-        <div class="form-row-2">
-          <div class="form-group">
-            <label for="trackTitle">Song Title *</label>
-            <input type="text" id="trackTitle" class="neu-input" placeholder="Track Name" />
+        <!-- Listener Song Requests Card -->
+        <div class="module-card neu-chassis">
+          <div class="section-head">
+            <div class="section-title">Listener Song Requests</div>
+            <div class="count-text" id="requestCountPill">0 requests</div>
           </div>
-          <div class="form-group">
-            <label for="trackArtist">Artist *</label>
-            <input type="text" id="trackArtist" class="neu-input" placeholder="Artist Name" />
-          </div>
-        </div>
 
-        <div class="form-row-2">
-          <div class="form-group">
-            <label for="trackAlbum">Album</label>
-            <input type="text" id="trackAlbum" class="neu-input" placeholder="Album Title" />
+          <div class="request-scroll" id="requestScroll">
+            <!-- Dynamically loaded listener requests -->
           </div>
-          <div class="form-group">
-            <label for="trackGenre">Genre</label>
-            <input type="text" id="trackGenre" class="neu-input" placeholder="Electronic / Pop" />
-          </div>
-        </div>
-
-        <div class="form-row-2">
-          <div class="form-group">
-            <label for="trackQuality">Quality Label</label>
-            <select id="trackQuality" class="neu-select">
-              <option value="24-Bit / 96kHz Lossless">24-Bit / 96kHz Lossless</option>
-              <option value="FLAC Studio Master">FLAC Studio Master</option>
-              <option value="WAV Uncompressed">WAV Uncompressed</option>
-              <option value="320kbps High-Bitrate">320kbps High-Bitrate</option>
-              <option value="High-Res Audio">High-Res Audio</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="trackDuration">Duration (MM:SS)</label>
-            <input type="text" id="trackDuration" class="neu-input" placeholder="03:30" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="trackCover">Cover Image URL (Optional)</label>
-          <input type="url" id="trackCover" class="neu-input" placeholder="https://.../cover.jpg" />
-        </div>
-
-        <div class="toggle-well neu-well">
-          <span style="font-size: 0.82rem; font-weight: 600;">★ Pin to top as Featured</span>
-          <div class="haptic-key mini-key" id="btnToggleFeatured" role="button" tabindex="0">Featured: OFF</div>
-        </div>
-
-        <div class="haptic-key haptic-primary" id="btnSaveTrack" role="button" tabindex="0" style="width: 100%; margin-top: 2px;">
-          Publish to Play Mine
         </div>
       </section>
 
-      <!-- Right: Published Tracks + Listener Song Requests -->
-      <section class="right-stack">
-        <!-- Published Tracks -->
-        <div class="catalog-chassis neu-chassis">
-          <div class="catalog-top">
-            <div>
-              <div class="panel-title">Published Tracks (<span id="totalCount">0</span>)</div>
-              <div class="panel-hint">Live songs visible on play-mine.pages.dev</div>
-            </div>
-            <input type="text" id="adminSearch" class="neu-input" placeholder="Filter songs…" style="max-width: 220px;" />
+      <!-- Right Column: Published Catalog & Database Connection -->
+      <section class="col-stack">
+        <!-- Published Tracks Catalog -->
+        <div class="module-card neu-chassis">
+          <div class="section-head">
+            <div class="section-title">Published Music Library</div>
+            <div class="section-hint">Edit, feature, copy short link, or remove</div>
           </div>
 
-          <div class="admin-list" id="adminList"></div>
+          <div class="search-well">
+            <svg class="search-glyph" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="adminSearch" class="neu-input search-input-padded" placeholder="Filter published tracks…" aria-label="Filter published tracks" />
+          </div>
+
+          <div class="filter-row">
+            <div class="filter-strip" id="adminFilterBar">
+              <div class="haptic-key mini-key is-engaged" role="button" tabindex="0" data-filter="all">All Songs</div>
+              <div class="haptic-key mini-key" role="button" tabindex="0" data-filter="featured">Featured Only</div>
+            </div>
+            <span class="count-text" id="trackCountPill">0 songs</span>
+          </div>
+
+          <div class="track-scroll" id="adminTrackScroll">
+            <!-- Dynamically loaded tracks -->
+          </div>
         </div>
 
-        <!-- Listener Song Requests Inbox -->
-        <div class="catalog-chassis neu-chassis">
-          <div class="catalog-top">
-            <div>
-              <div class="panel-title">Listener Song Requests (<span id="reqCount">0</span>)</div>
-              <div class="panel-hint">Submissions sent by visitors from the main player</div>
-            </div>
+        <!-- Cloud Database Endpoint Card -->
+        <div class="module-card neu-chassis">
+          <div class="section-head">
+            <div class="section-title">Cloud Database Endpoint</div>
+            <div class="section-hint">Firebase Realtime Database URL</div>
           </div>
 
-          <div class="admin-list" id="requestsList"></div>
+          <div class="url-action-row">
+            <input type="url" id="dbUrlInput" class="neu-input" placeholder="https://cloud-db-studio-default-rtdb.firebaseio.com" />
+            <div class="haptic-key mini-key" id="btnSaveDbUrl" role="button" tabindex="0">
+              Apply
+            </div>
+          </div>
         </div>
       </section>
     </main>
@@ -672,29 +1004,53 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-    import { getDatabase, ref, push, set, update, remove, onValue } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    import { getDatabase, ref, onValue, get, push, set, update, remove, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
+    // =========================================================================
+    // 1. FIREBASE CONFIGURATION & REFERENCES
+    // =========================================================================
     const DEFAULT_DB_URL = "https://cloud-db-studio-default-rtdb.firebaseio.com";
-    const currentDbUrl = localStorage.getItem("play_mine_rtdb_url") || DEFAULT_DB_URL;
+    const activeDbUrl = localStorage.getItem("play_mine_rtdb_url") || DEFAULT_DB_URL;
 
     const firebaseConfig = {
       apiKey: "AIzaSyDpCAXfhldRc1nCZDWlWNRbcMFjqAh8uPc",
       authDomain: "cloud-db-studio.firebaseapp.com",
-      databaseURL: currentDbUrl,
+      databaseURL: activeDbUrl,
       projectId: "cloud-db-studio"
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getDatabase(app);
+
     const tracksRef = ref(db, "play_mine/tracks");
     const requestsRef = ref(db, "play_mine/requests");
+    const shortLinksByTrackRef = (trackKey) => ref(db, `play_mine/short_links/by_track/${trackKey}`);
+    const shortLinksByCodeRef = (code) => ref(db, `play_mine/short_links/by_code/${code}`);
+
+    // =========================================================================
+    // 2. STATE & HELPERS
+    // =========================================================================
+    const SHORT_CODE_ALPHABET = "23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ";
+    const SHORT_CODE_REGEX = /^[a-zA-Z0-9_-]{4,24}$/;
+    const shortCodeMemoryCache = new Map();
+
+    let allTracks = [];
+    let allRequests = [];
+    let editingTrackId = null;
+    let formFeatured = false;
+    let adminFilter = "all";
+    let adminSearchQuery = "";
+    let pendingDeleteTrackId = null;
+    let pendingDeleteTimer = null;
+
+    const previewProbeAudio = new Audio();
+    previewProbeAudio.preload = "metadata";
+    let isPreviewPlaying = false;
 
     const $ = (id) => document.getElementById(id);
-    let tracksCache = [];
-    let requestsCache = [];
-    let isFeatured = false;
-    const previewAudio = new Audio();
-    let previewingId = null;
+    $("dbUrlInput").value = activeDbUrl;
 
     function triggerHaptic(ms = 10) {
       if (navigator.vibrate) {
@@ -725,25 +1081,6 @@
       });
     }
 
-    function buildCoverSvg(seed = "Play Mine") {
-      let hash = 0;
-      for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
-      const hue = Math.abs(hash % 360);
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
-        <defs><radialGradient id="g" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="hsl(${hue},52%,36%)"/><stop offset="100%" stop-color="#07090d"/></radialGradient></defs>
-        <rect width="160" height="160" fill="url(#g)"/>
-        <circle cx="80" cy="80" r="36" fill="none" stroke="rgba(56,189,248,0.35)" stroke-width="2"/>
-      </svg>`;
-      return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
-    }
-
-    function formatDuration(sec) {
-      if (!Number.isFinite(sec) || sec <= 0) return "";
-      const m = Math.floor(sec / 60);
-      const s = Math.floor(sec % 60);
-      return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-    }
-
     function escapeHtml(str) {
       return String(str)
         .replace(/&/g, "&amp;")
@@ -752,176 +1089,611 @@
         .replace(/"/g, "&quot;");
     }
 
-    function resetForm() {
-      $("editTrackId").value = "";
-      $("trackUrl").value = "";
-      $("trackTitle").value = "";
-      $("trackArtist").value = "";
-      $("trackAlbum").value = "";
-      $("trackGenre").value = "";
-      $("trackQuality").value = "24-Bit / 96kHz Lossless";
-      $("trackDuration").value = "";
-      $("trackCover").value = "";
-      isFeatured = false;
-      $("btnToggleFeatured").textContent = "Featured: OFF";
-      $("btnToggleFeatured").classList.remove("is-engaged");
-      $("editorHeading").textContent = "Add New Track";
-      $("btnSaveTrack").textContent = "Publish to Play Mine";
-      renderAdminList();
+    function formatTime(sec) {
+      if (!Number.isFinite(sec) || sec <= 0) return "00:00";
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
     }
 
-    function loadTrackIntoEditor(track) {
-      $("editTrackId").value = track.id;
-      $("trackUrl").value = track.url || "";
-      $("trackTitle").value = track.title || "";
-      $("trackArtist").value = track.artist || "";
-      $("trackAlbum").value = track.album || "";
-      $("trackGenre").value = track.genre || "";
-      $("trackQuality").value = track.quality || "24-Bit / 96kHz Lossless";
-      $("trackDuration").value = track.duration || "";
-      $("trackCover").value = track.coverUrl || "";
-      isFeatured = Boolean(track.featured);
-      $("btnToggleFeatured").textContent = `Featured: ${isFeatured ? "ON" : "OFF"}`;
-      $("btnToggleFeatured").classList.toggle("is-engaged", isFeatured);
-      $("editorHeading").textContent = `Editing: ${track.title}`;
-      $("btnSaveTrack").textContent = "Save Changes";
-      renderAdminList();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    function formatRelativeDate(ts) {
+      if (!ts) return "";
+      try {
+        return new Date(ts).toLocaleString(undefined, {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      } catch (_) {
+        return "";
+      }
     }
 
-    bindHapticKey($("btnProbeAudio"), () => {
-      const url = $("trackUrl").value.trim();
-      if (!url) {
-        showToast("Enter an audio URL first.");
+    function sanitizeRtdbKey(raw) {
+      return String(raw || "").replace(/[.#$\[\]\/]/g, "").trim();
+    }
+
+    function getWebsiteOrigin() {
+      if (window.location.origin && /^https?:\/\//i.test(window.location.origin)) {
+        return window.location.origin.replace(/\/+$/, "");
+      }
+      return "https://play-mine.pages.dev";
+    }
+
+    function generateShortSongCode(length = 6) {
+      const bytes = new Uint8Array(length);
+      crypto.getRandomValues(bytes);
+      let code = "";
+      for (let i = 0; i < length; i++) {
+        code += SHORT_CODE_ALPHABET[bytes[i] % SHORT_CODE_ALPHABET.length];
+      }
+      return code;
+    }
+
+    async function getOrCreateShortSongCode(rawTrackId) {
+      const trackKey = sanitizeRtdbKey(rawTrackId);
+      if (!trackKey) throw new Error("Invalid track ID");
+      if (shortCodeMemoryCache.has(trackKey)) return shortCodeMemoryCache.get(trackKey);
+
+      const existingSnap = await get(shortLinksByTrackRef(trackKey));
+      if (existingSnap.exists()) {
+        const val = existingSnap.val();
+        const code = typeof val === "string" ? val : val?.code;
+        if (code && SHORT_CODE_REGEX.test(code)) {
+          shortCodeMemoryCache.set(trackKey, code);
+          return code;
+        }
+      }
+
+      let reservedCode = null;
+      for (let attempt = 0; attempt < 6; attempt++) {
+        const candidate = generateShortSongCode(6);
+        const tx = await runTransaction(shortLinksByCodeRef(candidate), (cur) => {
+          if (cur !== null) return;
+          return { trackId: trackKey, code: candidate, createdAt: Date.now() };
+        });
+        if (tx.committed) {
+          reservedCode = candidate;
+          break;
+        }
+      }
+      if (!reservedCode) throw new Error("Could not allocate short code");
+
+      await set(shortLinksByTrackRef(trackKey), {
+        code: reservedCode,
+        trackId: trackKey,
+        createdAt: Date.now()
+      });
+      shortCodeMemoryCache.set(trackKey, reservedCode);
+      return reservedCode;
+    }
+
+    async function copyTextToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (_) {}
+      }
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (_) {}
+      document.body.removeChild(ta);
+      return ok;
+    }
+
+    // =========================================================================
+    // 3. ALBUM-ART REACTIVE COLOR SAMPLER (MATCHES PLAYER CHASSIS)
+    // =========================================================================
+    function buildVinylDiscSvg(seed = "Play Mine") {
+      let hash = 0;
+      for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+      const hue = Math.abs(hash % 360);
+      const hue2 = (hue + 48) % 360;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
+        <defs>
+          <radialGradient id="disc" cx="35%" cy="30%" r="75%">
+            <stop offset="0%" stop-color="hsl(${hue}, 68%, 48%)" />
+            <stop offset="52%" stop-color="hsl(${hue2}, 42%, 18%)" />
+            <stop offset="100%" stop-color="#07090d" />
+          </radialGradient>
+        </defs>
+        <rect width="320" height="320" fill="url(#disc)"/>
+        <circle cx="160" cy="160" r="126" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="1.5"/>
+        <circle cx="160" cy="160" r="96" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="1"/>
+        <circle cx="160" cy="160" r="68" fill="none" stroke="hsl(${hue2}, 82%, 62%)" stroke-opacity="0.45" stroke-width="2.5"/>
+      </svg>`;
+      return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    }
+
+    function hslToRgb(h, s, l) {
+      h = ((h % 360) + 360) % 360 / 360;
+      s = Math.max(0, Math.min(1, s));
+      l = Math.max(0, Math.min(1, l));
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      };
+      if (s === 0) {
+        const v = Math.round(l * 255);
+        return [v, v, v];
+      }
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      return [
+        Math.round(hue2rgb(p, q, h + 1 / 3) * 255),
+        Math.round(hue2rgb(p, q, h) * 255),
+        Math.round(hue2rgb(p, q, h - 1 / 3) * 255)
+      ];
+    }
+
+    function boostNeonColor([r, g, b]) {
+      const max = Math.max(r, g, b) / 255;
+      const min = Math.min(r, g, b) / 255;
+      let h = 0, s = 0, l = (max + min) / 2;
+      if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max * 255) {
+          case r: h = ((g - b) / 255 / d + (g < b ? 6 : 0)) * 60; break;
+          case g: h = ((b - r) / 255 / d + 2) * 60; break;
+          default: h = ((r - g) / 255 / d + 4) * 60; break;
+        }
+      }
+      return hslToRgb(h, Math.max(0.65, Math.min(0.95, s)), Math.max(0.54, Math.min(0.68, l)));
+    }
+
+    function applyReactivePalette(primary, secondary) {
+      const root = document.documentElement.style;
+      root.setProperty("--dyn-primary", `rgb(${primary[0]}, ${primary[1]}, ${primary[2]})`);
+      root.setProperty("--dyn-primary-rgb", `${primary[0]}, ${primary[1]}, ${primary[2]}`);
+      root.setProperty("--dyn-secondary", `rgb(${secondary[0]}, ${secondary[1]}, ${secondary[2]})`);
+      root.setProperty("--dyn-secondary-rgb", `${secondary[0]}, ${secondary[1]}, ${secondary[2]}`);
+    }
+
+    function sampleAlbumCoverColors(imgSrc, fallbackSeed = "Play Mine") {
+      if (!imgSrc || imgSrc.startsWith("data:")) {
+        let hash = 0;
+        for (let i = 0; i < fallbackSeed.length; i++) hash = fallbackSeed.charCodeAt(i) + ((hash << 5) - hash);
+        const h1 = Math.abs(hash % 360);
+        applyReactivePalette(hslToRgb(h1, 0.85, 0.6), hslToRgb((h1 + 55) % 360, 0.85, 0.58));
         return;
       }
-      showToast("Reading audio duration…");
-      const probe = new Audio();
-      probe.preload = "metadata";
-      probe.src = url;
-      probe.addEventListener("loadedmetadata", () => {
-        const dur = formatDuration(probe.duration);
-        if (dur) {
-          $("trackDuration").value = dur;
-          showToast(`Duration detected: ${dur}`);
-        }
-        probe.src = "";
-      });
-      probe.addEventListener("error", () => {
-        showToast("Could not auto-read duration; enter MM:SS manually.");
-      });
+
+      const probe = new Image();
+      probe.crossOrigin = "anonymous";
+      probe.onload = () => {
+        try {
+          const c = document.createElement("canvas");
+          c.width = 24;
+          c.height = 24;
+          const ctx = c.getContext("2d", { willReadFrequently: true });
+          ctx.drawImage(probe, 0, 0, 24, 24);
+          const data = ctx.getImageData(0, 0, 24, 24).data;
+          const buckets = Array.from({ length: 12 }, () => ({ weight: 0, r: 0, g: 0, b: 0 }));
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+            if (a < 128) continue;
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const delta = max - min;
+            const lum = (max + min) / 510;
+            if (lum < 0.08 || lum > 0.94) continue;
+            const sat = max === 0 ? 0 : delta / max;
+            let hue = 0;
+            if (delta > 0) {
+              if (max === r) hue = ((g - b) / delta + (g < b ? 6 : 0)) * 60;
+              else if (max === g) hue = ((b - r) / delta + 2) * 60;
+              else hue = ((r - g) / delta + 4) * 60;
+            }
+            const idx = Math.floor(hue / 30) % 12;
+            const weight = 0.25 + sat * sat * 2.5;
+            buckets[idx].weight += weight;
+            buckets[idx].r += r * weight;
+            buckets[idx].g += g * weight;
+            buckets[idx].b += b * weight;
+          }
+          const ranked = buckets.map((bk, idx) => ({ ...bk, idx })).filter((bk) => bk.weight > 0).sort((a, b) => b.weight - a.weight);
+          if (ranked.length === 0) return;
+          const top = ranked[0];
+          const primary = boostNeonColor([Math.round(top.r / top.weight), Math.round(top.g / top.weight), Math.round(top.b / top.weight)]);
+          const distinct = ranked.find((bk) => Math.min(Math.abs(bk.idx - top.idx), 12 - Math.abs(bk.idx - top.idx)) >= 2) || ranked[1];
+          const secondary = distinct
+            ? boostNeonColor([Math.round(distinct.r / distinct.weight), Math.round(distinct.g / distinct.weight), Math.round(distinct.b / distinct.weight)])
+            : boostNeonColor([primary[2], primary[0], primary[1]]);
+          applyReactivePalette(primary, secondary);
+        } catch (_) {}
+      };
+      probe.src = imgSrc;
+    }
+
+    // =========================================================================
+    // 4. FIREBASE AUTHENTICATION GATE
+    // =========================================================================
+    let listenersAttached = false;
+
+    async function handleLogin() {
+      const email = $("adminEmail").value.trim();
+      const pass = $("adminPass").value;
+      const fb = $("authFeedback");
+      fb.classList.remove("is-error");
+
+      if (!email || !pass) {
+        fb.textContent = "Enter both admin email and password.";
+        fb.classList.add("is-error");
+        return;
+      }
+
+      fb.textContent = "Verifying credentials…";
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        fb.textContent = "";
+        $("adminPass").value = "";
+        showToast("Studio unlocked");
+      } catch (err) {
+        console.error("Admin sign-in error:", err);
+        fb.textContent = "Invalid email or password.";
+        fb.classList.add("is-error");
+      }
+    }
+
+    bindHapticKey($("btnAdminLogin"), handleLogin);
+    $("adminPass").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleLogin();
+      }
     });
+
+    bindHapticKey($("btnSignOut"), async () => {
+      stopPreviewAudio();
+      await signOut(auth);
+      showToast("Signed out");
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      const pill = $("authStatusPill");
+      if (user) {
+        pill.classList.remove("is-locked");
+        $("authStatusText").textContent = user.email || "Authenticated";
+        $("btnSignOut").classList.remove("is-hidden");
+        $("authGateCard").classList.add("is-hidden");
+        $("studioWorkspace").classList.remove("is-hidden");
+        attachStudioRealtimeListeners();
+      } else {
+        pill.classList.add("is-locked");
+        $("authStatusText").textContent = "Sign-in Required";
+        $("btnSignOut").classList.add("is-hidden");
+        $("studioWorkspace").classList.add("is-hidden");
+        $("authGateCard").classList.remove("is-hidden");
+      }
+    });
+
+    // =========================================================================
+    // 5. LIVE PREVIEW, AUTO-DURATION & EDITOR FORM
+    // =========================================================================
+    function updateLivePreview() {
+      const title = $("fTitle").value.trim() || "Song Title Preview";
+      const artist = $("fArtist").value.trim() || "Artist Name";
+      const album = $("fAlbum").value.trim();
+      const genre = $("fGenre").value.trim() || "Music";
+      const quality = $("fQuality").value || "HIGH-RES AUDIO";
+      const duration = $("fDuration").value.trim() || "00:00";
+      const coverUrl = $("fCoverUrl").value.trim();
+
+      $("previewTitle").textContent = title;
+      $("previewArtist").textContent = album ? `${artist} • ${album}` : artist;
+      $("previewQuality").textContent = quality;
+      $("previewGenre").textContent = genre;
+      $("previewDuration").textContent = duration;
+
+      const finalCover = coverUrl || buildVinylDiscSvg(title + artist);
+      $("previewCover").src = finalCover;
+      sampleAlbumCoverColors(coverUrl, title + artist);
+    }
+
+    ["fTitle", "fArtist", "fAlbum", "fGenre", "fQuality", "fDuration", "fCoverUrl"].forEach((id) => {
+      $(id).addEventListener("input", updateLivePreview);
+      $(id).addEventListener("change", updateLivePreview);
+    });
+
+    updateLivePreview();
+
+    function stopPreviewAudio() {
+      previewProbeAudio.pause();
+      isPreviewPlaying = false;
+      $("btnPreviewAudio").classList.remove("is-engaged");
+      $("btnPreviewAudio").textContent = "Preview";
+    }
+
+    function detectDurationFromAudioUrl(autoPlay = false) {
+      const url = $("fAudioUrl").value.trim();
+      if (!url) {
+        showToast("Enter a direct audio stream URL first.");
+        return;
+      }
+
+      if (autoPlay && isPreviewPlaying) {
+        stopPreviewAudio();
+        return;
+      }
+
+      showToast(autoPlay ? "Loading audio preview…" : "Reading track duration…");
+      previewProbeAudio.src = url;
+
+      const onMeta = () => {
+        if (Number.isFinite(previewProbeAudio.duration) && previewProbeAudio.duration > 0) {
+          const formatted = formatTime(previewProbeAudio.duration);
+          $("fDuration").value = formatted;
+          updateLivePreview();
+          showToast(`Detected duration: ${formatted}`);
+        }
+      };
+
+      previewProbeAudio.addEventListener("loadedmetadata", onMeta, { once: true });
+      previewProbeAudio.addEventListener("error", () => {
+        stopPreviewAudio();
+        showToast("Could not load audio stream URL.");
+      }, { once: true });
+
+      if (autoPlay) {
+        previewProbeAudio.play().then(() => {
+          isPreviewPlaying = true;
+          $("btnPreviewAudio").classList.add("is-engaged");
+          $("btnPreviewAudio").textContent = "Stop";
+        }).catch(() => {
+          stopPreviewAudio();
+          showToast("Browser blocked audio preview.");
+        });
+      } else {
+        previewProbeAudio.load();
+      }
+    }
+
+    bindHapticKey($("btnDetectDuration"), () => detectDurationFromAudioUrl(false));
+    bindHapticKey($("btnPreviewAudio"), () => detectDurationFromAudioUrl(true));
+
+    function setFeaturedToggleUI(val) {
+      formFeatured = Boolean(val);
+      $("btnToggleFeatured").classList.toggle("is-featured", formFeatured);
+      $("btnToggleFeatured").textContent = `★ Featured: ${formFeatured ? "ON" : "OFF"}`;
+    }
 
     bindHapticKey($("btnToggleFeatured"), () => {
-      isFeatured = !isFeatured;
-      $("btnToggleFeatured").textContent = `Featured: ${isFeatured ? "ON" : "OFF"}`;
-      $("btnToggleFeatured").classList.toggle("is-engaged", isFeatured);
+      setFeaturedToggleUI(!formFeatured);
     });
 
-    bindHapticKey($("btnResetForm"), resetForm);
+    function resetEditorForm() {
+      editingTrackId = null;
+      stopPreviewAudio();
+      $("editorHeading").textContent = "Publish New Song";
+      $("editorSubhint").textContent = "Syncs instantly to Play Mine";
+      $("btnSaveTrack").textContent = "Publish Song";
+      $("btnCancelEdit").classList.add("is-hidden");
 
-    bindHapticKey($("btnSaveTrack"), async () => {
-      const url = $("trackUrl").value.trim();
-      const title = $("trackTitle").value.trim();
-      const artist = $("trackArtist").value.trim();
+      $("fTitle").value = "";
+      $("fArtist").value = "";
+      $("fAlbum").value = "";
+      $("fGenre").value = "";
+      $("fQuality").value = "HIGH-RES AUDIO";
+      $("fDuration").value = "";
+      $("fAudioUrl").value = "";
+      $("fCoverUrl").value = "";
+      setFeaturedToggleUI(false);
+      updateLivePreview();
+      renderAdminTracks();
+    }
 
-      if (!url || !title || !artist) {
-        showToast("Audio URL, Song Title, and Artist are required.");
+    bindHapticKey($("btnCancelEdit"), resetEditorForm);
+
+    function loadTrackIntoEditor(track) {
+      editingTrackId = track.id;
+      stopPreviewAudio();
+      $("editorHeading").textContent = "Edit Song";
+      $("editorSubhint").textContent = `Editing: ${track.title || "Untitled"}`;
+      $("btnSaveTrack").textContent = "Save Changes";
+      $("btnCancelEdit").classList.remove("is-hidden");
+
+      $("fTitle").value = track.title || "";
+      $("fArtist").value = track.artist || "";
+      $("fAlbum").value = track.album || "";
+      $("fGenre").value = track.genre || "";
+      $("fQuality").value = track.quality || "HIGH-RES AUDIO";
+      $("fDuration").value = track.duration || "";
+      $("fAudioUrl").value = track.url || "";
+      $("fCoverUrl").value = track.coverUrl || "";
+      setFeaturedToggleUI(Boolean(track.featured));
+      updateLivePreview();
+      renderAdminTracks();
+
+      $("editorCard").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    async function handleSaveTrack() {
+      const fb = $("editorFeedback");
+      fb.classList.remove("is-error");
+
+      const title = $("fTitle").value.trim();
+      const artist = $("fArtist").value.trim();
+      const album = $("fAlbum").value.trim();
+      const genre = $("fGenre").value.trim() || "Music";
+      const quality = $("fQuality").value || "HIGH-RES AUDIO";
+      const duration = $("fDuration").value.trim() || "00:00";
+      const url = $("fAudioUrl").value.trim();
+      const coverUrl = $("fCoverUrl").value.trim();
+
+      if (!title || !artist || !url) {
+        fb.textContent = "Song Title, Artist, and Direct Audio URL are required.";
+        fb.classList.add("is-error");
         return;
       }
 
-      const editId = $("editTrackId").value.trim();
       const payload = {
-        url,
         title,
         artist,
-        album: $("trackAlbum").value.trim(),
-        genre: $("trackGenre").value.trim() || "Music",
-        quality: $("trackQuality").value,
-        duration: $("trackDuration").value.trim() || "03:30",
-        coverUrl: $("trackCover").value.trim(),
-        featured: isFeatured,
+        album,
+        genre,
+        quality,
+        duration,
+        url,
+        coverUrl,
+        featured: formFeatured,
         updatedAt: Date.now()
       };
 
       try {
-        if (editId) {
-          await update(ref(db, `play_mine/tracks/${editId}`), payload);
-          showToast(`Updated "${title}".`);
+        if (editingTrackId) {
+          await update(ref(db, `play_mine/tracks/${editingTrackId}`), payload);
+          showToast(`Updated "${title}"`);
+          fb.textContent = `Saved changes to "${title}".`;
         } else {
           payload.createdAt = Date.now();
-          await set(push(tracksRef), payload);
-          showToast(`Published "${title}" live.`);
+          const newRef = push(tracksRef);
+          await set(newRef, payload);
+          showToast(`Published "${title}"`);
+          fb.textContent = `Published "${title}" to Play Mine!`;
         }
-        resetForm();
+        resetEditorForm();
+        setTimeout(() => { fb.textContent = ""; }, 4000);
       } catch (err) {
-        console.error(err);
-        showToast("Save failed. Check database permissions.");
+        console.error("Save track error:", err);
+        fb.textContent = "Permission denied or network error while saving.";
+        fb.classList.add("is-error");
       }
-    });
+    }
 
-    function renderAdminList() {
-      const listEl = $("adminList");
-      const q = $("adminSearch").value.toLowerCase().trim();
-      const editingId = $("editTrackId").value;
+    bindHapticKey($("btnSaveTrack"), handleSaveTrack);
 
-      const filtered = tracksCache.filter((t) =>
-        !q ||
-        (t.title || "").toLowerCase().includes(q) ||
-        (t.artist || "").toLowerCase().includes(q) ||
-        (t.album || "").toLowerCase().includes(q)
-      );
+    // =========================================================================
+    // 6. REALTIME SYNC FOR TRACKS & LISTENER REQUESTS
+    // =========================================================================
+    function attachStudioRealtimeListeners() {
+      if (listenersAttached) return;
+      listenersAttached = true;
 
-      $("totalCount").textContent = tracksCache.length;
-      listEl.innerHTML = "";
+      onValue(tracksRef, (snapshot) => {
+        const val = snapshot.val();
+        if (val && typeof val === "object") {
+          allTracks = Object.entries(val)
+            .filter(([, item]) => item && typeof item === "object")
+            .map(([id, item]) => ({ ...item, id }))
+            .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.createdAt || 0) - (a.createdAt || 0));
+        } else {
+          allTracks = [];
+        }
+        renderAdminTracks();
+      }, (err) => console.error("Tracks listener error:", err));
 
-      if (filtered.length === 0) {
-        listEl.innerHTML = `
-          <div class="neu-well" style="padding:24px 16px;text-align:center;color:var(--text-dim);font-size:0.84rem;">
-            No tracks published yet. Add your first song on the left.
-          </div>
-        `;
+      onValue(requestsRef, (snapshot) => {
+        const val = snapshot.val();
+        if (val && typeof val === "object") {
+          allRequests = Object.entries(val)
+            .filter(([, item]) => item && typeof item === "object")
+            .map(([id, item]) => ({ ...item, id }))
+            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        } else {
+          allRequests = [];
+        }
+        renderRequests();
+      }, (err) => console.error("Requests listener error:", err));
+    }
+
+    function renderAdminTracks() {
+      const container = $("adminTrackScroll");
+      const q = adminSearchQuery.toLowerCase().trim();
+      const visible = allTracks.filter((t) => {
+        if (adminFilter === "featured" && !t.featured) return false;
+        if (!q) return true;
+        return (
+          (t.title || "").toLowerCase().includes(q) ||
+          (t.artist || "").toLowerCase().includes(q) ||
+          (t.album || "").toLowerCase().includes(q) ||
+          (t.genre || "").toLowerCase().includes(q)
+        );
+      });
+
+      $("trackCountPill").textContent = `${visible.length} ${visible.length === 1 ? "song" : "songs"}`;
+      container.innerHTML = "";
+
+      if (visible.length === 0) {
+        container.innerHTML = `<div class="empty-box neu-well">No matching tracks in library.</div>`;
         return;
       }
 
-      filtered.forEach((track) => {
+      visible.forEach((track) => {
         const plate = document.createElement("div");
-        plate.className = `track-plate${track.id === editingId ? " is-editing" : ""}`;
+        plate.className = `track-plate${editingTrackId === track.id ? " is-editing" : ""}`;
 
-        const cover = track.coverUrl && track.coverUrl.trim()
+        const coverSrc = track.coverUrl && track.coverUrl.trim()
           ? track.coverUrl.trim()
-          : buildCoverSvg((track.title || "") + (track.artist || ""));
+          : buildVinylDiscSvg((track.title || "") + (track.artist || ""));
+
+        const isConfirmingDelete = pendingDeleteTrackId === track.id;
 
         plate.innerHTML = `
-          <img src="${cover}" alt="" class="plate-art" />
+          <img class="plate-art" src="${coverSrc}" alt="" loading="lazy" />
           <div class="plate-meta">
-            <div class="plate-title">${escapeHtml(track.title)}${track.featured ? ' <span style="color:var(--accent-amber);font-size:0.76rem;">★ Featured</span>' : ""}</div>
-            <div class="plate-sub">${escapeHtml(track.artist)}${track.album ? " • " + escapeHtml(track.album) : ""} (${escapeHtml(track.duration || "--:--")})</div>
-            <div class="plate-url">${escapeHtml(track.url)}</div>
+            <div class="plate-title">${escapeHtml(track.title || "Untitled")}${track.featured ? ' <span style="color:var(--dyn-secondary);">★</span>' : ""}</div>
+            <div class="plate-sub">${escapeHtml(track.artist || "Unknown")}${track.duration ? " • " + escapeHtml(track.duration) : ""}</div>
           </div>
           <div class="plate-actions">
-            <div class="haptic-key mini-key" data-act="preview" role="button" tabindex="0">
-              ${previewingId === track.id ? "Stop" : "Test Play"}
+            <div class="haptic-key action-key ${track.featured ? "is-featured" : ""}" data-act="feature" role="button" tabindex="0" title="Toggle Featured">
+              <span>${track.featured ? "★ Featured" : "☆ Feature"}</span>
             </div>
-            <div class="haptic-key mini-key" data-act="edit" role="button" tabindex="0">
-              Edit
+            <div class="haptic-key action-key" data-act="share" role="button" tabindex="0" title="Copy short link">
+              <span>Link</span>
             </div>
-            <div class="haptic-key mini-key haptic-danger" data-act="delete" role="button" tabindex="0">
-              Delete
+            <div class="haptic-key action-key" data-act="edit" role="button" tabindex="0" title="Edit song">
+              <span>Edit</span>
+            </div>
+            <div class="haptic-key action-key ${isConfirmingDelete ? "is-confirm-delete" : "is-danger"}" data-act="delete" role="button" tabindex="0" title="Delete song">
+              <span>${isConfirmingDelete ? "Confirm?" : "Delete"}</span>
             </div>
           </div>
         `;
 
-        bindHapticKey(plate.querySelector('[data-act="preview"]'), () => {
-          if (previewingId === track.id) {
-            previewAudio.pause();
-            previewingId = null;
-            renderAdminList();
-          } else {
-            previewAudio.src = track.url;
-            previewAudio.play().catch(() => showToast("Unable to play URL."));
-            previewingId = track.id;
-            renderAdminList();
+        bindHapticKey(plate.querySelector('[data-act="feature"]'), async () => {
+          try {
+            await update(ref(db, `play_mine/tracks/${track.id}`), {
+              featured: !track.featured,
+              updatedAt: Date.now()
+            });
+            showToast(!track.featured ? `Featured "${track.title}"` : `Unfeatured "${track.title}"`);
+          } catch (_) {
+            showToast("Could not update featured status.");
+          }
+        });
+
+        const shareBtn = plate.querySelector('[data-act="share"]');
+        bindHapticKey(shareBtn, async () => {
+          try {
+            const code = await getOrCreateShortSongCode(track.id);
+            const url = `${getWebsiteOrigin()}/${encodeURIComponent(code)}`;
+            const ok = await copyTextToClipboard(url);
+            if (ok) {
+              shareBtn.classList.add("is-copied");
+              shareBtn.querySelector("span").textContent = "Copied";
+              showToast(`Copied: ${url}`);
+              setTimeout(() => {
+                shareBtn.classList.remove("is-copied");
+                shareBtn.querySelector("span").textContent = "Link";
+              }, 1800);
+            } else {
+              showToast(url);
+            }
+          } catch (_) {
+            showToast("Could not generate short link.");
           }
         });
 
@@ -929,104 +1701,119 @@
           loadTrackIntoEditor(track);
         });
 
-        const delBtn = plate.querySelector('[data-act="delete"]');
-        let armed = false;
-        bindHapticKey(delBtn, async () => {
-          if (!armed) {
-            armed = true;
-            delBtn.textContent = "Confirm?";
-            setTimeout(() => {
-              armed = false;
-              if (delBtn) delBtn.textContent = "Delete";
-            }, 3000);
+        bindHapticKey(plate.querySelector('[data-act="delete"]'), async () => {
+          if (pendingDeleteTrackId !== track.id) {
+            pendingDeleteTrackId = track.id;
+            renderAdminTracks();
+            clearTimeout(pendingDeleteTimer);
+            pendingDeleteTimer = setTimeout(() => {
+              pendingDeleteTrackId = null;
+              renderAdminTracks();
+            }, 3500);
             return;
           }
+
+          clearTimeout(pendingDeleteTimer);
+          pendingDeleteTrackId = null;
           try {
+            // Clean up any associated short link first
+            const linkSnap = await get(shortLinksByTrackRef(track.id));
+            if (linkSnap.exists()) {
+              const val = linkSnap.val();
+              const code = typeof val === "string" ? val : val?.code;
+              if (code) await remove(shortLinksByCodeRef(code)).catch(() => {});
+              await remove(shortLinksByTrackRef(track.id)).catch(() => {});
+            }
             await remove(ref(db, `play_mine/tracks/${track.id}`));
-            if ($("editTrackId").value === track.id) resetForm();
-            showToast(`Deleted "${track.title}".`);
-          } catch (_) {
-            showToast("Failed to delete track.");
+            if (editingTrackId === track.id) resetEditorForm();
+            showToast(`Deleted "${track.title}"`);
+          } catch (err) {
+            console.error("Delete track error:", err);
+            showToast("Could not delete song.");
           }
         });
 
-        listEl.appendChild(plate);
+        container.appendChild(plate);
       });
     }
 
-    function renderRequestsList() {
-      const box = $("requestsList");
-      $("reqCount").textContent = requestsCache.length;
-      box.innerHTML = "";
+    function renderRequests() {
+      const container = $("requestScroll");
+      $("requestCountPill").textContent = `${allRequests.length} ${allRequests.length === 1 ? "request" : "requests"}`;
+      container.innerHTML = "";
 
-      if (requestsCache.length === 0) {
-        box.innerHTML = `
-          <div class="neu-well" style="padding:20px 16px;text-align:center;color:var(--text-dim);font-size:0.84rem;">
-            No song requests from listeners yet.
-          </div>
-        `;
+      if (allRequests.length === 0) {
+        container.innerHTML = `<div class="empty-box neu-well">No pending listener song requests.</div>`;
         return;
       }
 
-      requestsCache.forEach((req) => {
-        const card = document.createElement("div");
-        card.className = "request-plate";
-        const when = req.createdAt ? new Date(req.createdAt).toLocaleString() : "";
+      allRequests.forEach((reqItem) => {
+        const plate = document.createElement("div");
+        plate.className = "request-plate";
 
-        card.innerHTML = `
-          <div>
-            <div class="req-msg">${escapeHtml(req.message || "")}</div>
-            <div class="req-meta">From: ${escapeHtml(req.email || "")}${when ? " • " + escapeHtml(when) : ""}</div>
+        const timeLabel = formatRelativeDate(reqItem.createdAt);
+
+        plate.innerHTML = `
+          <div class="req-info">
+            <div class="req-msg">${escapeHtml(reqItem.message || "")}</div>
+            <div class="req-sender">${escapeHtml(reqItem.email || "Anonymous")}${timeLabel ? " • " + escapeHtml(timeLabel) : ""}</div>
           </div>
-          <div class="haptic-key mini-key haptic-danger" data-del="1" role="button" tabindex="0">Remove</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+            <div class="haptic-key action-key" data-req="fill" role="button" tabindex="0" title="Pre-fill song title into editor">
+              <span>Fill Editor</span>
+            </div>
+            <div class="haptic-key action-key is-danger" data-req="dismiss" role="button" tabindex="0" title="Remove completed request">
+              <span>Done</span>
+            </div>
+          </div>
         `;
 
-        bindHapticKey(card.querySelector('[data-del="1"]'), async () => {
+        bindHapticKey(plate.querySelector('[data-req="fill"]'), () => {
+          resetEditorForm();
+          $("fTitle").value = reqItem.message || "";
+          updateLivePreview();
+          $("editorCard").scrollIntoView({ behavior: "smooth", block: "start" });
+          showToast("Copied request into editor");
+        });
+
+        bindHapticKey(plate.querySelector('[data-req="dismiss"]'), async () => {
           try {
-            await remove(ref(db, `play_mine/requests/${req.id}`));
-            showToast("Request removed.");
+            await remove(ref(db, `play_mine/requests/${reqItem.id}`));
+            showToast("Request cleared");
           } catch (_) {
             showToast("Could not remove request.");
           }
         });
 
-        box.appendChild(card);
+        container.appendChild(plate);
       });
     }
 
-    $("adminSearch").addEventListener("input", renderAdminList);
+    // Search & Filter Wiring
+    $("adminSearch").addEventListener("input", (e) => {
+      adminSearchQuery = e.target.value;
+      renderAdminTracks();
+    });
 
-    onValue(
-      tracksRef,
-      (snapshot) => {
-        $("connLed").style.background = "var(--accent-green)";
-        $("connLabel").textContent = "Connected";
-        const val = snapshot.val();
-        if (val && typeof val === "object") {
-          tracksCache = Object.entries(val)
-            .map(([id, item]) => ({ id, ...item }))
-            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-        } else {
-          tracksCache = [];
-        }
-        renderAdminList();
-      },
-      () => {
-        $("connLed").style.background = "var(--accent-rose)";
-        $("connLabel").textContent = "Offline";
-      }
-    );
+    document.querySelectorAll("#adminFilterBar .mini-key").forEach((pill) => {
+      bindHapticKey(pill, () => {
+        document.querySelectorAll("#adminFilterBar .mini-key").forEach((p) => p.classList.remove("is-engaged"));
+        pill.classList.add("is-engaged");
+        adminFilter = pill.dataset.filter;
+        renderAdminTracks();
+      });
+    });
 
-    onValue(requestsRef, (snapshot) => {
-      const val = snapshot.val();
-      if (val && typeof val === "object") {
-        requestsCache = Object.entries(val)
-          .map(([id, item]) => ({ id, ...item }))
-          .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-      } else {
-        requestsCache = [];
+    // Database URL Configuration
+    bindHapticKey($("btnSaveDbUrl"), () => {
+      const nextUrl = $("dbUrlInput").value.trim().replace(/\/+$/, "");
+      if (!nextUrl || !/^https:\/\/.+/i.test(nextUrl)) {
+        showToast("Enter a valid https:// Firebase RTDB URL.");
+        return;
       }
-      renderRequestsList();
+      localStorage.setItem("play_mine_rtdb_url", nextUrl);
+      showToast("Database URL saved — reloading…");
+      setTimeout(() => window.location.reload(), 650);
     });
   </script>
 </body>
